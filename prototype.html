@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日新闻简报 - 2026年8月20日</title>
+<style>
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555555;
+  --text-tertiary: #888888;
+  --accent: #c0392b;
+  --accent-light: #e74c3c;
+  --border: #e8e8e8;
+  --border-light: #f0f0f0;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --radius: 8px;
+  --max-w: 860px;
+  --gap: 24px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC",
+               "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== HEADER ===== */
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 40px 24px 32px;
+  text-align: center;
+}
+.site-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+}
+.site-header .date {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+.site-header .tagline {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+/* ===== MAIN ===== */
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===== SECTION TITLES ===== */
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 32px 0 16px;
+  border-bottom: 2px solid var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* ===== HEADLINE CARDS ===== */
+.headlines {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.headline-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, border-color 0.2s;
+  position: relative;
+}
+.headline-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: #d0d0d0;
+}
+.headline-card .rank {
+  position: absolute;
+  top: 20px;
+  left: -1px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 10px 4px 12px;
+  border-radius: 0 6px 6px 0;
+  line-height: 1.2;
+}
+.headline-card .content {
+  padding-left: 8px;
+}
+.headline-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.headline-card .summary {
+  font-size: 14.5px;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin-bottom: 12px;
+}
+.headline-card .meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  flex-wrap: wrap;
+}
+.headline-card .meta a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.headline-card .meta a:hover {
+  text-decoration: underline;
+}
+.headline-card .meta .dot {
+  width: 3px;
+  height: 3px;
+  background: var(--text-tertiary);
+  border-radius: 50%;
+}
+.headline-card .controversy {
+  background: #fff8e1;
+  border-left: 3px solid #f0ad4e;
+  padding: 8px 12px;
+  margin-top: 10px;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  color: #8a6d3b;
+  line-height: 1.6;
+}
+
+/* ===== ORDINARY NEWS ===== */
+.ordinary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.ordinary-item {
+  background: var(--surface);
+  padding: 16px 20px;
+  transition: background 0.15s;
+}
+.ordinary-item:hover {
+  background: #f9f9f8;
+}
+.ordinary-item h4 {
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.ordinary-item .summary {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ordinary-item .meta {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.ordinary-item .meta a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.ordinary-item .meta a:hover {
+  text-decoration: underline;
+}
+
+/* ===== FOOTER ===== */
+.site-footer {
+  text-align: center;
+  padding: 40px 24px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 700px) {
+  .site-header { padding: 28px 16px 24px; }
+  .site-header h1 { font-size: 22px; }
+  .container { padding: 0 16px; }
+  .headline-card { padding: 18px 16px 18px 20px; }
+  .headline-card h3 { font-size: 16px; }
+  .ordinary-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== DARK MODE (auto) ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a1a;
+    --surface: #242424;
+    --text-primary: #e8e8e8;
+    --text-secondary: #aaaaaa;
+    --text-tertiary: #777777;
+    --accent: #e74c3c;
+    --accent-light: #ff6b5a;
+    --border: #333333;
+    --border-light: #2a2a2a;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .headline-card .controversy {
+    background: #2a2518;
+    border-left-color: #c9922a;
+    color: #d4b87a;
+  }
+  .ordinary-item:hover { background: #2a2a2a; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>每日新闻简报</h1>
+  <div class="date">2026年8月20日 · 星期三</div>
+  <div class="tagline">今日重要新闻，一页掌握。</div>
+</header>
+
+<main class="container">
+
+  <!-- ===== 今日头条 ===== -->
+  <div class="section-title">
+    今日头条 <span class="badge">10</span>
+  </div>
+  <div class="headlines" id="headlines"></div>
+
+  <!-- ===== 其他重要新闻 ===== -->
+  <div class="section-title" style="margin-top: 40px;">
+    其他重要新闻 <span class="badge">40</span>
+  </div>
+  <div class="ordinary-grid" id="ordinary"></div>
+
+</main>
+
+<footer class="site-footer">
+  每日新闻简报 · 由私人新闻简报工具生成
+</footer>
+
+<script>
+// ============================================================
+// 虚拟新闻数据（后续将由真实数据替换）
+// ============================================================
+
+const headlines = [
+  {
+    title: "印度尼西亚发生7.7级强烈地震，已致47人死亡",
+    summary: "印度尼西亚弗洛雷斯岛附近海域发生7.7级强烈地震，已确认至少47人死亡，数百人受伤。这是该地区数十年来最强的地震，多处建筑倒塌，海啸预警已发布。",
+    source: "纽约时报",
+    url: "https://www.nytimes.com/2026/08/15/world/asia/earthquake-indonesia-flores-tsunami.html",
+    time: "6小时前",
+    controversy: null
+  },
+  {
+    title: "美伊谈判最后期限已过，双方未能达成全面协议",
+    summary: "美国与伊朗未能在约定的最后期限前就结束战争及限制伊朗核计划达成广泛协议。双方在核限制、停火条件和制裁解除等核心议题上分歧依然巨大。",
+    source: "纽约时报",
+    url: "https://www.nytimes.com/2026/08/17/world/middleeast/iran-mou-deadline.html",
+    time: "8小时前",
+    controversy: null
+  },
+  {
+    title: "特朗普威胁轰炸阿曼：若其在美伊谈判中\u201c挡路\u201d",
+    summary: "美国总统特朗普公开威胁称，如果阿曼在美伊谈判中妨碍进程，将对其实施军事打击。此言论发生在海湾国家试图调解霍尔木兹海峡紧张局势之际。",
+    source: "金融时报",
+    url: "https://www.ft.com/content/d4d07198-498d-48d1-9e54-85f1febcd070?syn-25a6b1a6=1",
+    time: "5小时前",
+    controversy: "特朗普对主权国家发出军事威胁，批评者认为这破坏了外交调解空间，可能使地区局势进一步恶化。"
+  },
+  {
+    title: "英伟达宣布支持俄亥俄州超级数据中心，投资或达1050亿美元",
+    summary: "英伟达宣布将支持在俄亥俄州建设全球最大的数据中心之一，总投资可能高达5000亿美元，该项目将由OpenAI租赁运营。这是AI基础设施领域有史以来最大规模的单笔投资。",
+    source: "纽约时报科技版",
+    url: "https://www.nytimes.com/2026/08/17/technology/nvidia-ohio-data-center-openai.html",
+    time: "4小时前",
+    controversy: null
+  },
+  {
+    title: "Meta发布最强AI模型开源版本，引发安全与开放辩论",
+    summary: "Meta发布了其最强大的AI模型Muse Glimmer的开源版本，可自由下载和修改。此举加剧了AI界关于开源与闭源、安全与创新之间的核心辩论。",
+    source: "纽约时报科技版",
+    url: "https://www.nytimes.com/2026/08/10/technology/meta-ai-open-source.html",
+    time: "3小时前",
+    controversy: "开源AI模型的发布直接涉及AI安全与开放获取之间的核心辩论，不同利益方对此存在根本性分歧。"
+  },
+  {
+    title: "特朗普下令五角大楼削减与韩国的联合军事演习",
+    summary: "特朗普总统下令五角大楼大幅缩减与韩国的联合军事演习规模，同时在社交媒体上批评韩国未协助推动伊朗无核化，并公开赞扬朝鲜及其领导人。",
+    source: "纽约时报",
+    url: "https://www.nytimes.com/2026/08/16/us/politics/trump-south-korea-military-exercises.html",
+    time: "7小时前",
+    controversy: null
+  },
+  {
+    title: "伊朗最高领袖任命强硬派要职，表明国家将保持战争状态",
+    summary: "伊朗最高领袖哈梅内伊任命多名强硬派忠诚者担任军政要职，释放明确信号：伊朗将继续保持战争准备状态，并可能对国内异见进行更严厉的压制。",
+    source: "纽约时报",
+    url: "https://www.nytimes.com/2026/08/17/world/middleeast/iran-khamenei-military-leaders-war.html",
+    time: "9小时前",
+    controversy: null
+  },
+  {
+    title: "美国30年期国债收益率飙升至2007年以来最高水平",
+    summary: "受通胀预期升温、美联储政策不确定性以及全球贸易摩擦加剧影响，美国30年期国债收益率大幅上涨，触及2007年以来的最高水平，引发全球金融市场震动。",
+    source: "彭博社",
+    url: "https://www.bloomberg.com/news/articles/2026-08-17/us-bond-selloff-drives-30-year-yields-to-the-highest-since-2007",
+    time: "2小时前",
+    controversy: null
+  },
+  {
+    title: "中国推动数据出海，希望其数据影响全球AI模型",
+    summary: "中国正积极推动本国数据出口，希望中国数据能够训练和影响全球的AI聊天机器人模型。此举引发西方国家对中国数据渗透和信息操控的担忧。",
+    source: "纽约时报",
+    url: "https://www.nytimes.com/2026/08/17/world/asia/china-ai-data-chatbots.html",
+    time: "10小时前",
+    controversy: null
+  },
+  {
+    title: "社交媒体虚假信息引发西班牙与摩洛哥之间难民危机",
+    summary: "社交媒体上关于西班牙边境开放的虚假信息导致大量移民涌入西班牙飞地休达，造成约90人死亡。事件凸显了社交媒体对现实世界的严重影响。",
+    source: "纽约时报科技版",
+    url: "https://www.nytimes.com/2026/08/11/technology/social-media-ceuta-spain-morocco.html",
+    time: "12小时前",
+    controversy: null
+  }
+];
+
+const ordinary = [
+  { title: "赞比亚因暴力和欺诈指控暂停总统选举计票", summary: "赞比亚选举委员会因投票站工作人员遭袭且选票被盗，宣布暂停总统选举计票工作，引发对该国民主进程稳定性的担忧。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/14/world/africa/zambia-election-vote-count-suspended-president.html", time: "11小时前" },
+  { title: "AI驱动的芯片短缺引发华盛顿新一轮游说潮", summary: "AI数据中心大量消耗内存芯片，导致苹果、医疗设备制造商等其他行业向美国政府寻求干预，以平衡芯片供应链分配。", source: "纽约时报科技版", url: "https://www.nytimes.com/2026/08/10/technology/memory-chip-shortage-ai.html", time: "6小时前" },
+  { title: "中国在亚洲扩张影响力，特朗普重心偏向伊朗", summary: "随着中国在亚太地区推动基础设施和外交扩张，美国将战略重心放在中东伊朗问题上，引发亚洲盟友对美国安全承诺的担忧。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/15/us/politics/china-expansion-asia-trump-iran.html", time: "8小时前" },
+  { title: "以色列在黎巴嫩发动空袭，造成11人死亡", summary: "以色列军方对黎巴嫩南部发动空袭，造成至少11人死亡，黎巴嫩卫生部确认多名平民伤亡，地区紧张局势进一步升级。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/15/world/middleeast/israel-strikes-lebanon-ansar.html", time: "4小时前" },
+  { title: "库什纳访问以色列，试图推进特朗普加沙和平计划", summary: "美国总统特使库什纳抵达以色列，与内塔尼亚胡会面，试图打破加沙停火谈判的僵局，但哈马斯对美方方案持保留态度。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/16/world/middleeast/kushner-hamas-talks.html", time: "5小时前" },
+  { title: "乌克兰利用卫星技术驱动战争无人机", summary: "乌克兰军方越来越多地使用商业卫星数据来引导和校准远程攻击无人机，显著提升了打击精度和作战效率。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/17/world/europe/from-the-sky-to-the-battlefield.html", time: "7小时前" },
+  { title: " heatwaves持续侵袭欧洲，多国发布高温预警", summary: "欧洲多国再次遭遇极端高温天气，西班牙、意大利和法国部分地区气温突破40摄氏度，热浪导致的死亡人数持续攀升。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/14/world/europe/europe-heat-wave-photos.html", time: "3小时前" },
+  { title: "OpenAI高管Brad Lightcap宣布离职", summary: "OpenAI首席运营官Brad Lightcap宣布将从公司离职，这是该公司今年以来第二位高层管理人员变动，引发外界对OpenAI内部治理的关注。", source: "纽约时报科技版", url: "https://www.nytimes.com/2026/08/11/technology/brad-lightcap-openai.html", time: "9小时前" },
+  { title: "Waymo自动驾驶汽车增长加速，但\u201c边缘案例\u201d问题凸显", summary: "谷歌旗下Waymo自动驾驶出租车服务用户增长迅速，但复杂的交通场景和极端天气条件下的安全问题仍待解决。", source: "纽约时报科技版", url: "https://www.nytimes.com/2026/08/10/technology/waymo-expansion-edge-cases.html", time: "10小时前" },
+  { title: "Spotify将标记AI生成艺术家并限制其推广", summary: "音乐流媒体平台Spotify宣布将对AI生成的音乐内容进行标记，并降低其在推荐算法中的权重，以保护人类音乐创作者的权益。", source: "纽约时报科技版", url: "https://www.nytimes.com/2026/08/11/arts/music/spotify-artificial-intelligence-music.html", time: "11小时前" },
+  { title: "塔利班庆祝执政五周年，阿富汗女性权利仍遭严重压制", summary: "塔利班在喀布尔举行大规模集会庆祝重新掌权五周年，但阿富汗女性在教育、就业和公共生活方面的权利仍受到系统性剥夺。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/15/world/asia/entrenched-embattled-and-defiant-the-taliban-celebrate-5-years-in-power.html", time: "12小时前" },
+  { title: "法国最高法院裁定禁止未成年人使用社交媒体违宪", summary: "法国宪法委员会裁定，政府拟议的禁止16岁以下未成年人使用社交媒体的法案违反宪法，理由是该措施对言论自由的限制过于宽泛。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/14/world/europe/france-court-strikes-down-ban-social-media-children.html", time: "6小时前" },
+  { title: "柬埔寨红色高棉酷刑幸存者 Bou Meng 去世", summary: "Bou Meng，S-21集中营少数幸存者之一，于金边去世，享年80岁。他的证词为记录红色高棉暴行提供了珍贵的历史见证。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/15/world/asia/bou-meng-dead.html", time: "14小时前" },
+  { title: "比利时发现价值1000万美元的埋藏黄金", summary: "建筑工人在比利时一座前啤酒厂地下发现了一批埋藏的金条，总价值约1000万美元，推测可能与二战时期的财产转移有关。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/15/world/europe/gold-bars-coins-belgium.html", time: "15小时前" },
+  { title: "美国驻多伦多领事馆枪击案暴露当地雇佣枪手网络", summary: "多伦多美国领事馆附近发生枪击事件，调查揭露了一个利用年轻人作为雇佣枪手的犯罪网络，这些年轻人如同地下经济中的零工。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/16/world/canada/us-consulate-synagogue-shooting-toronto-canada.html", time: "8小时前" },
+  { title: "缅甸最大城市霍乱疫情已感染超过90人", summary: "缅甸仰光爆发霍乱疫情，已确认超过90人感染。当地医疗系统在内战中遭受严重破坏，公共卫生基础设施几近瘫痪。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/16/world/asia/cholera-outbreak-yangon-myanmar.html", time: "13小时前" },
+  { title: "印度女性参与抗议后遭遇大规模网络暴力", summary: "印度多地女性在参与社会抗议活动后，遭受有组织的在线骚扰和网络暴力，凸显该国数字空间中的性别安全问题。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/16/world/asia/india-women-protests-online-abuse.html", time: "16小时前" },
+  { title: "意大利乡村牧师短缺，非洲牧师填补空白引发文化讨论", summary: "随着意大利本土天主教神职人员持续减少，越来越多的非洲裔牧师来到意大利乡村服务，引发了关于文化融合和宗教传统的讨论。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/16/world/europe/italy-priest-shortage.html", time: "17小时前" },
+  { title: "AI芯片短缺导致医疗设备行业面临供应危机", summary: "由于AI数据中心大量采购高端芯片，医疗影像设备和诊断仪器制造商面临严重的芯片供应短缺，可能影响全球医疗服务。", source: "纽约时报科技版", url: "https://www.nytimes.com/2026/08/10/technology/memory-chip-shortage-ai.html", time: "5小时前" },
+  { title: "特朗普向朝鲜示好引发韩国盟友不安", summary: "特朗普政府近期对朝鲜释放友好信号，同时削减对韩国的安全承诺，引发韩国和日本对美国亚太同盟体系稳定性的担忧。", source: "纽约时报", url: "https://www.nytimes.com/2026/08/17/world/asia/trump-korea-military-kim-jong-un.html", time: "7小时前" },
+  { title: "私人信贷市场承压，不良贷款规模膨胀", summary: "全球私人信贷市场面临压力，随着利率持续高企，不良贷款规模不断扩大，投资者对高收益信贷产品的风险重新评估。", source: "彭博社", url: "https://www.ft.com/content/67acde0d-4154-4332-b33b-2d03d3a86007?syn-25a6b1a6=1", time: "4小时前" },
+  { title: "切尔西股东Walter和Boehly讨论出售股份", summary: "英超切尔西足球俱乐部的两位主要股东正在就出售各自持有的股份进行谈判，此举可能改变俱乐部的所有权结构和未来发展方向。", source: "彭博社", url: "https://www.ft.com/content/71a498fa-4ce7-4c0b-ab14-7b7f46b2b9c6?syn-25a6b1a6=1", time: "6小时前" },
+  { title: "中东地缘政治格局正在经历深刻重组", summary: "分析人士指出，伊朗核危机、以色列-哈马斯冲突和海湾国家外交转型正在共同推动中东地区地缘政治格局的深刻重组。", source: "经济学人", url: "https://www.ft.com/content/895ca028-33c7-4295-bf8c-13a3121b80ac?syn-25a6b1a6=1", time: "10小时前" },
+  { title: "有史以来最大交易亏损排行榜揭晓", summary: "金融研究机构发布了一份有史以来最大单笔交易亏损排行榜，涉及多位知名投资者和机构，揭示了高杠杆交易的极端风险。", source: "彭博社", url: "https://www.ft.com/content/340bf9e7-0e67-4d19-b671-3dc8186efb99", time: "8小时前" },
+  { title: "加拿大总理卡尼紧急避免特朗普新一轮关税", summary: "加拿大总理卡尼与美方进行最后时刻的谈判，试图避免特朗普政府对加拿大商品加征新一轮关税，谈判焦点集中在乳制品和能源领域。", source: "彭博社", url: "https://www.ft.com/content/e15d3b98-47d0-4a26-9dae-f3147815981e?syn-25a6b1a6=1", time: "3小时前" },
+  { title: "美国经济学家警告科技股可能面临修正", summary: "欧洲央行经济学家发布报告警告，美国科技股估值过高，叠加贸易摩擦和利率不确定性，市场可能面临显著回调。", source: "彭博社", url: "https://www.ft.com/content/cb4b22ab-4183-4d19-be60-6d2fab86d86d?syn-25a6b1a6=1", time: "5小时前" },
+  { title: "美国暂停在国家公园内修建边境墙", summary: "美国政府宣布暂停在亚利桑那州一处国家公园内修建边境墙的工程，此举遭到环保组织和当地居民的欢迎，但引发边境安全支持者的批评。", source: "彭博社", url: "https://www.ft.com/content/6aafe865-0bd0-4b18-bf9e-5073fcd91c35?syn-25a6b1a6=1", time: "7小时前" },
+  { title: "亚洲股市下跌，油价因中东局势持续走高", summary: "受中东地缘政治紧张局势影响，亚洲主要股指普遍下跌，国际油价连续第三个交易日上涨，布伦特原油突破每桶85美元。", source: "彭博社", url: "https://www.bloomberg.com/news/articles/2026-08-17/us-futures-flat-tech-shares-gain-on-anthropic-revenue-jump", time: "2小时前" },
+  { title: "台風13号影响持续，日本气象厅发布长期预警", summary: "日本气象厅发布警告称，第13号台风带来的强降雨和洪水影响将持续较长时间，呼吁民众保持高度警戒。同时，第13号台风的路径仍存在不确定性。", source: "NHK", url: "http://www3.nhk.or.jp/news/html/20260808/k10015199841000.html", time: "1小时前" },
+  { title: "日本北部和东部9日将出现极不稳定天气", summary: "日本气象厅预测，受大气不稳定状态影响，日本北部和东部地区9日将出现强降雨、雷暴和冰雹等极端天气，建议居民减少外出。", source: "NHK", url: "http://www3.nhk.or.jp/news/html/20260808/k10015200211000.html", time: "3小时前" },
+  { title: "爱知县连续发生水难事故，已致2人死亡", summary: "日本爱知县近日连续发生多起水上安全事故，已造成2人死亡。夏季水上活动增多，相关部门呼吁加强安全意识。", source: "NHK", url: "http://www3.nhk.or.jp/news/html/20260808/k10015200261000.html", time: "5小时前" },
+  { title: "熊本地震10周年：专家分析与前次地震的关联", summary: "地震专家分析指出，10年前的熊本地震可能与相邻板块区域的活动存在关联，研究结果对地震预测和防灾减灾具有重要参考价值。", source: "NHK", url: "http://www3.nhk.or.jp/news/html/20260808/k10015200121000.html", time: "8小时前" },
+  { title: "橄榄球联赛一名斐济籍球员疑似因热射病死亡", summary: "日本橄榄球联赛One的一名斐济籍球员在训练后因疑似热射病被紧急送医，最终不幸去世，引发对运动员高温训练安全的关注。", source: "NHK", url: "http://www3.nhk.or.jp/news/html/20260808/k10015200291000.html", time: "6小时前" },
+  { title: "韩国足协被曝向外籍裁判提供不当接待", summary: "韩国媒体报道，韩国足球协会涉嫌向外籍裁判提供不当接待，以影响比赛判罚，韩国足协已宣布对此事展开内部调查。", source: "NHK", url: "http://www3.nhk.or.jp/news/html/20260808/k10015200271000.html", time: "10小时前" },
+  { title: "铃木一朗参加水手OB全垒打大赛，引爆球迷热情", summary: "前西雅图水手队球星铃木一朗参加了球队老将全垒打大赛，与球迷热情互动，展现了其持久的运动魅力和对棒球的热爱。", source: "NHK", url: "http://www3.nhk.or.jp/news/html/20260808/k10015200331000.html", time: "12小时前" },
+  { title: "高盛宣布以23亿美元收购ETF供应商Neos", summary: "高盛集团宣布将以23亿美元收购ETF供应商Neos，此举将增强高盛在被动投资和交易所产品领域的市场竞争力。", source: "彭博社", url: "https://www.bloomberg.com/news/videos/2026-08-17/goldman-sachs-to-acquire-etf-provider-neos-in-2-3b-deal-video", time: "4小时前" },
+  { title: "Saylor旗下Strategy再次出售股票以回购优先股", summary: "比特币大户Michael Saylor的Strategy公司宣布出售更多公司股票，所得资金用于回购此前发行的优先股，以优化公司资本结构。", source: "彭博社", url: "https://www.bloomberg.com/news/articles/2026-08-17/saylor-s-strategy-sells-more-stock-to-repurchase-preferred", time: "5小时前" },
+  { title: "伯克希尔追踪ETF 'OMAH' 表现跑赢巴菲特公司", summary: "追踪伯克希尔·哈撒韦的ETF 'OMAH' 近期表现优于伯克希尔公司本身，引发投资者对被动投资工具与主动管理之间关系的讨论。", source: "彭博社", url: "https://www.bloomberg.com/news/videos/2026-08-17/berkshire-tracking-etf-omah-outperforms-company-video", time: "6小时前" },
+  { title: "随着油价和国债收益率上升，美国股市下跌", summary: "受油价上涨和国债收益率攀升的双重压力，美国股市主要指数集体下跌，科技股和能源股走势分化明显。", source: "彭博社", url: "https://www.bloomberg.com/news/videos/2026-08-17/stocks-slip-as-oil-treasury-yields-rise-closing-bell-video", time: "1小时前" },
+  { title: "美元指数持续走弱，交易员缩减美联储紧缩预期", summary: "美元指数连续多个交易日下跌，市场交易员大幅缩减了对美联储进一步加息的预期，全球风险资产情绪有所改善。", source: "彭博社", url: "https://www.bloomberg.com/news/articles/2026-08-17/dollar-extends-slide-as-traders-scale-back-fed-tightening-bets", time: "3小时前" }
+];
+
+// ============================================================
+// 渲染函数
+// ============================================================
+
+function renderHeadlines(data) {
+  const container = document.getElementById('headlines');
+  data.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'headline-card';
+    let controversyHTML = '';
+    if (item.controversy) {
+      controversyHTML = `<div class="controversy">⚠️ 争议：${item.controversy}</div>`;
+    }
+    card.innerHTML = `
+      <div class="rank">${i + 1}</div>
+      <div class="content">
+        <h3>${item.title}</h3>
+        <div class="summary">${item.summary}</div>
+        <div class="meta">
+          <a href="${item.url}" target="_blank" rel="noopener">${item.source}</a>
+          <span class="dot"></span>
+          <span>${item.time}</span>
+        </div>
+        ${controversyHTML}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderOrdinary(data) {
+  const container = document.getElementById('ordinary');
+  data.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'ordinary-item';
+    el.innerHTML = `
+      <h4>${item.title}</h4>
+      <div class="summary">${item.summary}</div>
+      <div class="meta">
+        <a href="${item.url}" target="_blank" rel="noopener">${item.source}</a>
+        · ${item.time}
+      </div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+// 初始化
+renderHeadlines(headlines);
+renderOrdinary(ordinary);
+</script>
+</body>
+</html>

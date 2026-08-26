@@ -1,0 +1,143 @@
+# 简报格式配置
+#
+# 控制最终简报的结构、条数和语言偏好。
+
+# 分区设置
+# 每个分区的名称和最大条数
+sections:
+  - name: "🔴 今天必须知道"
+    max_items: 3
+    description: "当天最重要的新闻，无论是否匹配用户兴趣"
+
+  - name: "🟠 你大概率会感兴趣"
+    max_items: 5
+    description: "根据用户长期兴趣筛选的新闻"
+
+  - name: "🟡 你正在关注"
+    max_items: 3
+    description: "用户近期持续关注的事件进展"
+
+  - name: "🔵 其他重要新闻"
+    max_items: 3
+    description: "高重要性但不在用户兴趣范围内的新闻，避免信息茧房"
+
+# 语言设置
+language:
+  # 默认输出语言
+  default: zh
+  # 英文来源的专业术语是否保留英文原文
+  # 例如："Large Language Model（大语言模型）"
+  preserve_english_terms: true
+  # 术语对照表（可选）
+  # 如果 LLM 翻译不准确，可以在这里手动指定
+  term_overrides: {}
+  #   "GPT": "GPT"
+  #   "LLM": "LLM（大语言模型）"
+
+# 简报输出
+output:
+  # 输出目录（相对于项目根目录）
+  dir: output
+  # 文件名格式（支持 YYYY-MM-DD 占位符）
+  filename: "newsletter_YYYY-MM-DD.md"
+
+# 请求设置
+fetch:
+  # 每个 RSS 源的请求超时（秒）
+  timeout: 15
+  # 并发抓取数量
+  max_concurrent: 5
+  # SSL 验证（代理环境下建议 False）
+  ssl_verify: false
+  # 代理地址（可选，留空则使用系统环境变量 HTTP_PROXY/HTTPS_PROXY）
+  proxy: "http://127.0.0.1:7897"
+
+# 去重/分组设置
+dedup:
+  # 高度相似阈值：≥ 此值视为同一事件（精确匹配组）
+  high_threshold: 0.8
+  # 相似阈值下限：≥ 此值且 < high_threshold 视为相关报道（相关报道组）
+  low_threshold: 0.35
+  # 注意：原有 dedup_threshold 保留用于向后兼容
+  threshold: 0.6
+
+# 头版筛选设置
+selection:
+  # 最终 Headline 数量
+  headline_count: 10
+  # LLM 返回的候选数量（候选池大小）
+  candidate_count: 60
+
+# 新闻重要性权重系统
+# 详见 docs/NEWS_PRIORITY_RULES.md
+weights:
+  # 全局事件类别权重（子类权重叠加到父类）
+  topics:
+    geopolitical:
+      weight: 10
+      children:
+        war: { weight: 5 }
+        nuclear: { weight: 2 }
+        sanctions: { weight: 3 }
+        diplomacy: { weight: 3 }
+    economic:
+      weight: 8
+      children:
+        trade_war: { weight: 5 }
+        market_crash: { weight: 4 }
+        policy_change: { weight: 3 }
+    technology:
+      weight: 6
+      children:
+        ai: { weight: 4 }
+        semiconductor: { weight: 3 }
+        regulation: { weight: 2 }
+    security:
+      weight: 7
+      children:
+        terrorism: { weight: 4 }
+        cyber: { weight: 3 }
+    climate:
+      weight: 5
+      children:
+        extreme_weather: { weight: 3 }
+        policy: { weight: 2 }
+    health:
+      weight: 5
+      children:
+        pandemic: { weight: 4 }
+        outbreak: { weight: 3 }
+
+  # 新闻来源权重（反映来源可靠性和权威性）
+  sources:
+    reuters: 5
+    associated_press: 5
+    afp: 5
+    bbc: 4
+    the_guardian: 4
+    financial_times: 4
+    the_economist: 4
+    new_york_times: 4
+    washington_post: 4
+    wall_street_journal: 4
+    bloomberg: 4
+    cnbc: 3
+    nhk_world: 3
+    dw: 3
+    al_jazeera: 3
+    nyt_chinese: 3
+    xinhua: 2
+    zaobao: 2
+    nikkei: 3
+
+  # 用户兴趣权重（反映用户长期关注的主题）
+  interests:
+    ai: 5
+    semiconductor: 4
+    robotics: 3
+    energy: 3
+    space: 4
+    geopolitics: 3
+    trade: 3
+    climate: 2
+    health: 2

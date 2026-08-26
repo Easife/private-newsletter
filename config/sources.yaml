@@ -1,0 +1,121 @@
+# 新闻来源配置
+#
+# 每个来源包含：
+#   name: 来源名称（用于显示）
+#   rss_url: RSS 订阅地址
+#   weight: 权重 0-1，影响排序（来源越可靠，权重越高）
+#   language: 该来源的主要语言 (en/zh/ja)
+#   tags: 分类标签，用于主题匹配
+#
+# 你可以随时增删来源，无需修改程序代码。
+
+sources:
+  # === 国际通讯社 ===
+  - name: Reuters
+    rss_url: https://feeds.reuters.com/reuters/topNews
+    weight: 0.9
+    language: en
+    tags: [international, politics, business, tech]
+
+  - name: Associated Press
+    rss_url: https://rsshub.app/apnews/topics/apf-topnews
+    weight: 0.9
+    language: en
+    tags: [international, politics, breaking-news]
+
+  # === 英国媒体 ===
+  - name: BBC
+    rss_url: https://feeds.bbci.co.uk/news/rss.xml
+    weight: 0.85
+    language: en
+    tags: [international, politics, business, tech]
+
+  - name: BBC World
+    rss_url: https://feeds.bbci.co.uk/news/world/rss.xml
+    weight: 0.85
+    language: en
+    tags: [international, geopolitics]
+
+  - name: The Guardian
+    rss_url: https://www.theguardian.com/world/rss
+    weight: 0.8
+    language: en
+    tags: [international, politics, world]
+
+  # === 美国主流媒体 ===
+  - name: New York Times
+    rss_url: https://rss.nytimes.com/services/xml/rss/nyt/World.xml
+    weight: 0.8
+    language: en
+    tags: [international, politics, business]
+
+  - name: NYT Technology
+    rss_url: https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml
+    weight: 0.75
+    language: en
+    tags: [tech, ai, science]
+
+  - name: NYT Chinese
+    rss_url: https://cn.nytimes.com/rss/
+    weight: 0.8
+    language: zh
+    tags: [china, international]
+
+  # === 财经媒体 ===
+  - name: Financial Times
+    rss_url: https://www.ft.com/rss/home
+    weight: 0.85
+    language: en
+    tags: [business, finance, geopolitics, china]
+
+  - name: Bloomberg
+    rss_url: https://feeds.bloomberg.com/markets/news.rss
+    weight: 0.85
+    language: en
+    tags: [business, finance, markets, tech]
+
+  # === 科技媒体 ===
+  - name: The Economist
+    rss_url: https://www.economist.com/rss
+    weight: 0.8
+    language: en
+    tags: [politics, business, tech, international]
+
+  # === 德国/中东媒体 ===
+  - name: DW
+    rss_url: https://rss.dw.com/rdf/rss-en-all
+    weight: 0.7
+    language: en
+    tags: [international, politics, germany]
+
+  - name: Al Jazeera
+    rss_url: https://www.aljazeera.com/xml/rss/all.xml
+    weight: 0.7
+    language: en
+    tags: [international, middle-east, politics]
+
+  # === 日本媒体 ===
+  - name: NHK World
+    rss_url: https://www3.nhk.or.jp/rss/news/cat0.xml
+    weight: 0.7
+    language: ja
+    tags: [japan, international]
+
+  - name: 日经
+    rss_url: https://www.nikkei.com/rss/
+    weight: 0.7
+    language: ja
+    tags: [japan, business, tech, china]
+
+  # === 中文来源 ===
+  - name: 新华社
+    rss_url: http://www.xinhuanet.com/politics/xhll.xml
+    weight: 0.7
+    language: zh
+    tags: [china, politics, policy]
+
+  - name: 联合早报
+    rss_url: https://www.zaobao.com/rss/realtime/china
+    weight: 0.65
+    language: zh
+    tags: [china, international, southeast-asia]

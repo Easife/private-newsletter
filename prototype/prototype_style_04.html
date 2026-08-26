@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案4：自然未来主义</title>
+<style>
+:root {
+  --bg: #f0f5f1;
+  --surface: rgba(255,255,255,0.88);
+  --surface-solid: #ffffff;
+  --text: #1a2e1a;
+  --text-secondary: #4a6a4a;
+  --text-tertiary: #8aaa8a;
+  --accent: #2d7a5f;
+  --accent-light: #3d9e78;
+  --accent-soft: #e6f5ed;
+  --warm: #c4956a;
+  --warm-soft: #faf3eb;
+  --border: rgba(45,122,95,0.1);
+  --shadow-sm: 0 1px 3px rgba(30,80,50,0.05);
+  --shadow: 0 2px 8px rgba(30,80,50,0.06);
+  --shadow-hover: 0 8px 28px rgba(30,80,50,0.1);
+  --radius: 14px;
+  --max-w: 860px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+               "Noto Sans SC", "PingFang SC", "Hiragino Sans GB",
+               "Microsoft YaHei", system-ui, sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(45,122,95,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(196,149,106,0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* HEADER */
+.header {
+  padding: 52px 24px 44px;
+  text-align: center;
+}
+.header-icon {
+  font-size: 28px; margin-bottom: 14px; opacity: 0.7;
+}
+.header h1 {
+  font-size: 28px; font-weight: 600; letter-spacing: 2px;
+  color: var(--text); margin-bottom: 8px;
+}
+.header-date {
+  font-size: 13px; color: var(--text-tertiary);
+  letter-spacing: 1px; margin-bottom: 10px;
+}
+.header-sub {
+  font-size: 14px; color: var(--text-secondary);
+  max-width: 440px; margin: 0 auto;
+}
+.header-stats {
+  display: flex; justify-content: center; gap: 20px;
+  margin-top: 18px;
+}
+.header-stat {
+  font-size: 12px; color: var(--text-tertiary);
+  display: flex; align-items: center; gap: 5px;
+}
+.header-stat .num {
+  color: var(--accent); font-weight: 600;
+}
+.header-divider {
+  width: 100%; height: 1px; margin-top: 32px;
+  background: linear-gradient(90deg, transparent, var(--border), var(--accent), var(--border), transparent);
+}
+
+/* CONTAINER */
+.container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+/* SECTION */
+.section { padding: 32px 0 0; }
+.section-title {
+  font-size: 13px; font-weight: 500; color: var(--accent);
+  letter-spacing: 1px; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title .count {
+  font-size: 11px; color: var(--text-tertiary); font-weight: 400;
+}
+
+/* HEADLINES */
+.headlines { display: flex; flex-direction: column; gap: 18px; }
+.hl-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.hl-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.hl-img {
+  width: 100%; height: 270px; overflow: hidden;
+  position: relative;
+}
+.hl-img::after {
+  content: "";
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.85));
+}
+.hl-img img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.hl-body { padding: 20px 26px 24px; }
+.hl-rank {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 12px; border-radius: 12px;
+  margin-bottom: 10px;
+}
+.hl-rank .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent);
+}
+.hl-card h3 {
+  font-size: 19px; font-weight: 600; line-height: 1.55;
+  margin-bottom: 10px;
+}
+.hl-card .summary {
+  font-size: 14px; color: var(--text-secondary); line-height: 1.8;
+  margin-bottom: 14px;
+}
+.meta-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-tertiary); flex-wrap: wrap;
+}
+.meta-row a {
+  color: var(--accent); text-decoration: none; font-weight: 500;
+  transition: opacity 0.2s;
+}
+.meta-row a:hover { opacity: 0.7; }
+.dot-sep {
+  width: 3px; height: 3px; border-radius: 50%;
+  background: var(--text-tertiary); opacity: 0.4; display: inline-block;
+}
+.tag-free {
+  font-size: 10px; font-weight: 500; color: var(--accent);
+  background: var(--accent-soft); padding: 1px 8px; border-radius: 8px;
+}
+.tag-paid {
+  font-size: 10px; font-weight: 500; color: #b45309;
+  background: var(--warm-soft); padding: 1px 8px; border-radius: 8px;
+}
+
+/* ORDINARY */
+.ordinary-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.ord-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+.ord-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+.ord-card.has-img { display: flex; gap: 14px; align-items: stretch; }
+.ord-thumb {
+  flex-shrink: 0; width: 130px;
+  border-radius: 10px; overflow: hidden;
+  background: var(--accent-soft);
+}
+.ord-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center; display: block;
+}
+.ord-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ord-card h4 {
+  font-size: 14.5px; font-weight: 600; line-height: 1.55;
+  margin-bottom: 6px;
+}
+.ord-card .summary {
+  font-size: 13px; color: var(--text-secondary); line-height: 1.65;
+  margin-bottom: 8px; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.ord-card .meta-row { font-size: 11px; }
+
+/* FOOTER */
+.footer {
+  text-align: center; padding: 36px 24px 44px;
+  font-size: 12px; color: var(--text-tertiary);
+  margin-top: 20px;
+}
+
+@media (max-width: 700px) {
+  .header h1 { font-size: 22px; }
+  .hl-img { height: 190px; }
+  .ordinary-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1a14; --surface: rgba(26,46,32,0.88); --surface-solid: #1a2e20;
+    --text: #d4e8dc; --text-secondary: #98bca8; --text-tertiary: #5a7a68;
+    --accent: #4dcea8; --accent-light: #6de0bc;
+    --accent-soft: #1a3a2a; --warm: #d4a878; --warm-soft: #2a2018;
+    --border: rgba(77,206,168,0.1);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+    --shadow: 0 2px 8px rgba(0,0,0,0.25);
+    --shadow-hover: 0 8px 28px rgba(0,0,0,0.3);
+  }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-icon">🌿</div>
+  <h1>每日新闻简报</h1>
+  <div class="header-date">2026 年 8 月 22 日 · 星期五</div>
+  <div class="header-sub">从 17 个全球新闻源中智能筛选，为你呈现今日最重要的新闻</div>
+  <div class="header-stats">
+    <div class="header-stat"><span class="num">343</span> 原始</div>
+    <div class="header-stat"><span class="num">84</span> 去重</div>
+    <div class="header-stat"><span class="num">50</span> 精选</div>
+  </div>
+  <div class="header-divider"></div>
+</header>
+
+<main class="container">
+
+  <div class="section">
+    <div class="section-title">今日头条 <span class="count">3</span></div>
+    <div class="headlines">
+
+      <div class="hl-card">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-rank"><span class="dot"></span>头条 01</div>
+          <h3>加拿大与美国贸易战全面升级，卡尼誓言"一美元对一美元"回击</h3>
+          <div class="summary">在华盛顿最新的贸易谈判破裂后，加拿大总理马克·卡尼宣布将对美国产品征收对等关税，涵盖钢铁、铝制品及消费品。这是近年来北美贸易关系最严重的恶化。</div>
+          <div class="meta-row">
+            <a href="#">纽约时报</a><span class="tag-free">免费</span>
+            <span class="dot-sep"></span>
+            <a href="#">卫报</a><span class="tag-free">免费</span>
+            <span class="dot-sep"></span>
+            <a href="#">Google 搜索</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hl-card">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-rank"><span class="dot"></span>头条 02</div>
+          <h3>欧盟通过全球首个全面 AI 法案，科技巨头面临合规挑战</h3>
+          <div class="summary">欧盟议会以压倒性多数通过《人工智能法案》，对高风险 AI 系统实施严格监管。OpenAI、Google、Meta 等公司需在 18 个月内完成合规调整。</div>
+          <div class="meta-row">
+            <a href="#">金融时报</a><span class="tag-paid">付费</span>
+            <span class="dot-sep"></span>
+            <a href="#">Google 搜索</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hl-card">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-rank"><span class="dot"></span>头条 03</div>
+          <h3>联合国气候峰会：120 国承诺 2035 年前碳排放减半</h3>
+          <div class="summary">在纽约联合国总部举行的气候行动峰会上，120 个国家签署了历史性减排协议。中国、美国和欧盟承诺在 2035 年前将碳排放较 2020 年水平减少 50%。</div>
+          <div class="meta-row">
+            <a href="#">德国之声</a><span class="tag-free">免费</span>
+            <span class="dot-sep"></span>
+            <a href="#">半岛电视台</a><span class="tag-free">免费</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">其他重要新闻 <span class="count">6</span></div>
+    <div class="ordinary-grid">
+
+      <div class="ord-card has-img">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <h4>Anthropic 计划通过大规模 IPO 筹集 1000 亿美元</h4>
+          <div class="summary">AI 公司 Anthropic 正在筹备史上最大规模的科技 IPO，计划估值超过 3000 亿美元。</div>
+          <div class="meta-row"><a href="#">纽约时报科技版</a><span class="tag-paid">付费</span></div>
+        </div>
+      </div>
+
+      <div class="ord-card">
+        <h4>伊朗称美国新制裁侵犯了其他国家的主权</h4>
+        <div class="summary">伊朗外交部强烈谴责美国最新的单边制裁措施，称其违反国际法准则，并表示将采取"相应回应"。</div>
+        <div class="meta-row"><a href="#">半岛电视台</a><span class="tag-free">免费</span></div>
+      </div>
+
+      <div class="ord-card has-img">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <h4>缅甸军方空袭佛寺造成 14 人死亡</h4>
+          <div class="summary">联合国人权办公室对缅甸最新空袭事件表示震惊，呼吁各方遵守国际人道法。</div>
+          <div class="meta-row"><a href="#">BBC World</a><span class="tag-free">免费</span></div>
+        </div>
+      </div>
+
+      <div class="ord-card has-img">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <h4>被美国指控帮助贩毒集团的墨西哥州长重返工作岗位</h4>
+          <div class="summary">尽管面临美国的引渡要求，该州长在获得墨西哥法院裁决后恢复执政。</div>
+          <div class="meta-row"><a href="#">纽约时报</a><span class="tag-paid">付费</span></div>
+        </div>
+      </div>
+
+      <div class="ord-card">
+        <h4>日本央行维持超低利率政策，日元汇率继续承压</h4>
+        <div class="summary">日本央行宣布维持 -0.1% 的基准利率不变，市场预期短期内不会退出超宽松货币政策。</div>
+        <div class="meta-row">
+          <a href="#">NHK World</a><span class="tag-free">免费</span>
+          <span class="dot-sep"></span>
+          <a href="#">彭博社</a><span class="tag-paid">付费</span>
+        </div>
+      </div>
+
+      <div class="ord-card has-img">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <h4>SpaceX 星舰完成轨道飞行测试</h4>
+          <div class="summary">星舰在第三次全系统轨道试飞中成功完成绕地球飞行并安全着陆。</div>
+          <div class="meta-row"><a href="#">纽约时报科技版</a><span class="tag-paid">付费</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">每日新闻简报 · 方案4：自然未来主义</footer>
+
+</body>
+</html>

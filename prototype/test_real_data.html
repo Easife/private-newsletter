@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日新闻简报 - 2026年08月22日</title>
+<style>
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555555;
+  --text-tertiary: #888888;
+  --accent: #c0392b;
+  --accent-light: #e74c3c;
+  --border: #e8e8e8;
+  --border-light: #f0f0f0;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --radius: 8px;
+  --max-w: 860px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC",
+               "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 40px 24px 32px;
+  text-align: center;
+}
+.site-header h1 { font-size: 28px; font-weight: 700; letter-spacing: 2px; }
+.site-header .date { font-size: 15px; color: var(--text-secondary); margin-top: 6px; }
+.site-header .tagline { font-size: 13px; color: var(--text-tertiary); margin-top: 4px; }
+.site-header .stats {
+  font-size: 12px; color: var(--text-tertiary); margin-top: 8px;
+  padding: 8px 16px; background: #f8f8f8; border-radius: 6px; display: inline-block;
+}
+.container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+.section-title {
+  font-size: 18px; font-weight: 600; padding: 32px 0 16px;
+  border-bottom: 2px solid var(--accent); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title .badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--accent); color: #fff; font-size: 12px;
+  font-weight: 600; padding: 2px 8px; border-radius: 10px;
+}
+.headlines { display: flex; flex-direction: column; gap: 16px; }
+.headline-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px 28px;
+  box-shadow: var(--shadow-sm); position: relative;
+}
+.headline-card:hover { box-shadow: var(--shadow-md); border-color: #d0d0d0; }
+.headline-card .rank {
+  position: absolute; top: 20px; left: -1px;
+  background: var(--accent); color: #fff; font-size: 13px;
+  font-weight: 700; padding: 4px 10px 4px 12px; border-radius: 0 6px 6px 0;
+  z-index: 2;
+}
+.headline-image {
+  margin: -24px -28px 16px -28px;
+  overflow: hidden;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.headline-image img {
+  width: 100%; height: auto; max-height: 320px;
+  object-fit: cover; display: block;
+}
+.headline-card .content { padding-left: 8px; }
+.headline-card h3 { font-size: 18px; font-weight: 600; line-height: 1.5; margin-bottom: 8px; }
+.headline-card .summary { font-size: 14.5px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 12px; }
+.headline-card .meta {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--text-tertiary); flex-wrap: wrap;
+}
+.headline-card .meta a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.headline-card .meta a:hover { text-decoration: underline; }
+.headline-card .meta .dot { width: 3px; height: 3px; background: var(--text-tertiary); border-radius: 50%; }
+.related-sources { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-light); }
+.related-label { font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px; }
+.related-sources ul { list-style: none; padding: 0; margin: 0; }
+.related-sources li { font-size: 13px; color: var(--text-secondary); line-height: 1.6; padding-left: 12px; position: relative; }
+.related-sources li::before { content: ""; position: absolute; left: 0; top: 8px; width: 4px; height: 4px; background: var(--text-tertiary); border-radius: 50%; }
+.related-title { font-size: 18px; font-weight: 600; line-height: 1.5; margin-bottom: 8px; }
+.related-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 4px 0; }
+.related-meta { font-size: 12px; color: var(--text-tertiary); }
+.related-meta a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.related-meta a:hover { text-decoration: underline; }
+.ordinary-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  background: var(--border-light); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.ordinary-item { background: var(--surface); padding: 18px 20px; border-radius: 8px; margin-bottom: 10px; }
+.ordinary-item:hover { background: #f9f9f8; }
+.ordinary-item.has-image {
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.ordinary-thumb {
+  flex-shrink: 0; width: 140px; height: 100px;
+  border-radius: 6px; overflow: hidden; background: #f0f0f0;
+}
+.ordinary-thumb img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
+}
+.ordinary-text { flex: 1; min-width: 0; }
+.ordinary-item h4 { font-size: 14.5px; font-weight: 600; line-height: 1.55; margin-bottom: 6px; }
+.ordinary-item .summary {
+  font-size: 13px; color: var(--text-secondary); line-height: 1.65;
+  margin-bottom: 8px; display: -webkit-box;
+  -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.ordinary-item .meta { font-size: 12px; color: var(--text-tertiary); }
+.ordinary-item .meta a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.ordinary-item .meta a:hover { text-decoration: underline; }
+.site-footer { text-align: center; padding: 40px 24px; font-size: 13px; color: var(--text-tertiary); border-top: 1px solid var(--border); margin-top: 40px; }
+@media (max-width: 700px) {
+  .container { padding: 0 16px; }
+  .headline-card { padding: 18px 16px 18px 20px; }
+  .headline-card h3 { font-size: 16px; }
+  .related-title { font-size: 16px; }
+  .ordinary-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a1a; --surface: #242424; --text-primary: #e8e8e8;
+    --text-secondary: #aaaaaa; --text-tertiary: #777777;
+    --accent: #e74c3c; --border: #333333; --border-light: #2a2a2a;
+  }
+  .ordinary-item:hover { background: #2a2a2a; }
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <h1>每日新闻简报</h1>
+  <div class="date">2026年08月22日 · 星期六</div>
+  <div class="tagline">真实数据测试版 v2 - 重要性评分 + 按需翻译</div>
+  <div class="stats">
+    共 91 条新闻 · 90 组 · 展示 10 条头条 + 40 条普通
+  </div>
+</header>
+<main class="container">
+  <div class="section-title">今日头条 <span class="badge">10</span></div>
+  <div class="headlines">
+    <div class="headline-card">
+      <div class="rank">1</div>
+      
+      <div class="content">
+        <h3>贸易谈判失败后，加拿大誓言以“一美元对一美元”的方式匹配特朗普的关税</h3>
+        <div class="summary">马克·卡尼指责美国在最后一刻对协议进行了“不公平”的修改，原本可以避免征收50%的进口税。加拿大总理马克·卡尼承诺，在双方未能在周五午夜最后期限前达成贸易协议后，加拿大总理马克·卡尼承诺将“以美元对美元”征收关税。由于唐纳德·特朗普的好战外交政策激怒了渥太华官员，此次贸易争端是华盛顿与其最亲密盟友和贸易伙伴之一之间最近关系中最大的破裂。继续阅读</div>
+        <div class="meta"><a href="https://www.theguardian.com/world/2026/aug/22/canada-tariffs-trump-trade-deal-talks-fail" target="_blank" rel="noopener">卫报</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        
+      </div>
+    </div>
+    
+
+    <div class="headline-card">
+      <div class="rank">2</div>
+      <div class="headline-image"><img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-canada-tariffs-lgpc/21int-canada-tariffs-lgpc-mediumSquareAt3X.jpg" alt="谈判破裂，加拿大与美国贸易战升级" loading="lazy"></div>
+      <div class="content">
+        <h3>谈判破裂，加拿大与美国贸易战升级</h3>
+        <div class="summary">由于马克·卡尼暂停了谈判，特朗普政府为避免征收新税而进行的激烈谈判陷入僵局。美国对加拿大征收的关税以及对美国的报复性关税将生效。</div>
+        <div class="meta"><a href="https://www.nytimes.com/2026/08/21/world/canada/trump-tariffs-trade-no-deal-carney-canada.html" target="_blank" rel="noopener">纽约时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Canada-U.S.%20Trade%20War%20Escalates%20as%20Talks%20Collapse" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        
+      </div>
+    </div>
+    
+
+    <div class="headline-card">
+      <div class="rank">3</div>
+      
+      <div class="content">
+        <h3>由于贸易谈判失败，美国对部分加拿大产品征收50%的关税</h3>
+        <div class="summary">美国贸易代表杰米森·格里尔表示，在特朗普新关税生效前几分钟，加拿大拒绝敲定贸易协议。加拿大的马克·卡尼表示，提议的条款“不公平”。</div>
+        <div class="meta"><a href="https://www.dw.com/en/us-imposes-50-tariffs-on-some-canadian-products-as-trade-talks-fail/a-78466352?maca=en-rss-en-all-1573-rdf" target="_blank" rel="noopener">德国之声</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        
+      </div>
+    </div>
+    
+
+    <div class="headline-card">
+      <div class="rank">4</div>
+      
+      <div class="content">
+        <h3>欧盟外交政策负责人表示，乌克兰购物中心袭击造成16人死亡，这是“精心策划的恐怖袭击”</h3>
+        <div class="summary">欧盟最高外交官卡亚·卡拉斯 (Kaja Kallas) 威胁对泽连斯基 (Volodymyr Zelenskyy) 的家乡克里沃罗格 (Kryvyi Rih) 实施最严厉的制裁。 俄罗斯无人机撞向乌克兰中部一座繁忙的购物中心，造成 16 人死亡，泽连斯基 (Volodymyr Zelenskyy) 谴责此次袭击“愤世嫉俗且卑鄙”。 欧盟外交政策负责人卡亚·卡拉斯 (Kaja Kallas) 谴责周五对克里维的袭击里赫——总统的家乡——被称为“精心设计的恐怖”，并表示她正在“提出最遥远的建议”。</div>
+        <div class="meta"><a href="https://www.theguardian.com/world/2026/aug/22/ukraine-shopping-centre-attack-deaths-russia-terror-by-design-kaja-kallas-kryvyi-rih" target="_blank" rel="noopener">卫报</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        
+      </div>
+    </div>
+    
+
+    <div class="headline-card">
+      <div class="rank">5</div>
+      
+      <div class="content">
+        <h3>随着贸易谈判破裂，加拿大誓言对美国征收关税</h3>
+        <div class="summary">马克·卡尼拒绝“不公平”协议，华盛顿高级特使批评“错失良机”</div>
+        <div class="meta"><a href="https://www.ft.com/content/24f9c08e-e23f-434e-b0f4-fc1eb55a7b04?syn-25a6b1a6=1" target="_blank" rel="noopener">金融时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Canada%20vows%20to%20match%20US%20tariffs%20as%20trade%20talks%20collapse" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        
+      </div>
+    </div>
+    
+
+    <div class="headline-card">
+      <div class="rank">6</div>
+      <div class="headline-image"><img src="https://static01.nyt.com/images/2026/08/21/multimedia/00int-canada-tariffs-hfos-pbtz/00int-canada-tariffs-hfos-pbtz-mediumSquareAt3X-v3.jpg" alt="卡尼在美加贸易战中勇敢对抗特朗普" loading="lazy"></div>
+      <div class="content">
+        <h3>卡尼在美加贸易战中勇敢对抗特朗普</h3>
+        <div class="summary">加拿大总理放弃了他认为与美国达成的一项糟糕的贸易协议。许多加拿大人支持他，但这将付出高昂的代价。</div>
+        <div class="meta"><a href="https://www.nytimes.com/2026/08/22/world/canada/carney-trump-canada-tariffs.html" target="_blank" rel="noopener">纽约时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Carney%20Stands%20Up%20to%20Trump%20in%20U.S.-Canada%20Trade%20War" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        
+      </div>
+    </div>
+    
+
+    <div class="headline-card">
+      <div class="rank">7</div>
+      
+      <div class="content">
+        <h3>美国贸易谈判破裂，加拿大予以反击</h3>
+        <div class="summary">彭博新闻社加拿大执行编辑德里克·德克洛特 (Derek Decloet) 与戴维·古拉 (David Gura) 和克里斯蒂娜·鲁菲尼 (Christina Ruffini) 一起在彭博社本周末解释说，美加谈判最后一刻破裂，引发美国对约 200 亿美元的加拿大商品征收 50% 的关税，以及渥太华承诺进行报复，加拿大人感到沮丧，但不一定感到惊讶。 （来源：彭博社）</div>
+        <div class="meta"><a href="https://www.bloomberg.com/news/videos/2026-08-22/canada-pushes-back-as-us-trade-talks-collapse-video" target="_blank" rel="noopener">彭博社</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Canada%20Pushes%20Back%20as%20US%20Trade%20Talks%20Collapse" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        
+      </div>
+    </div>
+    
+
+    <div class="headline-card">
+      <div class="rank">8</div>
+      
+      <div class="content">
+        <h3>特朗普在白宫宴会厅谈论霍尔木兹海峡，并表示他将霍尔木兹海峡视为“美国领土”——事实确实如此</h3>
+        <div class="summary">该博客现已关闭。五角大楼解雇了《星条旗报》的出版商和编辑，因为以特朗普的名字命名的海军航母可能会以纪念黑人战争英雄而引发强烈反对。美国参议员、蒙大拿州共和党人和牧场主蒂姆·希伊反对唐纳德·特朗普周五宣布的一项允许增加进口碎牛肉的计划。
+ “一年来我一直建议特朗普总统不要采取这种行动，因为美国牧场主一直在</div>
+        <div class="meta"><a href="https://www.theguardian.com/us-news/live/2026/aug/21/democrats-progressive-election-politics-live" target="_blank" rel="noopener">卫报</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        <div class="related-sources">
+              <div class="related-label">相关报道：</div>
+              <ul><li><span class="related-title">特朗普表示，他将霍尔木兹海峡视为“美国领土”</span><div class="related-summary">总统在南卡罗来纳州的集会上就关键战略航道发表评论，并开玩笑地轰炸伊朗。唐纳德·特朗普周五称霍尔木兹海峡是“美国领土”，美国继续对伊朗的航运和港口进行军事封锁，而特朗普政府正在努力结束与该国的战争。“我们甚至不知道我们是否会赢，因为我现在认为霍尔木兹海峡是美国领土，”特朗普在南卡罗来纳州向人群发表讲话时说道。他正在竞选</div><div class="related-meta"><a href="https://www.theguardian.com/us-news/2026/aug/21/trump-strait-of-hormuz-american-territory" target="_blank" rel="noopener">卫报</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div></li><li><span class="related-title">特朗普的挑战：40万亿美元的债务、6.7%的抵押贷款和5美元的柴油</span><div class="related-summary">由于伊朗战争推高物价且美国财政恶化，总统的议程面临压力</div><div class="related-meta"><a href="https://www.ft.com/content/6cb399fa-9fba-4806-98a3-9572fe319622?syn-25a6b1a6=1" target="_blank" rel="noopener">金融时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Trump%E2%80%99s%20challenge%3A%20%2440tn%20debt%2C%206.7%25%20mortgages%20and%20%245%20diesel" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div></li></ul>
+            </div>
+      </div>
+    </div>
+    
+
+    <div class="headline-card">
+      <div class="rank">9</div>
+      <div class="headline-image"><img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-canada-tariffs-deal-1-ltfw/21int-canada-tariffs-deal-1-ltfw-mediumSquareAt3X.jpg" alt="随着特朗普午夜最后期限的临近，加拿大与美国的关税谈判仍在继续" loading="lazy"></div>
+      <div class="content">
+        <h3>随着特朗普午夜最后期限的临近，加拿大与美国的关税谈判仍在继续</h3>
+        <div class="summary">加拿大谈判代表正在华盛顿敲定一项协议，该协议将避免新的关税并改善现有关税的条款，但马克·卡尼(Mark Carney)在国内面临着艰难的推销。</div>
+        <div class="meta"><a href="https://www.nytimes.com/2026/08/21/world/canada/trump-carney-tariffs-trade-talks.html" target="_blank" rel="noopener">纽约时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Canada-U.S.%20Tariff%20Talks%20Continue%20as%20Trump%E2%80%99s%20Midnight%20Deadline%20Looms" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        
+      </div>
+    </div>
+    
+
+    <div class="headline-card">
+      <div class="rank">10</div>
+      
+      <div class="content">
+        <h3>乌克兰：德国外长约翰·瓦德菲尔访问基辅后俄罗斯加强袭击</h3>
+        <div class="summary">德国外交部长约翰·瓦德菲尔在乌克兰第 35 届独立日之前前往基辅。他的访问正值乌克兰和俄罗斯之间的空袭造成数人死亡之际。</div>
+        <div class="meta"><a href="https://www.dw.com/en/ukraine-russia-steps-up-attacks-as-german-foreign-minister-johan-wadephul-visits-kyiv/a-78467414?maca=en-rss-en-all-1573-rdf" target="_blank" rel="noopener">德国之声</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        
+      </div>
+    </div>
+    </div>
+  <div class="section-title" style="margin-top: 40px;">其他重要新闻 <span class="badge">40</span></div>
+  <div class="ordinary-grid">
+        <div class="ordinary-item has-image">
+          <div class="ordinary-thumb">
+            <img src="https://static01.nyt.com/images/2026/08/22/multimedia/22Lebanon-Assess-01-vpgh/22Lebanon-Assess-01-vpgh-mediumSquareAt3X.jpg" alt="黎巴嫩遏制真主党的努力在以色列战争中陷入停滞" loading="lazy">
+          </div>
+          <div class="ordinary-text">
+            <h4>黎巴嫩遏制真主党的努力在以色列战争中陷入停滞</h4>
+            <div class="summary">在激进组织将国家拖回与以色列的战争之后，总统约瑟夫·奥恩上任后，得到了民众的授权，要求重新夺回控制权。</div>
+            <div class="meta"><a href="https://www.nytimes.com/2026/08/22/world/middleeast/lebanon-hezbollah-israel-diplomacy.html" target="_blank" rel="noopener">纽约时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Lebanon%E2%80%99s%20Efforts%20to%20Tame%20Hezbollah%20Stall%20Amid%20Israel%20War" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+          </div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>购物中心袭击事件发生后第二天，俄罗斯在乌克兰发动空袭，造成 6 人死亡</h4>
+          <div class="summary">与此同时，官员称，乌克兰无人机袭击了俄罗斯南部的家乡，造成两名儿童死亡，他们的父母受伤。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/news/2026/8/22/russian-strikes-kill-6-people-in-ukraine-day-after-shopping-complex-attack?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item has-image">
+          <div class="ordinary-thumb">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21biz-anthropic-mbzl/21biz-anthropic-mbzl-mediumSquareAt3X-v2.jpg" alt="Anthropic 的目标是通过大规模 IPO 筹集 1000 亿美元" loading="lazy">
+          </div>
+          <div class="ordinary-text">
+            <h4>Anthropic 的目标是通过大规模 IPO 筹集 1000 亿美元</h4>
+            <div class="summary">此次发行可能会对这个成立五年的人工智能公司进行估值。该公司的银行家告诉潜在投资者，这家初创公司的估值为 2 万亿美元，这将超过埃隆·马斯克 (Elon Musk) 的 SpaceX。</div>
+            <div class="meta"><a href="https://www.nytimes.com/2026/08/21/technology/anthropic-ipo-100-billion.html" target="_blank" rel="noopener">纽约时报科技版</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Anthropic%20Could%20Aim%20to%20Raise%20%24100%20Billion%20in%20Blockbuster%20I.P.O." target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+          </div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>伊朗称美国新制裁侵犯了其他国家的主权</h4>
+          <div class="summary">外交部发言人埃斯梅尔·巴格海(Esmaeil Baghaei)抨击特朗普的最新威胁是“全面经典殖民主义”的回归。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/news/2026/8/22/iran-says-new-us-sanctions-violate-sovereignty-of-other-states?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>缅甸军方空袭佛寺造成14人死亡</h4>
+          <div class="summary">目击者称，大约 100 人正在缅甸中部参加冥想静修，当时该建筑遭到军用飞机袭击。</div>
+          <div class="meta"><a href="https://www.dw.com/en/myanmar-military-airstrike-kills-14-at-buddhist-monastery-reports/a-78468290?maca=en-rss-en-all-1573-rdf" target="_blank" rel="noopener">德国之声</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>俄罗斯国家原子能公司让工人重返伊朗布什尔核电站</h4>
+          <div class="summary">据国际文传电讯社援引该公司首席执行官阿列克谢·利哈乔夫的话报道，俄罗斯国有原子能公司Rosatom正在继续将员工送回伊朗布什尔核电站。</div>
+          <div class="meta"><a href="https://www.bloomberg.com/news/articles/2026-08-22/russia-s-rosatom-returns-workers-to-iran-s-bushehr-nuclear-plant" target="_blank" rel="noopener">彭博社</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Russia%E2%80%99s%20Rosatom%20Returns%20Workers%20to%20Iran%E2%80%99s%20Bushehr%20Nuclear%20Plant" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>中国人工智能模型在价格和使用方面取得进展</h4>
+          <div class="summary">中国的人工智能模型正在迅速缩小与美国竞争对手的性能差距，同时以较低的价格和允许公司在本地部署它们的开放权重技术赢得用户。彭博新闻科技记者 Luz Ding 本周末在彭博社向主持人 David Gura 和 Christina Ruffini 解释说，中国的人工智能模型能力正在以更低的成本接近美国领先模型。 （来源：彭博社）</div>
+          <div class="meta"><a href="https://www.bloomberg.com/news/videos/2026-08-22/chinese-ai-models-gain-ground-on-price-and-use-video" target="_blank" rel="noopener">彭博社</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Chinese%20AI%20Models%20Gain%20Ground%20on%20Price%20and%20Use" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>印度外长在美国关税威胁下访问俄罗斯</h4>
+          <div class="summary">印度外交部长苏杰生将访问俄罗斯并共同主持第27届印俄政府间委员会贸易、科技和文化会议。</div>
+          <div class="meta"><a href="https://www.bloomberg.com/news/articles/2026-08-22/india-s-foreign-minister-to-visit-russia-amid-us-tariff-threat" target="_blank" rel="noopener">彭博社</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=India%E2%80%99s%20Foreign%20Minister%20to%20Visit%20Russia%20Amid%20US%20Tariff%20Threat" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>卢拉在巴西与卢比奥的冲突中将特朗普视为不太可能的盟友</h4>
+          <div class="summary">巴西总统和美国国务卿在南美国家大选前互斥</div>
+          <div class="meta"><a href="https://www.ft.com/content/da43f854-8083-4ec1-86da-76b47c84e64a?syn-25a6b1a6=1" target="_blank" rel="noopener">金融时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Lula%20turns%20to%20Trump%20as%20unlikely%20ally%20in%20Brazil%E2%80%99s%20clash%20with%20Marco%20Rubio" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>债券市场考验财政部干预的极限</h4>
+          <div class="summary">本周末加入彭博社的是彭博电台《商业大师》节目主持人巴里·里索尔茨 (Barry Ritholtz)，他告诉主持人大卫·古拉 (David Gura) 和克里斯蒂娜·鲁菲尼 (Christina Ruffini)，财政部长斯科特·贝森特 (Scott Bessent) 的债券市场举措可能会带来短期缓解，但无法克服持续的通胀、不断上升的债务以及决定长期收益率的力量。 （来源：彭博社）</div>
+          <div class="meta"><a href="https://www.bloomberg.com/news/videos/2026-08-22/bond-market-tests-limits-of-treasury-intervention-video" target="_blank" rel="noopener">彭博社</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Bond%20Market%20Tests%20Limits%20of%20Treasury%20Intervention" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>五角大楼因“不服从”而解雇军事报纸领导层</h4>
+          <div class="summary">《星条旗报》的主编表示，在他反对潜在的编辑干预后，他因不服从命令而与该报的出版商和一名记者一起被解雇。</div>
+          <div class="meta"><a href="https://www.dw.com/en/pentagon-fires-military-newspaper-leadership-for-insubordination/a-78466373?maca=en-rss-en-all-1573-rdf" target="_blank" rel="noopener">德国之声</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>墨西哥乐观地认为美国可以降低汽车和钢铁关税</h4>
+          <div class="summary">墨西哥最高贸易谈判代表乐观地表示，他可以从美国获得对墨西哥汽车和钢铁出口负担较轻的关税条款，类似于华盛顿正在与加拿大讨论的修订措施。</div>
+          <div class="meta"><a href="https://www.bloomberg.com/news/articles/2026-08-22/mexico-optimistic-it-can-achieve-lower-us-tariffs-on-cars-steel" target="_blank" rel="noopener">彭博社</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Mexico%20Optimistic%20it%20Can%20Achieve%20Lower%20US%20Tariffs%20on%20Cars%2C%20Steel" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>中国机器人打破博尔特 1 亿米世界纪录</h4>
+          <div class="summary">中国仿人机器人“闪电”百米试跑速度超过人类世界纪录保持者尤塞恩·博尔特。一年前，人形机器人艰难地完成了一场比赛。</div>
+          <div class="meta"><a href="https://www.dw.com/en/chinese-robot-beats-usain-bolt-s-100m-world-record/a-78468749?maca=en-rss-en-all-1573-rdf" target="_blank" rel="noopener">德国之声</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>世界银行预计受战争影响的黎巴嫩经济将萎缩 6.4%</h4>
+          <div class="summary">这家全球银行表示，随着通货膨胀和消费者价格上涨，与以色列的冲突使黎巴嫩的经济复苏脱轨。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/news/2026/8/22/world-bank-projects-war-hit-lebanons-economy-to-contract-by-6-4-percent?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>巴勒斯坦青少年在西岸袭击中被枪杀，联合国回应</h4>
+          <div class="summary">在被占领的约旦河西岸定居者袭击中，一名 17 岁巴勒斯坦人被杀，另一人受重伤</div>
+          <div class="meta"><a href="https://www.aljazeera.com/video/newsfeed/2026/8/22/palestinian-teen-shot-and-killed-in-west-bank-attack-un-responds?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>16,000 剂疫苗抵达，埃博拉病毒继续在刚果民主共和国蔓延</h4>
+          <div class="summary">卫生当局警告称，“大约每三十分钟就有一人死于埃博拉病毒”。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/video/newsfeed/2026/8/22/ebola-continues-to-spread-in-the-drc-as-16000-vaccine-doses-arrive?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>由于战争导致经济萎缩，卡塔尔削减国内外国家支出</h4>
+          <div class="summary">富裕的海湾国家因美伊霍尔木兹海峡冲突而遭受重创</div>
+          <div class="meta"><a href="https://www.ft.com/content/efe10069-cbe3-4071-a091-26afa74fb4b3?syn-25a6b1a6=1" target="_blank" rel="noopener">金融时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Qatar%20cuts%20state%20spending%20at%20home%20and%20abroad%20as%20war%20shrinks%20economy" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>随着“极端”厄尔尼诺现象临近，巴拿马运河将减少航运</h4>
+          <div class="summary">巴拿马运河将于 9 月 15 日之前将每日过境船舶数量从 40 艘减少至 32 艘，这可能导致航运速度减慢和成本上升。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/video/newsfeed/2026/8/22/panama-canal-to-reduce-shipping-as-extreme-el-nino-approaches?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>中国的新月任务可以解开月球冰的秘密：为什么这很重要</h4>
+          <div class="summary">嫦娥七号旨在更多地了解月球阴影陨石坑内的水。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/news/2026/8/22/chinas-new-moon-mission-could-unlock-secret-of-lunar-ice-why-that-matters?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>尤塞恩·博尔特 (Usain Bolt) 在世界人形机器人运动会上打破了 100 米纪录</h4>
+          <div class="summary">据官方媒体报道，中国机器人达到了每秒 14.5 米的峰值速度，打破了博尔特在北京保持的 1 亿米纪录。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/sports/2026/8/22/usain-bolts-100m-record-broken-at-world-humanoid-robot-games?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item has-image">
+          <div class="ordinary-thumb">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-mexico-governor-bhpv/21int-mexico-governor-bhpv-mediumSquareAt3X.jpg" alt="被美国指控帮助卡特尔的墨西哥州长重返工作岗位" loading="lazy">
+          </div>
+          <div class="ordinary-text">
+            <h4>被美国指控帮助卡特尔的墨西哥州长重返工作岗位</h4>
+            <div class="summary">在美国检察官指控州长鲁本·罗查·莫亚保护锡那罗亚卡特尔后，他表示将辞职，专注于辩护。周五，他宣布回归，但遭到了很多批评。</div>
+            <div class="meta"><a href="https://www.nytimes.com/2026/08/21/world/americas/mexico-sinaloa-governor-cartels.html" target="_blank" rel="noopener">纽约时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Mexican%20Governor%2C%20Accused%20by%20U.S.%20of%20Helping%20Cartel%2C%20Returns%20to%20His%20Job" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+          </div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>尽管法院命令阻止更改，但美国邮政服务规则收紧邮寄投票</h4>
+          <div class="summary">规则将要求各州向联邦政府提供选民信息，以换取投递选票。美国邮政总局准备在周五晚些时候发布一项最终规则，要求各州在 11 月国会中期选举之前向联邦政府提供选民信息，尽管目前有两项法院命令阻止了这些变化生效。美国邮政总局在周五在线发布的最终规则文本中承认，</div>
+          <div class="meta"><a href="https://www.theguardian.com/us-news/2026/aug/21/us-postal-service-mail-in-voter-rule" target="_blank" rel="noopener">卫报</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>美国幼儿园疫苗接种率下降，豁免创历史新高</h4>
+          <div class="summary">CDC 的新数据显示，幼儿园儿童 MMR 疫苗接种率略有下降，非医疗豁免攀升至 4.2% 在唐纳德·特朗普对疫苗做出一系列误导性声明（包括某些注射剂看起来“像汽水瓶大小”）一周后，疾病控制与预防中心 (CDC) 发布了全国幼儿园疫苗接种率的最新数据。 CDC 通讯淡化了这些变化——一份三句话的公告称，“儿童的总体疫苗接种率</div>
+          <div class="meta"><a href="https://www.theguardian.com/society/2026/aug/22/kindergarten-mmr-vaccination-rates-dip" target="_blank" rel="noopener">卫报</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>最高法院让特朗普舞厅工作继续进行</h4>
+          <div class="summary">在下级法院表示该项目需要国会授权后，首席大法官约翰·罗伯茨暂时允许唐纳德·特朗普总统的白宫宴会厅继续施工，而最高法院正在考虑是否给予更长时间的延期。彭博新闻社最高法院记者格雷格·斯托尔与主持人大卫·古拉和克里斯蒂娜·鲁菲尼一起在彭博社本周末解释说，法院还权衡了涉及特朗普邮寄选票令的挑战，政府正在准备</div>
+          <div class="meta"><a href="https://www.bloomberg.com/news/videos/2026-08-22/supreme-court-keeps-trump-ballroom-work-going-video" target="_blank" rel="noopener">彭博社</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Supreme%20Court%20Keeps%20Trump%20Ballroom%20Work%20Going" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>德国成为欧洲最大的受监管大麻市场</h4>
+          <div class="summary">在该药物部分自由化两年后，批评者呼吁收紧立法</div>
+          <div class="meta"><a href="https://www.ft.com/content/6541cb37-1bc7-4f52-a8ef-f503d13be4ce" target="_blank" rel="noopener">金融时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Germany%20becomes%20Europe%E2%80%99s%20largest%20regulated%20cannabis%20market" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>超过 16,000 剂 Ervebo 疫苗抵达埃博拉病毒肆虐的刚果民主共和国</h4>
+          <div class="summary">由于专家警告病毒呈指数级传播，这些剂量是分配给金沙萨的 70,000 剂中的第一剂。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/news/2026/8/22/more-than-16000-doses-of-ervebo-vaccine-arrive-in-ebola-hit-dr-congo?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>联合国儿童基金会称援助削减后索马里儿童饥饿危机加剧</h4>
+          <div class="summary">在这个遭受干旱的国家，因严重营养不良而接受治疗的儿童人数增加了 32%。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/news/2026/8/22/somalia-child-hunger-crisis-deepens-after-aid-cuts-unicef-says?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>巴基斯坦 PTI 就入狱伊姆兰·汗的医院举动寻求藐视法庭诉讼</h4>
+          <div class="summary">当局将前总理送往州立医院检查，然后将其送回监狱后，该党采取了法律行动。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/news/2026/8/22/pakistans-pti-seeks-contempt-action-over-jailed-imran-khans-hospital?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>“这是一场海啸”：洪水在印度阿萨姆邦留下死亡痕迹</h4>
+          <div class="summary">从寻找女儿尸体的父亲到为救朋友而溺水身亡的男子，洪水造成了毁灭性的损失。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/news/2026/8/22/it-was-a-tsunami-floods-leave-death-trail-in-indias-assam?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>印度央行称外汇存款流入达 654 亿美元</h4>
+          <div class="summary">印度央行周六公布的最新数据显示，印度通过其 3500 万海外侨民的特殊外币存款获得了超过 650 亿美元的收入。</div>
+          <div class="meta"><a href="https://www.bloomberg.com/news/articles/2026-08-22/india-s-central-bank-says-forex-deposit-inflows-at-65-4-billion" target="_blank" rel="noopener">彭博社</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=India%E2%80%99s%20Central%20Bank%20Says%20Forex%20Deposit%20Inflows%20at%20%2465.4%20Billion" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>工会担心工党的零时合同计划可能会违反宣言承诺</h4>
+          <div class="summary">领导人声称商界人士的危言耸听可能会导致关键立法变得“毫无意义”。工会警告安迪·伯纳姆（Andy Burnham），工党削减零时工合同的政策可能无法兑现该党的宣言。工会领导人正在寻求商务大臣乔纳森·雷诺兹（Jonathan Reynolds）的保证，而英国工会大会谴责商业团体的“危言耸听”行为。继续阅读...</div>
+          <div class="meta"><a href="https://www.theguardian.com/uk-news/2026/aug/22/unions-worry-labours-plan-for-zero-hours-contracts-may-break-manifesto-pledge" target="_blank" rel="noopener">卫报</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item has-image">
+          <div class="ordinary-thumb">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20int-cameroon-1-cwzj/20int-cameroon-1-cwzj-mediumSquareAt3X.jpg" alt="喀麦隆年迈总统从国外呆了几个月回国" loading="lazy">
+          </div>
+          <div class="ordinary-text">
+            <h4>喀麦隆年迈总统从国外呆了几个月回国</h4>
+            <div class="summary">93 岁的保罗·比亚 (Paul Biya) 自 6 月初以来一直在瑞士。长期缺席引发了人们对他的健康状况和继任计划的质疑。</div>
+            <div class="meta"><a href="https://www.nytimes.com/2026/08/20/world/africa/cameroon-president-returns-from-long-stay-abroad.html" target="_blank" rel="noopener">纽约时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Cameroon%E2%80%99s%20Aging%20President%20Returns%20From%20Monthslong%20Stay%20Abroad" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+          </div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>德国调查柏林附近树林中发现的武器藏匿处</h4>
+          <div class="summary">去年，在柏林附近的森林中发现了手枪和弹药。德国当局怀疑它们将被用来代表俄罗斯情报机构进行暗杀。</div>
+          <div class="meta"><a href="https://www.dw.com/en/germany-investigates-arms-cache-found-in-woods-near-berlin/a-78371750?maca=en-rss-en-all-1573-rdf" target="_blank" rel="noopener">德国之声</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item has-image">
+          <div class="ordinary-thumb">
+            <img src="https://static01.nyt.com/images/2026/08/22/multimedia/22canadaletter-leblancembassy-gqjw/22canadaletter-leblancembassy-gqjw-mediumSquareAt3X.jpg" alt="意识到加拿大与美国贸易战不断升级" loading="lazy">
+          </div>
+          <div class="ordinary-text">
+            <h4>意识到加拿大与美国贸易战不断升级</h4>
+            <div class="summary">周五深夜，最后一刻的要求结束了在华盛顿举行的谈判，两国陷入了一场可能具有毁灭性的关税战。</div>
+            <div class="meta"><a href="https://www.nytimes.com/2026/08/22/world/canada/carney-tariffs-trade-trump-free-trade.html" target="_blank" rel="noopener">纽约时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=Waking%20Up%20to%20an%20Escalating%20Canada-U.S.%20Trade%20War" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+          </div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>人工智能的消费热潮伴随着一个陷阱</h4>
+          <div class="summary">彭明盛表示，人工智能的繁荣建立在数据中心、芯片和能源领域的长周期押注之上，尽管人工智能软件正在以极快的速度变化。如果采用速度放缓或更便宜的中国开源模型获得关注，大型科技公司可能不得不重新考虑当今人工智能竞赛背后的支出计划。 （来源：彭博社）</div>
+          <div class="meta"><a href="https://www.bloomberg.com/news/videos/2026-08-22/the-ai-spending-spree-comes-with-a-catch-video" target="_blank" rel="noopener">彭博社</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=The%20AI%20Spending%20Spree%20Comes%20With%20a%20Catch" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>被淹没的菲律宾社区寻求防洪资金的答案</h4>
+          <div class="summary">半岛电视台记者贾梅拉·阿林多安 (Jamela Alindogan) 从菲律宾北部报道，当地被淹没的社区正在寻求答案。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/video/newsfeed/2026/8/22/inundated-philippine-communities-seek-answers-over-flood-control-funds?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>尼日利亚和萨赫勒地区：安全鸿沟日益扩大</h4>
+          <div class="summary">不断扩大的外交裂痕使得应对共同的跨境安全威胁的努力变得更加复杂。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/news/2026/8/22/nigeria-and-the-sahel-a-growing-security-divide?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>犹太活动人士反击以色列定居者</h4>
+          <div class="summary">犹太活动人士在被占领的西岸部分地区提供“保护性存在”，以阻止定居者的暴力行为。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/video/newsfeed/2026/8/22/jewish-activists-push-back-against-israeli-settlers?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        
+
+        <div class="ordinary-item has-image">
+          <div class="ordinary-thumb">
+            <img src="https://static01.nyt.com/images/2026/08/22/multimedia/22belarus-envoy-01-lfmg/22belarus-envoy-01-lfmg-mediumSquareAt3X.jpg" alt="特朗普特使如何利用伏特加和黄色笑话进行美国外交" loading="lazy">
+          </div>
+          <div class="ordinary-text">
+            <h4>特朗普特使如何利用伏特加和黄色笑话进行美国外交</h4>
+            <div class="summary">外交官约翰·科尔表示，他的个性化方法取得了成果，并且符合总统的风格。批评者认为，他向独裁领导人放弃了太多。</div>
+            <div class="meta"><a href="https://www.nytimes.com/2026/08/22/world/europe/belarus-john-coale-lukashenko-trump.html" target="_blank" rel="noopener">纽约时报</a><span style="color:#e74c3c;font-size:11px;">[付费]</span> <span style='width:3px;height:3px;background:#888;border-radius:50%;display:inline-block;vertical-align:middle;'></span> <a href="https://www.google.com/search?q=How%20a%20Trump%20Envoy%20Uses%20Vodka%20and%20Dirty%20Jokes%20to%20Conduct%20U.S.%20Diplomacy" target="_blank" rel="noopener" style="color:#27ae60;">Google搜索</a></div>
+          </div>
+        </div>
+        
+
+        <div class="ordinary-item">
+          <h4>特朗普的关税将如何影响加拿大经济？</h4>
+          <div class="summary">谈判破裂后，美国对加拿大关键行业征收 50% 的关税，但不太可能削弱加拿大经济。</div>
+          <div class="meta"><a href="https://www.aljazeera.com/video/newsfeed/2026/8/22/how-will-trumps-tariffs-affect-canadas-economy?traffic_source=rss" target="_blank" rel="noopener">半岛电视台</a><span style="color:#27ae60;font-size:11px;">[免费]</span></div>
+        </div>
+        </div>
+</main>
+<footer class="site-footer">每日新闻简报 · 真实数据测试版 v2</footer>
+</body>
+</html>

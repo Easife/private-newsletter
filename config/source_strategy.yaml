@@ -1,0 +1,144 @@
+# 新闻来源策略表
+#
+# 定义每个新闻来源的访问属性和优先级。
+# 用于去重后的来源选择和付费/免费判断。
+#
+# authority_priority: 来源权威等级 (1=最高)
+# access_type: paid / free / unknown
+# language: 来源语言
+# display_name: 中文显示名称
+
+sources:
+  # === Tier 1: 国际权威通讯社 ===
+  - name: Reuters
+    display_name: 路透社
+    authority_priority: 1
+    access_type: free
+    language: en
+
+  - name: Associated Press
+    display_name: 美联社
+    authority_priority: 1
+    access_type: free
+    language: en
+
+  - name: AFP
+    display_name: 法新社
+    authority_priority: 1
+    access_type: free
+    language: en
+
+  # === Tier 1: 英国权威媒体 ===
+  - name: BBC
+    display_name: BBC
+    authority_priority: 1
+    access_type: free
+    language: en
+
+  - name: BBC World
+    display_name: BBC 世界
+    authority_priority: 1
+    access_type: free
+    language: en
+
+  - name: The Guardian
+    display_name: 卫报
+    authority_priority: 1
+    access_type: free
+    language: en
+
+  - name: Financial Times
+    display_name: 金融时报
+    authority_priority: 1
+    access_type: paid
+    language: en
+
+  - name: The Economist
+    display_name: 经济学人
+    authority_priority: 1
+    access_type: paid
+    language: en
+
+  # === Tier 1: 美国权威媒体 ===
+  - name: New York Times
+    display_name: 纽约时报
+    authority_priority: 1
+    access_type: paid
+    language: en
+
+  - name: NYT Technology
+    display_name: 纽约时报科技版
+    authority_priority: 1
+    access_type: paid
+    language: en
+
+  - name: Washington Post
+    display_name: 华盛顿邮报
+    authority_priority: 1
+    access_type: paid
+    language: en
+
+  - name: Wall Street Journal
+    display_name: 华尔街日报
+    authority_priority: 1
+    access_type: paid
+    language: en
+
+  # === Tier 1: 财经媒体 ===
+  - name: Bloomberg
+    display_name: 彭博社
+    authority_priority: 1
+    access_type: paid
+    language: en
+
+  - name: CNBC
+    display_name: CNBC
+    authority_priority: 2
+    access_type: free
+    language: en
+
+  # === Tier 2: 日本媒体 ===
+  - name: NHK World
+    display_name: NHK
+    authority_priority: 2
+    access_type: free
+    language: ja
+
+  - name: 日经
+    display_name: 日经新闻
+    authority_priority: 2
+    access_type: paid
+    language: ja
+
+  # === Tier 2: 中文媒体 ===
+  - name: 新华社
+    display_name: 新华社
+    authority_priority: 2
+    access_type: free
+    language: zh
+
+  - name: 联合早报
+    display_name: 联合早报
+    authority_priority: 2
+    access_type: free
+    language: zh
+
+  # === Tier 2: 德国/中东媒体 ===
+  - name: DW
+    display_name: 德国之声
+    authority_priority: 2
+    access_type: free
+    language: en
+
+  - name: Al Jazeera
+    display_name: 半岛电视台
+    authority_priority: 2
+    access_type: free
+    language: en
+
+  # === Tier 2: 中文媒体（纽约时报中文网） ===
+  - name: NYT Chinese
+    display_name: 纽约时报中文网
+    authority_priority: 2
+    access_type: free
+    language: zh
