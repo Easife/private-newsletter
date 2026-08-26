@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日新闻简报</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --font-serif:Georgia,"Noto Serif SC","Source Han Serif SC","PingFang SC",serif;
+  --c-bg:#fafaf8;
+  --c-surface:rgba(255,255,255,0.62);
+  --c-surface-solid:#ffffff;
+  --c-border:rgba(0,0,0,0.06);
+  --c-text:#1a1a1a;
+  --c-text-2:#555;
+  --c-text-3:#999;
+  --c-emerald:#2d9d78;
+  --c-emerald-bg:rgba(45,157,120,0.07);
+  --c-lime:#a3c94a;
+  --c-amber:#d4930d;
+  --coral:#e8735a;
+  --radius:16px;
+  --radius-sm:12px;
+  --max-w:780px;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-sans);
+  background:var(--c-bg);
+  color:var(--c-text);
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ─── Background blobs ─── */
+.bg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.bg::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 600px 500px at 12% 15%,rgba(163,201,74,0.18),transparent 70%),
+    radial-gradient(ellipse 500px 600px at 85% 20%,rgba(45,157,120,0.12),transparent 65%),
+    radial-gradient(ellipse 400px 400px at 50% 80%,rgba(232,115,90,0.09),transparent 60%),
+    radial-gradient(ellipse 550px 450px at 75% 65%,rgba(212,147,13,0.08),transparent 60%);
+}
+.blob{
+  position:absolute;border-radius:50%;
+  filter:blur(80px);will-change:transform;
+}
+.b1{width:420px;height:420px;top:-8%;left:-4%;background:rgba(163,201,74,0.22);animation:drift 28s ease-in-out infinite}
+.b2{width:380px;height:380px;top:15%;right:-6%;background:rgba(45,157,120,0.16);animation:drift 32s ease-in-out infinite reverse}
+.b3{width:320px;height:320px;bottom:8%;left:10%;background:rgba(232,115,90,0.13);animation:drift 26s ease-in-out infinite 4s}
+.b4{width:280px;height:280px;bottom:-4%;right:15%;background:rgba(212,147,13,0.12);animation:drift 30s ease-in-out infinite 8s}
+.b5{width:240px;height:240px;top:50%;left:45%;background:rgba(163,201,74,0.10);animation:drift 24s ease-in-out infinite 2s}
+@keyframes drift{
+  0%,100%{transform:translate(0,0)}
+  33%{transform:translate(30px,-20px)}
+  66%{transform:translate(-20px,15px)}
+}
+
+/* ─── Glass utility ─── */
+.glass{
+  background:var(--c-surface);
+  backdrop-filter:blur(20px) saturate(1.4);
+  -webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border:1px solid var(--c-border);
+}
+
+/* ─── Layout ─── */
+.wrap{max-width:var(--max-w);margin:0 auto;padding:0 20px}
+
+/* ─── Header ─── */
+header{
+  padding:28px 20px 22px;
+  text-align:center;
+  position:relative;
+}
+.hdr-inner{
+  display:inline-flex;flex-direction:column;align-items:center;gap:6px;
+  padding:18px 36px 16px;
+  border-radius:20px;
+}
+.hdr-tag{
+  font-size:10.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+  color:var(--c-emerald);
+  display:inline-flex;align-items:center;gap:5px;
+}
+.hdr-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--c-emerald)}
+header h1{
+  font-size:20px;font-weight:700;letter-spacing:1.5px;
+}
+.hdr-date{font-size:12px;color:var(--c-text-3)}
+.hdr-pills{
+  display:inline-flex;gap:14px;margin-top:4px;
+  font-size:11px;color:var(--c-text-3);
+}
+.hdr-pills b{color:var(--c-text);font-weight:600}
+
+/* ─── Section ─── */
+.sec{padding:24px 0 0}
+.sec-head{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:14px;
+}
+.sec-label{font-size:13px;font-weight:600}
+.sec-pill{
+  font-size:10.5px;font-weight:600;color:var(--c-emerald);
+  background:var(--c-emerald-bg);padding:2px 8px;border-radius:8px;
+}
+.sec-line{flex:1;height:1px;background:linear-gradient(90deg,var(--c-border),transparent)}
+
+/* ─── Headlines ─── */
+.hl-list{display:flex;flex-direction:column;gap:10px}
+.hl-card{
+  border-radius:var(--radius);overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  transition:box-shadow .25s,transform .25s;
+}
+.hl-card:hover{box-shadow:0 8px 28px rgba(0,0,0,0.08);transform:translateY(-1px)}
+.hl-img{width:100%;height:155px;overflow:hidden;background:#f0f0ee}
+.hl-img img{width:100%;height:100%;object-fit:cover;display:block}
+.hl-body{padding:14px 20px 16px}
+.hl-title-row{
+  display:flex;align-items:baseline;gap:8px;
+  margin-bottom:5px;
+}
+.hl-rank{
+  font-size:12px;font-weight:700;color:var(--c-emerald);
+  font-variant-numeric:tabular-nums;flex-shrink:0;
+  opacity:.7;
+}
+.hl-card h3{font-size:16px;font-weight:600;line-height:1.5}
+.hl-card .summary{
+  font-size:13px;color:var(--c-text-2);line-height:1.7;
+  margin-bottom:8px;
+}
+
+/* ─── Meta row ─── */
+.meta{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--c-text-3);flex-wrap:wrap}
+.meta a{color:var(--c-emerald);text-decoration:none;font-weight:500}
+.meta a:hover{text-decoration:underline}
+.meta .sep{width:3px;height:3px;border-radius:50%;background:#ddd;flex-shrink:0}
+.meta .lock{
+  font-size:9.5px;color:var(--c-amber);
+  background:rgba(212,147,13,0.08);
+  padding:1px 6px;border-radius:5px;font-weight:500;
+  display:inline-flex;align-items:center;gap:3px;
+}
+
+/* ─── Ordinary grid (2-col, left image right text) ─── */
+.ord-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.ord-card{
+  border-radius:var(--radius-sm);
+  padding:14px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.03);
+  display:flex;gap:12px;align-items:stretch;
+  transition:box-shadow .25s,transform .25s;
+}
+.ord-card:hover{box-shadow:0 6px 22px rgba(0,0,0,0.07);transform:translateY(-1px)}
+.ord-thumb{
+  flex-shrink:0;width:108px;
+  border-radius:10px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(163,201,74,0.06),rgba(45,157,120,0.05));
+}
+.ord-thumb img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.ord-noimg{
+  flex-shrink:0;width:108px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(163,201,74,0.06),rgba(45,157,120,0.04));
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--c-text-3);letter-spacing:.5px;
+}
+.ord-text{flex:1;min-width:0;display:flex;flex-direction:column}
+.ord-card h4{font-size:13.5px;font-weight:600;line-height:1.5;margin-bottom:4px}
+.ord-card .summary{
+  font-size:12px;color:var(--c-text-2);line-height:1.65;
+  margin-bottom:6px;flex:1;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.ord-card .meta{font-size:10.5px}
+
+/* ─── Footer ─── */
+footer{text-align:center;padding:32px 20px;font-size:11px;color:var(--c-text-3)}
+
+/* ─── Responsive ─── */
+@media(max-width:700px){
+  .ord-grid{grid-template-columns:1fr}
+  .hl-img{height:135px}
+  .hdr-inner{padding:14px 20px 12px}
+  header h1{font-size:17px}
+  .blob{opacity:.45}
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --c-bg:#111;--c-surface:rgba(28,28,28,0.7);--c-surface-solid:#1a1a1a;
+    --c-border:rgba(255,255,255,0.07);--c-text:#e4e4e4;--c-text-2:#aaa;--c-text-3:#666;
+    --c-emerald:#5ddcaa;--c-emerald-bg:rgba(93,220,170,0.1);
+    --c-amber:#f0b840;--coral:#f09080;
+  }
+  .b1{background:rgba(163,201,74,0.12)}
+  .b2{background:rgba(45,157,120,0.10)}
+  .b3{background:rgba(232,115,90,0.08)}
+  .b4{background:rgba(212,147,13,0.07)}
+  .b5{background:rgba(163,201,74,0.06)}
+  .ord-noimg{background:linear-gradient(135deg,rgba(163,201,74,0.08),rgba(45,157,120,0.06))}
+}
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="blob b4"></div>
+  <div class="blob b5"></div>
+</div>
+
+<header>
+  <div class="hdr-inner glass">
+    <div class="hdr-tag">Natural Future Tech</div>
+    <h1>每日新闻简报</h1>
+    <div class="hdr-date">2026 年 8 月 27 日 · 星期三</div>
+    <div class="hdr-pills">
+      <span><b>343</b> 原始</span>
+      <span><b>84</b> 去重</span>
+      <span><b>50</b> 精选</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ════ HEADLINES ════ -->
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-label">今日头条</span>
+      <span class="sec-pill">3</span>
+      <span class="sec-line"></span>
+    </div>
+    <div class="hl-list">
+
+      <!-- HL 1 -->
+      <div class="hl-card glass">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-title-row">
+            <span class="hl-rank">[01]</span>
+            <h3>加拿大与美国贸易战全面升级，卡尼誓言"一美元对一美元"回击</h3>
+          </div>
+          <div class="summary">在华盛顿最新的贸易谈判破裂后，加拿大总理马克·卡尼宣布将对美国产品征收对等关税，涵盖钢铁、铝制品及消费品。两国经济界对供应链中断表示深度担忧。</div>
+          <div class="meta">
+            <a href="#">纽约时报</a>
+            <span class="sep"></span>
+            <a href="#">卫报</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- HL 2 -->
+      <div class="hl-card glass">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-title-row">
+            <span class="hl-rank">[02]</span>
+            <h3>欧盟通过全球首个全面 AI 法案，科技巨头面临合规挑战</h3>
+          </div>
+          <div class="summary">欧盟议会以压倒性多数通过《人工智能法案》，对高风险 AI 系统实施严格监管。违规者将面临全球营收 7% 的罚款。</div>
+          <div class="meta">
+            <a href="#">金融时报</a>
+            <span class="lock">🔒 Paywall</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- HL 3 -->
+      <div class="hl-card glass">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-title-row">
+            <span class="hl-rank">[03]</span>
+            <h3>联合国气候峰会：120 国承诺 2035 年前碳排放减半</h3>
+          </div>
+          <div class="summary">120 个国家签署了历史性减排协议。中国、美国和欧盟承诺在 2035 年前将碳排放较 2020 年水平减少 50%。</div>
+          <div class="meta">
+            <a href="#">德国之声</a>
+            <span class="sep"></span>
+            <a href="#">半岛电视台</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════ ORDINARY ════ -->
+  <div class="sec">
+    <div class="sec-head">
+      <span class="sec-label">其他重要新闻</span>
+      <span class="sec-pill">8</span>
+      <span class="sec-line"></span>
+    </div>
+    <div class="ord-grid">
+
+      <!-- ORD 1 -->
+      <div class="ord-card glass">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <h4>Anthropic 计划通过大规模 IPO 筹集 1000 亿美元</h4>
+          <div class="summary">AI 公司 Anthropic 正在筹备史上最大规模的科技 IPO，计划估值超过 3000 亿美元，将超过阿里巴巴 2014 年创下的纪录。</div>
+          <div class="meta"><a href="#">纽约时报科技版</a><span class="lock">🔒 Paywall</span></div>
+        </div>
+      </div>
+
+      <!-- ORD 2 -->
+      <div class="ord-card glass">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <h4>缅甸军方空袭佛寺造成 14 人死亡</h4>
+          <div class="summary">联合国人权办公室对缅甸最新空袭事件表示震惊，呼吁各方遵守国际人道法，保护平民和宗教场所。</div>
+          <div class="meta"><a href="#">BBC World</a></div>
+        </div>
+      </div>
+
+      <!-- ORD 3 -->
+      <div class="ord-card glass">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <h4>被美国指控帮助贩毒集团的墨西哥州长重返工作岗位</h4>
+          <div class="summary">尽管面临美国的引渡要求和制裁威胁，该州长在获得墨西哥法院裁决后恢复执政，美墨关系再添变数。</div>
+          <div class="meta"><a href="#">纽约时报</a><span class="lock">🔒 Paywall</span></div>
+        </div>
+      </div>
+
+      <!-- ORD 4 -->
+      <div class="ord-card glass">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <h4>日本央行维持超低利率政策，日元汇率继续承压</h4>
+          <div class="summary">日本央行宣布维持 -0.1% 的基准利率不变，市场预期短期内不会退出超宽松货币政策。</div>
+          <div class="meta"><a href="#">NHK World</a><span class="sep"></span><a href="#">彭博社</a><span class="lock">🔒 Paywall</span></div>
+        </div>
+      </div>
+
+      <!-- ORD 5 -->
+      <div class="ord-card glass">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <h4>SpaceX 星舰完成轨道飞行测试</h4>
+          <div class="summary">星舰在第三次全系统轨道试飞中成功完成绕地球飞行并安全着陆，载人火星计划迈出关键一步。</div>
+          <div class="meta"><a href="#">纽约时报科技版</a><span class="lock">🔒 Paywall</span></div>
+        </div>
+      </div>
+
+      <!-- ORD 6 -->
+      <div class="ord-card glass">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <h4>伊朗称美国新制裁侵犯了其他国家的主权</h4>
+          <div class="summary">伊朗外交部强烈谴责美国最新的单边制裁措施，称其违反国际法准则，并表示将采取"相应回应"。</div>
+          <div class="meta"><a href="#">半岛电视台</a></div>
+        </div>
+      </div>
+
+      <!-- ORD 7 — no image -->
+      <div class="ord-card glass">
+        <div class="ord-noimg">无图片</div>
+        <div class="ord-text">
+          <h4>沃尔玛发布季度财报，电商增长超预期</h4>
+          <div class="summary">沃尔玛第二季度电商销售额同比增长 22%，受 AI 推荐系统和配送网络优化推动。</div>
+          <div class="meta"><a href="#">Bloomberg</a><span class="lock">🔒 Paywall</span></div>
+        </div>
+      </div>
+
+      <!-- ORD 8 — no image -->
+      <div class="ord-card glass">
+        <div class="ord-noimg">无图片</div>
+        <div class="ord-text">
+          <h4>欧洲央行考虑进一步降息以应对经济放缓</h4>
+          <div class="summary">多位欧洲央行官员暗示可能在年内再次降息 25 个基点，以应对欧元区经济疲软。</div>
+          <div class="meta"><a href="#">Financial Times</a><span class="lock">🔒 Paywall</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer>每日新闻简报 · Natural Future Tech</footer>
+
+</body>
+</html>
