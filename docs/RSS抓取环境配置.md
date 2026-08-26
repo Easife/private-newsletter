@@ -10,19 +10,21 @@
 本项目运行在无法直接访问外网的环境中：
 
 - **WSL**：网络命名空间隔离，无法直接访问互联网
-- **Windows**：需要通过 Clash 代理访问境外 RSS 源（NYT、BBC、Guardian 等）
+- **Windows**：部分网络环境需要通过代理访问境外 RSS 源（NYT、BBC、Guardian 等）
 
-因此 RSS 抓取必须配置代理。
+因此某些网络环境下 RSS 抓取需要配置代理。
 
 ---
 
 ## 2. 代理配置
 
-### 2.1 代理地址
+### 2.1 代理地址示例
 
 ```
 http://127.0.0.1:7897
 ```
+
+> 注意：以上为 Clash 代理的常见地址示例，请根据你实际使用的代理软件和端口修改。
 
 ### 2.2 配置位置
 
@@ -33,7 +35,9 @@ fetch:
   timeout: 15
   max_concurrent: 5
   ssl_verify: false
-  proxy: "http://127.0.0.1:7897"
+  # 代理地址（可选，留空则使用系统环境变量 HTTP_PROXY/HTTPS_PROXY）
+  # 示例：proxy: "http://127.0.0.1:7897"
+  proxy: ""
 ```
 
 ### 2.3 常见错误
@@ -45,11 +49,11 @@ fetch:
   # proxy: "http://127.0.0.1:7897"   ← 不生效！
 ```
 
-**正确：proxy 未注释**
+**正确：proxy 未注释且填入实际地址**
 
 ```yaml
 fetch:
-  proxy: "http://127.0.0.1:7897"     ← 生效
+  proxy: "http://127.0.0.1:7897"     ← 生效（请替换为你的实际代理地址）
 ```
 
 ### 2.4 环境变量备选
@@ -60,7 +64,7 @@ fetch:
 2. `os.environ.get("HTTPS_PROXY")`
 3. `os.environ.get("HTTP_PROXY")`
 
-三者都为空时，`proxies=None`，请求直连外网（会失败）。
+三者都为空时，`proxies=None`，请求直连外网（部分网络环境下会失败）。
 
 ---
 
@@ -85,7 +89,7 @@ run.py
 ### 快速判断
 
 ```bash
-# 1. 测试代理是否可用
+# 1. 测试代理是否可用（替换为你的实际代理地址）
 curl.exe -x http://127.0.0.1:7897 https://httpbin.org/ip
 # 应返回非国内 IP（如 64.118.x.x）
 
@@ -93,7 +97,7 @@ curl.exe -x http://127.0.0.1:7897 https://httpbin.org/ip
 curl.exe https://httpbin.org/ip
 # 如果返回国内 IP，说明直连被墙，必须走代理
 
-# 3. 测试 RSS 源
+# 3. 测试 RSS 源（替换为你的实际代理地址）
 curl.exe -x http://127.0.0.1:7897 https://feeds.bbci.co.uk/news/rss.xml
 # 应返回 XML 内容
 ```
@@ -104,7 +108,7 @@ curl.exe -x http://127.0.0.1:7897 https://feeds.bbci.co.uk/news/rss.xml
 |------|------|
 | 所有 RSS 源都超时/连接失败 | 代理问题 |
 | 部分源成功，部分失败 | 源站问题（403/404/超时） |
-| 代理返回 503 | Clash 代理服务异常，需重启 |
+| 代理返回 503 | 代理服务异常，需重启 |
 | 代理返回 200 但 RSS 解析失败 | RSS 格式问题 |
 
 ---
@@ -112,13 +116,13 @@ curl.exe -x http://127.0.0.1:7897 https://feeds.bbci.co.uk/news/rss.xml
 ## 5. 常用测试命令
 
 ```bash
-# 测试代理连通性
+# 测试代理连通性（替换为你的实际代理地址）
 curl.exe -x http://127.0.0.1:7897 https://httpbin.org/ip
 
 # 测试 RSS 源（替换 URL）
 curl.exe -x http://127.0.0.1:7897 https://feeds.bbci.co.uk/news/rss.xml
 
-# Python 测试
+# Python 测试（替换为你的实际代理地址）
 python -c "import requests; r=requests.get('https://httpbin.org/ip',proxies={'https':'http://127.0.0.1:7897'},verify=False); print(r.json())"
 ```
 
@@ -126,35 +130,17 @@ python -c "import requests; r=requests.get('https://httpbin.org/ip',proxies={'ht
 
 ## 6. 故障案例
 
-### 案例：代理未启用导致 RSS 0 条（2026-08-22）
+### 案例：代理未启用导致 RSS 0 条
 
-**现象**：运行 `python run.py --raw-file data/raw_news.json`，所有 17 个 RSS 源全部超时，返回 0 条新闻。
+**现象**：运行 `python run.py --raw-file data/raw_news.json`，所有 RSS 源全部超时，返回 0 条新闻。
 
 **排查过程**：
-1. 测试代理连接 → 代理端口 7897 开放，但返回 503
+1. 测试代理连接 → 代理端口开放，但返回 503
 2. 检查 newsletter.yaml → `proxy` 被注释掉
 3. 检查环境变量 → 未设置 HTTP_PROXY/HTTPS_PROXY
 4. 最终 `proxies=None`，请求直连外网被墙
 
-**修复**：取消 `newsletter.yaml` 中 proxy 的注释。
-
-**修复后结果**：
-- 343 条新闻成功抓取
-- 9/17 来源成功
-- 343/343 新闻包含完整 URL
-- 74 条新闻包含图片 URL
-
-**失败源（非代理问题）**：
-
-| 来源 | 失败原因 |
-|------|---------|
-| Reuters | 连接被中断 |
-| AP | rsshub.app 返回 403 |
-| Economist | 返回 403 |
-| 新华社 | RSS URL 返回 404 |
-| 日经 | RSS URL 返回 404 |
-| 联合早报 | RSS 解析失败 |
-| BBC World/BBC | 超时 (15s) |
+**修复**：取消 `newsletter.yaml` 中 proxy 的注释，并填入实际代理地址。
 
 ---
 

@@ -13,8 +13,10 @@ import json as json_module
 import logging
 import os
 import subprocess
+import sys
 import time
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 import yaml
@@ -122,10 +124,35 @@ def _filter_by_date(items: list[NewsItem], target_date: str) -> list[NewsItem]:
 # Windows Python 翻译代理调用
 # ============================================================
 
-# Windows 端 Python 解释器路径（WSL 视角）
-WIN_PYTHON = "/mnt/c/Users/qing4/AppData/Local/Programs/Python/Python311/python.exe"
+# 项目根目录（自动检测）
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+# Windows 端 Python 解释器路径（WSL 视角，自动检测）
+WIN_PYTHON = str(Path(sys.executable)) if sys.platform == "win32" else None
+if sys.platform != "win32" and WIN_PYTHON is None:
+    # WSL 环境：尝试常见 Windows Python 路径
+    for candidate in [
+        "/mnt/c/Program Files/Python311/python.exe",
+        "/mnt/c/Program Files (x86)/Python311/python.exe",
+    ]:
+        if os.path.exists(candidate):
+            WIN_PYTHON = candidate
+            break
+
 # Windows 端项目根路径（Windows 视角，用于传递给 Windows Python）
-WIN_PROJECT_WIN = "D:\\AI工作\\private-newsletter-win"
+# 将 WSL 路径转换为 Windows 路径，或从 Windows 环境直接获取
+if sys.platform == "win32":
+    WIN_PROJECT_WIN = str(PROJECT_ROOT)
+else:
+    # WSL: /mnt/d/... → D:\...
+    win_path = str(PROJECT_ROOT)
+    if win_path.startswith("/mnt/"):
+        drive = win_path[5].upper()
+        rest = win_path[6:].replace("/", "\\")
+        WIN_PROJECT_WIN = f"{drive}:{rest}"
+    else:
+        WIN_PROJECT_WIN = win_path
+
 WIN_TRANSLATE_SCRIPT_WIN = f"{WIN_PROJECT_WIN}\\translate_news_windows.py"
 
 
@@ -153,12 +180,13 @@ def _call_windows_translate(items: list[NewsItem], timeout: int = 600) -> list:
     input_path_win = f"{input_dir_win}\\translate_input.json"
     output_path_win = f"{input_dir_win}\\translate_output.json"
 
-    # WSL 视角路径（用于写文件）
-    input_path_wsl = "/mnt/d/AI工作/private-newsletter-win/data/translation/translate_input.json"
-    output_path_wsl = "/mnt/d/AI工作/private-newsletter-win/data/translation/translate_output.json"
+    # WSL 视角路径（基于项目根目录）
+    translation_dir = PROJECT_ROOT / "data" / "translation"
+    input_path_wsl = str(translation_dir / "translate_input.json")
+    output_path_wsl = str(translation_dir / "translate_output.json")
 
-    # WSL 创建目录并写入文件
-    os.makedirs("/mnt/d/AI工作/private-newsletter-win/data/translation", exist_ok=True)
+    # 创建目录并写入文件
+    translation_dir.mkdir(parents=True, exist_ok=True)
     with open(input_path_wsl, "w", encoding="utf-8") as f:
         json_module.dump(items_json, f, ensure_ascii=False, indent=2)
 
