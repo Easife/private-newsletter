@@ -132,6 +132,7 @@ WIN_PYTHON = str(Path(sys.executable)) if sys.platform == "win32" else None
 if sys.platform != "win32" and WIN_PYTHON is None:
     # WSL 环境：尝试常见 Windows Python 路径
     for candidate in [
+        "/mnt/c/Users/qing4/AppData/Local/Programs/Python/Python311/python.exe",
         "/mnt/c/Program Files/Python311/python.exe",
         "/mnt/c/Program Files (x86)/Python311/python.exe",
     ]:
