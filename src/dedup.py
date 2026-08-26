@@ -323,11 +323,8 @@ def group_news(
     return groups
 
 
-def deduplicate(items: list[NewsItem], threshold: float = 0.6, low_threshold: float = 0.35) -> list[NewsItem]:
-    """对新闻列表进行去重（向后兼容接口）
-
-    此函数保留原有接口，内部调用 group_news() 并展平结果。
-    每个组保留 leader，但合并组内所有来源到 leader.sources。
+def deduplicate(items: list[NewsItem], threshold: float = 0.6, low_threshold: float = 0.35) -> tuple[list[NewsItem], list[NewsGroup], dict]:
+    """对新闻列表进行去重，返回 3 值以兼容主流程
 
     Args:
         items: 原始新闻列表
@@ -335,7 +332,10 @@ def deduplicate(items: list[NewsItem], threshold: float = 0.6, low_threshold: fl
         low_threshold: 相关报道阈值下限，低于此值视为独立新闻
 
     Returns:
-        去重后的新闻列表（每个组的 leader，sources 已合并）
+        (deduped_items, news_groups, dedup_stats)
+        - deduped_items: 去重后的新闻列表（每个组的 leader，sources 已合并）
+        - news_groups: 新闻分组列表
+        - dedup_stats: 统计信息字典
     """
     groups = group_news(items, high_threshold=threshold, low_threshold=low_threshold)
 
@@ -356,5 +356,22 @@ def deduplicate(items: list[NewsItem], threshold: float = 0.6, low_threshold: fl
             )
         deduped.append(leader)
 
-    logger.info(f"去重（兼容模式）：{len(items)} → {len(deduped)} 条（阈值 {threshold}）")
-    return deduped
+    # 统计
+    exact_count = sum(1 for g in groups if g.group_type == "exact_match")
+    related_count = sum(1 for g in groups if g.group_type == "related")
+    single_count = sum(1 for g in groups if g.group_type == "single")
+
+    stats = {
+        "input_count": len(items),
+        "output_count": len(groups),
+        "exact_match": exact_count,
+        "related": related_count,
+        "single": single_count,
+    }
+
+    logger.info(
+        f"去重：{len(items)} 条 → {len(groups)} 组 "
+        f"(精确匹配 {exact_count}, 相关报道 {related_count}, 独立 {single_count})"
+    )
+
+    return deduped, groups, stats
