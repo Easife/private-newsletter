@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日新闻简报 - Natural Future Tech</title>
+<style>
+:root {
+  --bg: #f0f5f1;
+  --surface: rgba(255,255,255,0.72);
+  --surface-solid: #ffffff;
+  --glass-border: rgba(255,255,255,0.5);
+  --text: #1a2e1a;
+  --text-secondary: #4a6a4a;
+  --text-tertiary: #8aaa8a;
+  --emerald: #2d7a5f;
+  --emerald-light: #3d9e78;
+  --emerald-soft: rgba(45,122,95,0.08);
+  --sage: #a7d8c0;
+  --gold: #c4956a;
+  --gold-soft: rgba(196,149,106,0.1);
+  --border: rgba(45,122,95,0.08);
+  --shadow-sm: 0 2px 8px rgba(30,80,50,0.04);
+  --shadow: 0 4px 20px rgba(30,80,50,0.06);
+  --shadow-hover: 0 12px 40px rgba(30,80,50,0.1);
+  --radius: 20px;
+  --radius-sm: 14px;
+  --max-w: 920px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+               "Noto Sans SC", "PingFang SC", "Microsoft YaHei",
+               system-ui, sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 15% 10%, rgba(167,216,192,0.25) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 85%, rgba(196,149,106,0.12) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.4) 0%, transparent 60%);
+  background-attachment: fixed;
+  color: var(--text);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  padding: 56px 24px 48px;
+  text-align: center;
+  position: relative;
+}
+.header::after {
+  content: "";
+  position: absolute; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sage), transparent);
+}
+.header-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--emerald-soft);
+  border: 1px solid rgba(45,122,95,0.12);
+  border-radius: 20px; padding: 6px 16px;
+  font-size: 11px; font-weight: 500; color: var(--emerald);
+  letter-spacing: 1px; text-transform: uppercase;
+  margin-bottom: 18px;
+}
+.header-tag .leaf { font-size: 12px; }
+.header h1 {
+  font-size: 30px; font-weight: 600; letter-spacing: 2px;
+  color: var(--text); margin-bottom: 8px;
+}
+.header-date {
+  font-size: 14px; color: var(--text-tertiary); margin-bottom: 12px;
+}
+.header-stats {
+  display: flex; justify-content: center; gap: 24px;
+  font-size: 12px; color: var(--text-tertiary);
+}
+.header-stats .num {
+  color: var(--emerald); font-weight: 600;
+}
+
+/* CONTAINER */
+.container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+/* SECTION */
+.section { padding: 40px 0 0; }
+.section-head {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 20px;
+}
+.section-label {
+  font-size: 15px; font-weight: 600; color: var(--text);
+}
+.section-pill {
+  font-size: 11px; font-weight: 600; color: var(--emerald);
+  background: var(--emerald-soft); padding: 3px 10px;
+  border-radius: 10px;
+}
+.section-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* HEADLINES */
+.headlines { display: flex; flex-direction: column; gap: 20px; }
+.hl-card {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.hl-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+  border-color: rgba(45,122,95,0.15);
+}
+.hl-img {
+  width: 100%; height: 280px; overflow: hidden;
+  position: relative;
+}
+.hl-img::after {
+  content: "";
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 80px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.85));
+}
+.hl-img img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 0.5s ease;
+}
+.hl-card:hover .hl-img img { transform: scale(1.02); }
+.hl-body { padding: 22px 28px 26px; }
+.hl-meta-top {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.hl-rank {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 10px;
+  background: var(--emerald);
+  color: #fff; font-size: 13px; font-weight: 700;
+}
+.hl-tag {
+  font-size: 10px; font-weight: 500; color: var(--gold);
+  background: var(--gold-soft); padding: 3px 10px;
+  border-radius: 10px; letter-spacing: 0.5px;
+}
+.hl-read {
+  font-size: 11px; color: var(--text-tertiary); margin-left: auto;
+}
+.hl-card h3 {
+  font-size: 19px; font-weight: 600; line-height: 1.55;
+  margin-bottom: 10px; color: var(--text);
+}
+.hl-card .summary {
+  font-size: 14px; color: var(--text-secondary); line-height: 1.8;
+  margin-bottom: 14px;
+}
+.meta-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-tertiary); flex-wrap: wrap;
+}
+.meta-row a {
+  color: var(--emerald); text-decoration: none; font-weight: 500;
+  transition: opacity 0.2s;
+}
+.meta-row a:hover { opacity: 0.7; }
+.dot-sep {
+  width: 3px; height: 3px; border-radius: 50%;
+  background: var(--sage); display: inline-block;
+}
+.tag-free {
+  font-size: 10px; font-weight: 500; color: var(--emerald);
+  background: var(--emerald-soft); padding: 2px 8px; border-radius: 8px;
+}
+.tag-paid {
+  font-size: 10px; font-weight: 500; color: #b45309;
+  background: var(--gold-soft); padding: 2px 8px; border-radius: 8px;
+}
+
+/* ORDINARY - Grid with two layouts */
+.ordinary-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Layout A: Left Image */
+.ord-card {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+.ord-card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(45,122,95,0.12);
+}
+.ord-card.layout-a { display: flex; gap: 14px; align-items: stretch; }
+.ord-thumb {
+  flex-shrink: 0; width: 130px;
+  border-radius: 10px; overflow: hidden;
+  background: linear-gradient(135deg, #e8f5ef, #f0f8f4);
+}
+.ord-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center; display: block;
+}
+.ord-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ord-card h4 {
+  font-size: 14px; font-weight: 600; line-height: 1.55;
+  margin-bottom: 6px; color: var(--text);
+}
+.ord-card .summary {
+  font-size: 12.5px; color: var(--text-secondary); line-height: 1.65;
+  margin-bottom: 8px; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.ord-card .meta-row { font-size: 11px; }
+
+/* Layout B: Top Image */
+.ord-card.layout-b { display: flex; flex-direction: column; }
+.ord-card.layout-b .ord-thumb {
+  width: 100%; height: 140px;
+  border-radius: 10px; margin-bottom: 12px;
+}
+.ord-card.layout-b .ord-text { flex: none; }
+
+/* Category tag */
+.cat-tag {
+  display: inline-block; font-size: 10px; font-weight: 500;
+  color: var(--emerald); background: var(--emerald-soft);
+  padding: 2px 8px; border-radius: 8px; margin-bottom: 6px;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center; padding: 48px 24px;
+  font-size: 12px; color: var(--text-tertiary);
+  margin-top: 20px;
+}
+.footer-line {
+  width: 40px; height: 1px; margin: 0 auto 16px;
+  background: var(--sage);
+}
+
+@media (max-width: 700px) {
+  .header h1 { font-size: 24px; }
+  .hl-img { height: 200px; }
+  .ordinary-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1a14; --surface: rgba(26,46,32,0.72);
+    --surface-solid: #1a2e20;
+    --glass-border: rgba(255,255,255,0.06);
+    --text: #d4e8dc; --text-secondary: #98bca8; --text-tertiary: #5a7a68;
+    --emerald: #4dcea8; --emerald-light: #6de0bc;
+    --emerald-soft: rgba(77,206,168,0.1);
+    --sage: #3a8a6a; --gold: #d4a878; --gold-soft: rgba(212,168,120,0.12);
+    --border: rgba(77,206,168,0.08);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.15);
+    --shadow: 0 4px 20px rgba(0,0,0,0.2);
+    --shadow-hover: 0 12px 40px rgba(0,0,0,0.25);
+  }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-tag"><span class="leaf">🌿</span> Natural Future Tech</div>
+  <h1>每日新闻简报</h1>
+  <div class="header-date">2026 年 8 月 27 日 · 星期三</div>
+  <div class="header-stats">
+    <span><span class="num">343</span> 原始</span>
+    <span><span class="num">84</span> 去重</span>
+    <span><span class="num">50</span> 精选</span>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- HEADLINES -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-label">今日头条</span>
+      <span class="section-pill">3</span>
+      <span class="section-line"></span>
+    </div>
+    <div class="headlines">
+
+      <div class="hl-card">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-meta-top">
+            <div class="hl-rank">1</div>
+            <span class="hl-tag">国际贸易</span>
+            <span class="hl-read">5 分钟阅读</span>
+          </div>
+          <h3>加拿大与美国贸易战全面升级，卡尼誓言"一美元对一美元"回击</h3>
+          <div class="summary">在华盛顿最新的贸易谈判破裂后，加拿大总理马克·卡尼宣布将对美国产品征收对等关税，涵盖钢铁、铝制品及消费品。这是近年来北美贸易关系最严重的恶化，两国经济界对供应链中断表示深度担忧。</div>
+          <div class="meta-row">
+            <a href="#">纽约时报</a><span class="tag-free">免费</span>
+            <span class="dot-sep"></span>
+            <a href="#">卫报</a><span class="tag-free">免费</span>
+            <span class="dot-sep"></span>
+            <a href="#">Google 搜索</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hl-card">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-meta-top">
+            <div class="hl-rank">2</div>
+            <span class="hl-tag">科技政策</span>
+            <span class="hl-read">4 分钟阅读</span>
+          </div>
+          <h3>欧盟通过全球首个全面 AI 法案，科技巨头面临合规挑战</h3>
+          <div class="summary">欧盟议会以压倒性多数通过《人工智能法案》，对高风险 AI 系统实施严格监管。OpenAI、Google、Meta 等科技公司需在 18 个月内完成合规调整，违规者将面临全球营收 7% 的罚款。</div>
+          <div class="meta-row">
+            <a href="#">金融时报</a><span class="tag-paid">付费</span>
+            <span class="dot-sep"></span>
+            <a href="#">Google 搜索</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hl-card">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-meta-top">
+            <div class="hl-rank">3</div>
+            <span class="hl-tag">气候环境</span>
+            <span class="hl-read">6 分钟阅读</span>
+          </div>
+          <h3>联合国气候峰会：120 国承诺 2035 年前碳排放减半</h3>
+          <div class="summary">在纽约联合国总部举行的气候行动峰会上，120 个国家签署了历史性减排协议。中国、美国和欧盟承诺在 2035 年前将碳排放较 2020 年水平减少 50%，同时设立 5000 亿美元的气候融资基金。</div>
+          <div class="meta-row">
+            <a href="#">德国之声</a><span class="tag-free">免费</span>
+            <span class="dot-sep"></span>
+            <a href="#">半岛电视台</a><span class="tag-free">免费</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ORDINARY - Layout A: Left Image -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-label">其他重要新闻</span>
+      <span class="section-pill">6</span>
+      <span class="section-line"></span>
+    </div>
+    <div class="ordinary-grid">
+
+      <div class="ord-card layout-a">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <span class="cat-tag">科技</span>
+          <h4>Anthropic 计划通过大规模 IPO 筹集 1000 亿美元</h4>
+          <div class="summary">AI 公司 Anthropic 正在筹备史上最大规模的科技 IPO，计划估值超过 3000 亿美元，将超过阿里巴巴 2014 年创下的纪录。</div>
+          <div class="meta-row"><a href="#">纽约时报科技版</a><span class="tag-paid">付费</span><span class="dot-sep"></span><span>3 分钟</span></div>
+        </div>
+      </div>
+
+      <div class="ord-card layout-b">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=400&h=250&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <span class="cat-tag">国际</span>
+          <h4>缅甸军方空袭佛寺造成 14 人死亡</h4>
+          <div class="summary">联合国人权办公室对缅甸最新空袭事件表示震惊，呼吁各方遵守国际人道法，保护平民和宗教场所。</div>
+          <div class="meta-row"><a href="#">BBC World</a><span class="tag-free">免费</span><span class="dot-sep"></span><span>4 分钟</span></div>
+        </div>
+      </div>
+
+      <div class="ord-card layout-a">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <span class="cat-tag">政治</span>
+          <h4>被美国指控帮助贩毒集团的墨西哥州长重返工作岗位</h4>
+          <div class="summary">尽管面临美国的引渡要求和制裁威胁，该州长在获得墨西哥法院裁决后恢复执政。</div>
+          <div class="meta-row"><a href="#">纽约时报</a><span class="tag-paid">付费</span><span class="dot-sep"></span><span>5 分钟</span></div>
+        </div>
+      </div>
+
+      <div class="ord-card layout-b">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <span class="cat-tag">经济</span>
+          <h4>日本央行维持超低利率政策，日元汇率继续承压</h4>
+          <div class="summary">日本央行宣布维持 -0.1% 的基准利率不变，市场预期短期内不会退出超宽松货币政策。</div>
+          <div class="meta-row"><a href="#">NHK World</a><span class="tag-free">免费</span><span class="dot-sep"></span><a href="#">彭博社</a><span class="tag-paid">付费</span></div>
+        </div>
+      </div>
+
+      <div class="ord-card layout-a">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <span class="cat-tag">科技</span>
+          <h4>SpaceX 星舰完成轨道飞行测试</h4>
+          <div class="summary">星舰在第三次全系统轨道试飞中成功完成绕地球飞行并安全着陆，载人火星计划迈出关键一步。</div>
+          <div class="meta-row"><a href="#">纽约时报科技版</a><span class="tag-paid">付费</span><span class="dot-sep"></span><span>4 分钟</span></div>
+        </div>
+      </div>
+
+      <div class="ord-card layout-a">
+        <div class="ord-thumb">
+          <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-text">
+          <span class="cat-tag">国际</span>
+          <h4>伊朗称美国新制裁侵犯了其他国家的主权</h4>
+          <div class="summary">伊朗外交部强烈谴责美国最新的单边制裁措施，称其违反国际法准则，并表示将采取"相应回应"。</div>
+          <div class="meta-row"><a href="#">半岛电视台</a><span class="tag-free">免费</span><span class="dot-sep"></span><span>3 分钟</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-line"></div>
+  每日新闻简报 · Natural Future Tech Prototype
+</footer>
+
+</body>
+</html>
