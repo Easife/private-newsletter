@@ -3,8 +3,19 @@ data/
 output/
 *.json
 
+# Runtime outputs (不要提交)
+cache/
+archive/
+latest/
+data/rss_audit/
+prototype/deepseek_style_output/
+
 # Logs
 *.log
+
+# Playwright browsers (本地环境，不提交)
+ms-playwright/
+__ms-playwright/
 
 # Python
 __pycache__/

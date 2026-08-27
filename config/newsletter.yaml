@@ -53,6 +53,33 @@ fetch:
   # 示例：proxy: "http://127.0.0.1:7897"
   proxy: ""
 
+# 翻译设置
+# 翻译失败采用分层 fallback：Google Translate → Bing（快速失败）→ LLM
+translation:
+  google:
+    # 最大批量大小（保持一致时，普通新闻 50 条按 25+25 分批）
+    batch_size: 25
+    # 批间随机等待秒数范围（避免固定频率触发 Google 限流）
+    batch_delay_min: 2
+    batch_delay_max: 8
+  bing:
+    # Bing 作为第二层兜底；接口不稳定时快速失败，尽快进入 LLM 层
+    enabled: true
+    timeout: 5
+    # 连续失败达到该次数后禁用 Bing fallback，剩余失败条目直接交 LLM
+    max_fail_streak: 3
+  llm:
+    # 每批翻译条数
+    batch_size: 20
+    # LLM 翻译模型 fallback 顺序（最多 5 个）：前一个失败后自动尝试下一个。
+    # 优先使用 OpenCode 可用免费模型。
+    model_fallbacks:
+      - opencode/big-pickle
+      - opencode/hy3-free
+      - opencode/mimo-v2.5-free
+      - opencode/nemotron-3.5-lightning-free
+      - opencode/nemotron-3-ultra-free
+
 # 去重/分组设置
 dedup:
   # 高度相似阈值：≥ 此值视为同一事件（精确匹配组）

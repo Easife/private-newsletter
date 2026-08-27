@@ -12,6 +12,7 @@
 import json as json_module
 import logging
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -26,6 +27,7 @@ from .fetcher import NewsItem, fetch_all, save_raw_news, load_raw_news
 from .formatter import format_newsletter
 from .llm import select_headlines
 from .non_news_filter import is_non_news
+from . import cache as cache_store
 
 logger = logging.getLogger(__name__)
 
@@ -157,7 +159,11 @@ else:
 WIN_TRANSLATE_SCRIPT_WIN = f"{WIN_PROJECT_WIN}\\translate_news_windows.py"
 
 
-def _call_windows_translate(items: list[NewsItem], timeout: int = 600) -> list:
+def _call_windows_translate(
+    items: list[NewsItem],
+    timeout: int = 600,
+    translation_config: Optional[dict] = None,
+) -> list:
     """通过 Windows Python 调用 Google Translate
 
     流程：
@@ -165,6 +171,12 @@ def _call_windows_translate(items: list[NewsItem], timeout: int = 600) -> list:
     2. 写入 Windows 端 input 文件（使用 Windows 路径）
     3. 调用 Windows Python 运行 translate_news_windows.py
     4. 读取 Windows 端 output 文件
+
+    Args:
+        items: 待翻译新闻
+        timeout: 整个 Windows 翻译进程的超时（秒）
+        translation_config: config/newsletter.yaml 的 translation 段，
+            用于透传 Google 分批大小/批间延迟、Bing 快速失败参数
     """
     # 1. 序列化
     items_json = []
@@ -191,12 +203,26 @@ def _call_windows_translate(items: list[NewsItem], timeout: int = 600) -> list:
     with open(input_path_wsl, "w", encoding="utf-8") as f:
         json_module.dump(items_json, f, ensure_ascii=False, indent=2)
 
-    # 3. 调用 Windows Python（使用 Windows 路径）
+    # 3. 调用 Windows Python（使用 Windows 路径；根据配置透传参数）
     cmd = [
         WIN_PYTHON, WIN_TRANSLATE_SCRIPT_WIN,
         "--input", input_path_win,
         "--output", output_path_win,
     ]
+    cfg = translation_config or {}
+    g_cfg = cfg.get("google", {}) or {}
+    b_cfg = cfg.get("bing", {}) or {}
+    if g_cfg.get("batch_size"):
+        cmd += ["--batch-size", str(g_cfg["batch_size"])]
+    if g_cfg.get("batch_delay_min") is not None:
+        cmd += ["--batch-delay-min", str(g_cfg["batch_delay_min"])]
+    if g_cfg.get("batch_delay_max") is not None:
+        cmd += ["--batch-delay-max", str(g_cfg["batch_delay_max"])]
+    if b_cfg.get("timeout") is not None:
+        cmd += ["--bing-timeout", str(b_cfg["timeout"])]
+    if b_cfg.get("max_fail_streak") is not None:
+        cmd += ["--bing-max-fail-streak", str(b_cfg["max_fail_streak"])]
+
     logger.info(f"调用 Windows Python: {' '.join(cmd)}")
     try:
         result = subprocess.run(
@@ -224,6 +250,134 @@ def _call_windows_translate(items: list[NewsItem], timeout: int = 600) -> list:
         return []
 
 
+def _build_translation_models(
+    cli_model: Optional[str],
+    translation_config: Optional[dict],
+) -> list[str]:
+    """LLM 翻译模型 fallback 顺序（最多 5 个）
+
+    - 若命令行指定 --model：插到最前（显式指定优先）
+    - 其余来自 config translation.llm.model_fallbacks（优先 OpenCode 免费模型）
+    - 去重，最多 5 个
+    """
+    fallbacks: list = []
+    if translation_config:
+        llm_cfg = translation_config.get("llm", {}) or {}
+        fallbacks = llm_cfg.get("model_fallbacks") or []
+    models: list[str] = []
+    if cli_model:
+        models.append(cli_model)
+    for m in fallbacks:
+        if m and m not in models:
+            models.append(m)
+    return models[:5]
+
+
+def _call_windows_translate_with_fallback(
+    items: list[NewsItem],
+    model: Optional[str] = None,
+    timeout: int = 900,
+    translation_config: Optional[dict] = None,
+    llm_usage: Optional[dict] = None,
+) -> list:
+    """翻译三层 fallback：Google Translate → Bing（快速失败）→ LLM（多模型 fallback）
+
+    第一层：Windows Python 调用 Google Translate（如启用 Bing 则先 Google 后 Bing）。
+    第三层：仍失败的条目交给 LLM 批量翻译，按 config 中的 model_fallbacks 顺序、
+    前一个模型失败后自动尝试下一个（最多 5 个模型，均在 OpenCode 可用范围内）。
+    三层都失败：保留英文原文（title_zh = title, summary_zh = 原文或空）。
+
+    Args:
+        items: 待翻译新闻
+        model: CLI 指定的模型（若有，作为翻译首要模型）
+        timeout: Windows 翻译进程超时（秒）
+        translation_config: config translation 段（Google/Bing 参数 + LLM 模型顺序）
+        llm_usage: 可选 dict，函数填充各 LLM 模型的实际使用统计
+
+    保持数据结构不变（各 layer 只填充 title_zh / summary_zh）。
+    """
+    # 第一、二层：Windows 端 Google + Bing
+    results = _call_windows_translate(items, timeout=timeout, translation_config=translation_config)
+
+    if not results:
+        logger.warning("Windows 翻译（Google+Bing）整体失败，全部条目交给 LLM fallback")
+        results = [
+            {
+                "item_index": i,
+                "title_zh": item.title,
+                "summary_zh": item.summary,
+                "err_title": "WINDOWS_FAIL",
+                "err_summary": "WINDOWS_FAIL",
+            }
+            for i, item in enumerate(items, 1)
+        ]
+
+    # 检查哪些条目翻译失败（err 非空）
+    failed_indices = []
+    for entry in results:
+        if entry.get("err_title") or entry.get("err_summary"):
+            failed_indices.append(entry.get("item_index"))
+
+    if not failed_indices:
+        logger.info("翻译第一层（Google/Bing）全部成功，无需 fallback")
+        return results
+
+    logger.info(f"翻译第二层（LLM）: 处理 {len(failed_indices)} 条失败条目...")
+
+    # 收集失败条目对应的 NewsItem（item_index 是 combined list 中的 1-based）
+    failed_items = []
+    for idx in failed_indices:
+        if isinstance(idx, int) and 1 <= idx <= len(items):
+            failed_items.append(items[idx - 1])
+
+    if not failed_items:
+        logger.warning("失败条目索引无效，跳过 LLM fallback")
+        return results
+
+    # 调用 LLM 批量翻译（src.llm.translate_ordinary_news，支持多模型 fallback）
+    try:
+        from .llm import translate_ordinary_news as llm_translate
+        models = _build_translation_models(model, translation_config or {})
+        logger.info(f"LLM 翻译模型 fallback 顺序: {', '.join(models) or 'opencode 默认'}（最多 5 个，失败的模型将自动跳过替换为下一个）")
+        llm_results = llm_translate(failed_items, models=models, model_usage=llm_usage)
+    except Exception as e:
+        logger.error(f"LLM 翻译调用异常: {e}")
+        llm_results = None
+
+    if not llm_results:
+        logger.warning("LLM 翻译失败，保留英文原文")
+        return results
+
+    # 将 LLM 翻译结果合并回 results
+    # LLM 的 item_index 是 failed_items（子列表）中的 1-based 位置，
+    # 对应 failed_indices 中相同位置的原始 item_index。
+    llm_map = {}
+    for tr in llm_results:
+        local_idx = tr.get("item_index")
+        if isinstance(local_idx, int) and 1 <= local_idx <= len(failed_indices):
+            orig_index = failed_indices[local_idx - 1]
+            llm_map[orig_index] = tr
+
+    merged = []
+    for entry in results:
+        idx = entry.get("item_index")
+        if idx in llm_map:
+            lu = llm_map[idx]
+            # 逐字段覆盖失败项；LLM 翻译成功则清除该字段 err（让翻译成功率反映最终有效翻译）
+            if entry.get("err_title"):
+                entry["title_zh"] = lu.get("title_zh", entry.get("title_zh", ""))
+                if entry.get("title_zh"):
+                    entry["err_title"] = None
+            if entry.get("err_summary"):
+                entry["summary_zh"] = lu.get("summary_zh", entry.get("summary_zh", ""))
+                if entry.get("summary_zh"):
+                    entry["err_summary"] = None
+        merged.append(entry)
+
+    logger.info(f"LLM fallback 完成: {len(llm_map)} 条合并，共 {len(merged)} 条")
+    return merged
+
+
 def run(
     config_dir: str = "config",
     output_dir: str = "output",
@@ -231,6 +385,8 @@ def run(
     model: Optional[str] = None,
     raw_file: Optional[str] = None,
     load_raw: Optional[str] = None,
+    force_refresh: bool = False,
+    retranslate_only: bool = False,
 ) -> Optional[str]:
     """运行完整的新闻简报生成流程
 
@@ -244,13 +400,25 @@ def run(
     7. 翻译（标题 + RSS 摘要）
     8. 输出 Markdown + JSON + HTML
 
+    缓存：
+    - 每日独立 run，缓存保存在 cache/YYYY-MM-DD/ 下
+    - 若当天缓存完整且未传 force_refresh：resume 模式。
+      完整复用当天 RSS/评分/翻译缓存，不论翻译成功率高低，
+      只重新生成 selected_news 和 HTML（翻译成功率仅作质量指标展示，
+      不改变 resume 的复用语义）。
+    - force_refresh=True：删除当天缓存，从 RSS 抓取开始完整重跑
+    - retranslate_only=True（预留的独立操作，本次不影响正常 resume）：
+      复用 raw/dedup/ranking 缓存，仅重新翻译当天新闻，直接覆盖翻译缓存。
+
     Args:
         config_dir: 配置文件目录
         output_dir: 输出目录
         date: 指定日期（YYYY-MM-DD），默认今天。用于筛选新闻和输出文件名。
-        model: LLM 模型选择
+        model: LLM 模型选择（评分使用；翻译优先使用配置中的免费模型 fallback 列表）
         raw_file: 执行 fetch 后将原始新闻保存到此 JSON 文件（不执行后续处理）
         load_raw: 从 JSON 文件加载原始新闻，跳过 fetch 阶段
+        force_refresh: 忽略当天缓存，重新执行完整 pipeline
+        retranslate_only: 仅重新翻译（预留独立操作），复用 raw/dedup/ranking 缓存
 
     Returns:
         生成的简报文件路径，失败返回 None
@@ -265,6 +433,34 @@ def run(
 
     timings = []  # [(阶段名, 耗时秒数)]
     t_total = time.time()
+
+    # 缓存：cache/YYYY-MM-DD/
+    project_root_str = str(PROJECT_ROOT)
+    cache_day_dir = cache_store.cache_dir(project_root_str, date)
+    resume_mode = False
+    reuse_stage = False
+    if force_refresh:
+        # 刷新：删除当天缓存，完整重跑
+        if cache_store.is_complete(cache_day_dir) or os.path.isdir(cache_day_dir):
+            cache_store.delete(cache_day_dir)
+            logger.info(f"--force-refresh: 已删除缓存 {cache_day_dir}")
+    elif cache_store.is_complete(cache_day_dir):
+        stat = cache_store.load_translation_stats(cache_day_dir)
+        rate = stat.get("success_rate", 1.0)
+        if retranslate_only:
+            # 预留独立操作：复用 raw/dedup/ranking，仅重新翻译
+            reuse_stage = True
+            logger.info(
+                f"--retranslate-only: 复用 raw/dedup/ranking 缓存，仅重新翻译"
+                f"（翻译质量 {rate:.0%}，仅作参考）"
+            )
+        else:
+            resume_mode = True
+            logger.info(
+                f"检测到当天缓存 {cache_day_dir}，进入 resume 模式："
+                f"完整复用 RSS/评分/翻译缓存（翻译质量 {rate:.0%}，仅作质量指标展示，"
+                f"不影响复用），只重新生成 selected_news 和 HTML"
+            )
 
     # ============================================================
     # 1. 加载配置
@@ -285,6 +481,14 @@ def run(
     sections = newsletter_config.get("sections", [])
     fetch_config = newsletter_config.get("fetch", {})
     output_config = newsletter_config.get("output", {})
+    selection_config = newsletter_config.get("selection", {})
+    translation_config = newsletter_config.get("translation", {})
+
+    # 头版/普通新闻数量（来自配置 selection 段）
+    # 原设计: rank 1-10 = 重要, rank 11-50 = 普通(40 条), rank 51-60 = backup(10 条)
+    headline_count = selection_config.get("headline_count", 10)
+    candidate_count = selection_config.get("candidate_count", 60)
+    max_ordinary = headline_count * 4  # rank 11-50 = 40 条，剩余 51-60 进入 backup
 
     # 代理配置：优先使用配置文件，其次使用环境变量
     proxy_url = fetch_config.get("proxy") or os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
@@ -299,198 +503,316 @@ def run(
     # ============================================================
     # 2. 获取新闻
     # ============================================================
-    t_phase = time.time()
-    if load_raw:
-        # 从 JSON 文件加载原始新闻（跳过 fetch）
-        logger.info(f"从 JSON 文件加载原始新闻: {load_raw}")
-        all_items = load_raw_news(load_raw)
-    else:
-        # 正常 fetch 流程
-        logger.info("正在获取新闻...")
-        all_items = fetch_all(
-            sources,
-            timeout=fetch_config.get("timeout", 15),
-            max_concurrent=fetch_config.get("max_concurrent", 5),
-            ssl_verify=fetch_config.get("ssl_verify", False),
-            proxies=proxies,
+
+    # 预定义变量（resume 时由缓存填充；完整流程时由各阶段填充）
+    news_groups: list = []
+    deduped_items: list = []
+    dedup_stats: dict = {}
+    candidates_result: list = []
+    all_translated: list = []
+
+    if not (resume_mode or reuse_stage):
+        # ============================================================
+        # 2. RSS 抓取 / 加载
+        # ============================================================
+        t_phase = time.time()
+        if load_raw:
+            # 从 JSON 文件加载原始新闻（跳过 fetch）
+            logger.info(f"从 JSON 文件加载原始新闻: {load_raw}")
+            all_items = load_raw_news(load_raw)
+        else:
+            # 正常 fetch 流程
+            logger.info("正在获取新闻...")
+            all_items = fetch_all(
+                sources,
+                timeout=fetch_config.get("timeout", 15),
+                max_concurrent=fetch_config.get("max_concurrent", 5),
+                ssl_verify=fetch_config.get("ssl_verify", False),
+                proxies=proxies,
+            )
+
+        if not all_items:
+            logger.error("未获取到任何新闻，请检查网络和新闻源配置")
+            return None
+        timings.append(("RSS 抓取", time.time() - t_phase))
+
+        # ============================================================
+        # 2.5 保存原始新闻（仅 fetch 模式 + 指定了 raw_file）
+        # ============================================================
+        if raw_file and not load_raw:
+            save_raw_news(all_items, raw_file)
+            logger.info(f"原始新闻已保存，后续处理未执行。可用以下命令继续处理：")
+            logger.info(f"  python run.py --load-raw {raw_file}")
+            return raw_file
+
+        # 缓存：保存原始新闻（供 resume 完整校验）
+        cache_store.save_raw(all_items, cache_day_dir)
+        logger.info(f"原始新闻已缓存: {cache_day_dir}")
+
+        # ============================================================
+        # 3. 按目标日期筛选
+        # ============================================================
+        t_phase = time.time()
+        logger.info(f"按日期筛选 ({date})...")
+
+        dated_items = _filter_by_date(all_items, date)
+
+        if not dated_items:
+            logger.warning(f"目标日期 {date} 没有匹配的新闻，尝试使用全部新闻")
+            dated_items = all_items
+        timings.append(("日期筛选", time.time() - t_phase))
+
+        # ============================================================
+        # 4. 去重
+        # ============================================================
+        t_phase = time.time()
+        logger.info("正在去重...")
+
+        threshold = fetch_config.get("dedup_threshold", 0.6)
+        dedup_config = newsletter_config.get("dedup", {})
+        low_threshold = dedup_config.get("low_threshold", 0.35)
+        deduped_items, news_groups, dedup_stats = deduplicate(
+            dated_items, threshold=threshold, low_threshold=low_threshold
+        )
+        timings.append(("去重", time.time() - t_phase))
+
+        # ============================================================
+        # 4.5 非新闻内容过滤
+        # ============================================================
+        t_phase = time.time()
+        before_count = len(deduped_items)
+        deduped_items = [item for item in deduped_items if not is_non_news(item)]
+        removed = before_count - len(deduped_items)
+        if removed > 0:
+            logger.info(f"非新闻过滤: 移除 {removed} 条, 剩余 {len(deduped_items)} 条")
+        timings.append(("非新闻过滤", time.time() - t_phase))
+
+        # 缓存：保存去重结果
+        cache_store.save_dedup_groups(news_groups, deduped_items, dedup_stats, cache_day_dir)
+        logger.info(f"去重结果已缓存: {cache_day_dir}")
+
+        # ============================================================
+        # 5. LLM 评分排序（group 级别，候选池 60 条）
+        # ============================================================
+        # 原设计：
+        #   dedup → 全部 group 代表 → LLM 依据权重参考表评分
+        #   → 返回最多 candidate_count 条候选 {id, score}
+        #   → Python 本地按 score 降序
+        #   → rank 1-10 = 今天重要新闻, rank 11-50 = 今日普通新闻, rank 51-60 = backup
+        # score 只存在于临时 selection 结果，不写入最终新闻数据。
+        t_phase = time.time()
+        logger.info("第一轮 LLM: 候选池评分...")
+
+        # 构建 group 代表列表：每个 group 只选一条代表送 LLM
+        group_representatives = []  # [(representative_item, NewsGroup)]
+        for g in news_groups:
+            if g.group_type == "related":
+                rep = max(g.items, key=lambda x: len(x.sources))
+                group_representatives.append((rep, g))
+            else:
+                group_representatives.append((g.leader, g))
+
+        rep_items = [rep for rep, g in group_representatives]
+        rep_group_ids = [g.group_id for _, g in group_representatives]
+
+        candidates_result = select_headlines(
+            items=rep_items,
+            model=model,
+            candidate_count=candidate_count,
+            group_ids=rep_group_ids,
+            models=_build_translation_models(model, translation_config),
         )
 
-    if not all_items:
-        logger.error("未获取到任何新闻，请检查网络和新闻源配置")
-        return None
-    timings.append(("RSS 抓取", time.time() - t_phase))
+        if not candidates_result:
+            logger.error("候选池评分失败")
+            return None
 
-    # ============================================================
-    # 2.5 保存原始新闻（仅 fetch 模式 + 指定了 raw_file）
-    # ============================================================
-    if raw_file and not load_raw:
-        save_raw_news(all_items, raw_file)
-        logger.info(f"原始新闻已保存，后续处理未执行。可用以下命令继续处理：")
-        logger.info(f"  python run.py --load-raw {raw_file}")
-        return raw_file
+        logger.info(f"候选池评分完成: {len(candidates_result)} 条候选人")
+        timings.append(("候选池评分 (LLM)", time.time() - t_phase))
 
-    # ============================================================
-    # 3. 按目标日期筛选
-    # ============================================================
-    t_phase = time.time()
-    logger.info(f"按日期筛选 ({date})...")
-
-    dated_items = _filter_by_date(all_items, date)
-
-    if not dated_items:
-        logger.warning(f"目标日期 {date} 没有匹配的新闻，尝试使用全部新闻")
-        dated_items = all_items
-    timings.append(("日期筛选", time.time() - t_phase))
-
-    # ============================================================
-    # 4. 去重
-    # ============================================================
-    t_phase = time.time()
-    logger.info("正在去重...")
-
-    threshold = fetch_config.get("dedup_threshold", 0.6)
-    dedup_config = newsletter_config.get("dedup", {})
-    low_threshold = dedup_config.get("low_threshold", 0.35)
-    deduped_items, news_groups, dedup_stats = deduplicate(
-        dated_items, threshold=threshold, low_threshold=low_threshold
-    )
-    timings.append(("去重", time.time() - t_phase))
-
-    # 构建 item → group 映射（供后续步骤使用 group 信息）
-    item_to_group = {}
-    for g in news_groups:
-        if g.group_type == "exact_match":
-            for item in deduped_items:
-                if item.title == g.leader.title:
-                    item_to_group[id(item)] = g
-                    break
+        # 缓存：保存评分结果
+        cache_store.save_ranking(candidates_result, cache_day_dir)
+        logger.info(f"评分结果已缓存: {cache_day_dir}")
+    else:
+        # resume 模式（高质量或低质量重翻）：从缓存恢复全部中间产物
+        t_phase = time.time()
+        news_groups, deduped_items, dedup_stats = cache_store.load_dedup_groups(cache_day_dir)
+        candidates_result = cache_store.load_ranking(cache_day_dir)
+        if reuse_stage:
+            logger.info(
+                f"retranslate-only: 恢复 {len(news_groups)} 组, {len(candidates_result)} 条评分, "
+                f"{dedup_stats.get('input_count', 0)} 条原始"
+            )
         else:
-            for item in g.items:
-                item_to_group[id(item)] = g
+            logger.info(
+                f"resume 恢复: {len(news_groups)} 组, {len(candidates_result)} 条评分, "
+                f"{dedup_stats.get('input_count', 0)} 条原始"
+            )
+        timings.append(("缓存恢复", time.time() - t_phase))
+
+        # 重建 group 代表列表（与完整流程一致）
+        group_representatives = []
+        for g in news_groups:
+            if g.group_type == "related":
+                rep = max(g.items, key=lambda x: len(x.sources))
+                group_representatives.append((rep, g))
+            else:
+                group_representatives.append((g.leader, g))
 
     # ============================================================
-    # 4.5 非新闻内容过滤
+    # 5.5 按 score 分配 rank（Python 本地排序）
     # ============================================================
-    t_phase = time.time()
-    before_count = len(deduped_items)
-    deduped_items = [item for item in deduped_items if not is_non_news(item)]
-    removed = before_count - len(deduped_items)
-    if removed > 0:
-        logger.info(f"非新闻过滤: 移除 {removed} 条, 剩余 {len(deduped_items)} 条")
-    timings.append(("非新闻过滤", time.time() - t_phase))
-
-    # ============================================================
-    # 5. LLM 选择头版（group 级别）
-    # ============================================================
-    t_phase = time.time()
-    logger.info("第一轮 LLM: 头版筛选...")
-
-    # 构建 group 代表列表：每个 group 只选一条代表送 LLM
-    group_representatives = []  # [(representative_item, NewsGroup)]
-    for g in news_groups:
-        if g.group_type == "related":
-            rep = max(g.items, key=lambda x: len(x.sources))
-            group_representatives.append((rep, g))
-        else:
-            group_representatives.append((g.leader, g))
-
-    rep_items = [rep for rep, g in group_representatives]
-    headlines_result = select_headlines(items=rep_items, model=model)
-
-    if not headlines_result:
-        logger.error("头版筛选失败")
-        return None
-
-    logger.info(f"头版筛选完成: {len(headlines_result)} 条")
-    timings.append(("头条筛选 (LLM)", time.time() - t_phase))
-
-    # 展开选中的 group（group 级别，不平铺 related 成员）
-    selected_groups = []
-    selected_group_ids = set()
-    for h in headlines_result:
-        idx = h["item_index"]  # 1-based into group_representatives
+    # 候选结果已按 score 降序排列（_parse_headline_selection 排序）
+    ranked_items = []
+    for rank, cand in enumerate(candidates_result, 1):
+        idx = cand["item_index"]  # 1-based into group_representatives
         if idx < 1 or idx > len(group_representatives):
-            logger.error(f"item_index {idx} 超出范围，跳过")
+            logger.error(f"候选 item_index {idx} 超出范围，跳过")
             continue
         rep, group = group_representatives[idx - 1]
-        selected_group_ids.add(group.group_id)
-        selected_groups.append(group)
+        ranked_items.append({
+            "rank": rank,
+            "score": cand["score"],
+            "group_id": group.group_id,
+            "group_type": group.group_type,
+            "rep": rep,
+            "group": group,
+        })
 
-    # 普通新闻候选 = dedup 后全部新闻 - 头版 group 内所有新闻
-    selected_item_ids = set()
-    for g in selected_groups:
-        for item in g.items:
-            selected_item_ids.add(id(item))
-    ordinary_candidates = [
-        item for item in deduped_items
-        if id(item) not in selected_item_ids
-    ]
-
-    # 普通新闻按 News Value Score 排序
-    # 当前使用 headline selection 阶段 LLM 给出的 score 作为临时排序依据。
-    # 未来加入主题版块后，将重新设计 Ordinary 的分类、排序和版块配额机制。
-    headline_score_map = {}
-    for h in headlines_result:
-        idx = h["item_index"]
-        if 1 <= idx <= len(group_representatives):
-            _, grp = group_representatives[idx - 1]
-            headline_score_map[grp.group_id] = h["score"]
-
-    ordinary_scored = []
-    unscored_count = 0
-    for item in ordinary_candidates:
-        grp = item_to_group.get(id(item))
-        if grp and grp.group_id in headline_score_map:
-            ordinary_scored.append((item, headline_score_map[grp.group_id]))
+    # 分配 rank
+    selected_groups = []
+    ordinary_candidates_result = []
+    backup_candidates = []
+    for entry in ranked_items:
+        if len(selected_groups) < headline_count:
+            selected_groups.append(entry["group"])
+        elif len(ordinary_candidates_result) < max_ordinary:
+            ordinary_candidates_result.append(entry)
         else:
-            unscored_count += 1
-            ordinary_scored.append((item, 0))
+            backup_candidates.append(entry)
 
-    if unscored_count > 0:
-        logger.info(f"普通新闻中有 {unscored_count} 条无 score（来自非 headline group 或无 group），以 score=0 排序")
+    ordinary_groups = [e["group"] for e in ordinary_candidates_result]
 
-    ordinary_scored.sort(key=lambda x: x[1], reverse=True)
-    ordinary_items = [item for item, _ in ordinary_scored]
-
-    # 普通新闻上限 40 条
-    MAX_ORDINARY = 40
-    if len(ordinary_items) > MAX_ORDINARY:
-        logger.info(f"普通新闻超过 {MAX_ORDINARY} 条上限，截断")
-        ordinary_items = ordinary_items[:MAX_ORDINARY]
-
-    logger.info(f"头版: {len(selected_groups)} groups, 普通: {len(ordinary_items)} 条")
     logger.info(
-        f"总计: {len(selected_groups) + len(ordinary_items)} / "
-        f"{len(deduped_items)} 条"
+        f"排名分配: 今天重要新闻 {len(selected_groups)} 条, "
+        f"今日普通新闻 {len(ordinary_groups)} 条, "
+        f"backup 备用池 {len(backup_candidates)} 条"
     )
+    logger.info("=" * 40)
+    logger.info("score 排序明细 (Top 60):")
+    for entry in ranked_items:
+        rep = entry["rep"]
+        src_names = ", ".join(rep.source_names[:3]) if rep.source_names else ""
+        logger.info(
+            f"rank {entry['rank']:2d} | score {entry['score']:3d} | "
+            f"{entry['group_id']} | {rep.title[:50]} | [{src_names}]"
+        )
+    logger.info("=" * 40)
 
-    # 翻译所有新闻：每条 headline group 只翻译 leader；ordinary 翻译全部
+    # 输出临时 ranking 结果文件（含 score，供调试；score 不写入 selected_news.json）
+    ranking_debug = {
+        "date": date,
+        "candidate_count": candidate_count,
+        "headline_count": headline_count,
+        "result": [
+            {
+                "rank": e["rank"],
+                "score": e["score"],
+                "group_id": e["group_id"],
+                "group_type": e["group_type"],
+                "title": e["rep"].title,
+                "sources": e["rep"].source_names,
+                "section": "headline" if e["rank"] <= headline_count
+                          else ("ordinary" if e["rank"] <= headline_count + max_ordinary else "backup"),
+            }
+            for e in ranked_items
+        ],
+    }
+    ranking_path = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)),
+        output_config.get("dir", output_dir),
+        "ranking_debug.json",
+    )
+    os.makedirs(os.path.dirname(ranking_path), exist_ok=True)
+    with open(ranking_path, "w", encoding="utf-8") as f:
+        json_module.dump(ranking_debug, f, ensure_ascii=False, indent=2)
+    logger.info(f"临时 ranking 结果已保存: {ranking_path}")
+
+    # 翻译所有新闻：每条 headline group 只翻译 leader；ordinary 翻译各 group leader
+    # 三种路径：
+    #   - resume 模式（resume_mode=True）：复用已有翻译缓存，不重新翻译
+    #   - 预留 retranslate-only（reuse_stage=True）：复用 raw/dedup/ranking，仅重新翻译
+    #   - 完整模式：抓取→去重→评分→翻译，全程写缓存
     t_phase = time.time()
     headlines_rep_items = [g.leader for g in selected_groups]
-    all_items_to_translate = headlines_rep_items + ordinary_items
-    all_translated = []
-    if all_items_to_translate:
-        logger.info(f"通过 Windows Python 调用 Google Translate 翻译 {len(all_items_to_translate)} 条新闻...")
-        all_translated = _call_windows_translate(all_items_to_translate)
-        if not all_translated:
-            logger.warning("Windows 翻译失败，使用原始标题")
-            all_translated = []
-    timings.append(("Google Translate (Windows)", time.time() - t_phase))
+    ordinary_rep_items = [g.leader for g in ordinary_groups]
+    all_items_to_translate = headlines_rep_items + ordinary_rep_items
+
+    # LLM 翻译模型 fallback 顺序（config 免费模型列表，最多 5 个；若指定 --model 则插到最前）
+    llm_usage: dict = {}
+    if reuse_stage:
+        # 预留独立操作：仅重新翻译，直接覆盖翻译缓存
+        logger.info(
+            f"[retranslate-only] 仅重新翻译 {len(all_items_to_translate)} 条"
+            f"（Google 分批 + 随机间隔 → Bing 快速失败 → LLM 多模型 fallback）..."
+        )
+        all_translated = []
+        if all_items_to_translate:
+            all_translated = _call_windows_translate_with_fallback(
+                all_items_to_translate, model=model,
+                translation_config=translation_config, llm_usage=llm_usage,
+            )
+            if not all_translated:
+                logger.warning("翻译失败，使用原始标题")
+                all_translated = []
+        cache_store.save_translation(all_translated, cache_day_dir)
+        logger.info(f"[retranslate-only] 翻译已更新并写回缓存: {cache_day_dir}")
+    elif resume_mode:
+        # resume 模式：完整复用当天翻译缓存（不论成功率高低）
+        all_translated = cache_store.load_translation(cache_day_dir)
+        rate_cached = cache_store.translation_success_rate(all_translated)
+        logger.info(
+            f"翻译恢复（resume，完整复用）: {len(all_translated)} 条, "
+            f"成功率 {rate_cached:.0%}（质量指标展示，不触发重翻）"
+        )
+    else:
+        # 完整模式：正常翻译 + 写缓存
+        all_translated = []
+        if all_items_to_translate:
+            logger.info(
+                f"通过 Windows Python 调用 Google Translate 翻译 {len(all_items_to_translate)} 条新闻"
+                f"（Google 分批 {translation_config.get('google', {}).get('batch_size', 25)}+，"
+                f"批间随机等待 → Bing 快速失败 → LLM 多模型 fallback）..."
+            )
+            all_translated = _call_windows_translate_with_fallback(
+                all_items_to_translate, model=model,
+                translation_config=translation_config, llm_usage=llm_usage,
+            )
+            if not all_translated:
+                logger.warning("翻译失败，使用原始标题")
+                all_translated = []
+        cache_store.save_translation(all_translated, cache_day_dir)
+        logger.info(f"翻译结果已缓存: {cache_day_dir}")
+        logger.info(f"翻译质量: {cache_store.translation_success_rate(all_translated):.0%}")
+    # LLM 翻译模型使用统计（最终报告用：各模型翻译成功条数）
+    for mname, rec in llm_usage.items():
+        if rec.get("success_items", 0) or rec.get("attempts", 0):
+            logger.info(
+                f"LLM 翻译模型 | {mname} | 成功 {rec.get('success_items', 0)} 条 "
+                f"/ 批次 {rec.get('success_batches', 0)} | 尝试 {rec.get('attempts', 0)} 次"
+            )
+    timings.append(("翻译 (Google→Bing→LLM)", time.time() - t_phase))
 
     # 构造翻译索引（item_index → translated dict）
     translate_map = {t["item_index"]: t for t in all_translated}
 
-    # 构造 rep_items 的 item_index 映射（用于查找 group leader 的翻译）
-    rep_item_index = {}
-    for i, (rep, _) in enumerate(group_representatives):
-        rep_item_index[id(rep)] = i + 1
-
     # 构造头条数据（group 级别，一个 group = 一个 headline card）
     headline_data = []
-    for group in selected_groups:
+    for h_idx, group in enumerate(selected_groups, 1):
         leader = group.leader
-        leader_idx = rep_item_index.get(id(leader))
-        tr = translate_map.get(leader_idx, {}) if leader_idx else {}
+        # all_items_to_translate = headlines_rep_items + ordinary_rep_items，
+        # 因此 headline 第 h_idx 条在 combined 列表中的 1-based 位置即为 h_idx
+        tr = translate_map.get(h_idx, {}) if all_translated else {}
         entry = {
             "title": leader.title,
             "title_zh": tr.get("title_zh", leader.title),
@@ -517,13 +839,13 @@ def run(
             ]
         headline_data.append(entry)
 
-    # 构造普通新闻数据（含 group 信息）
+# 构造普通新闻数据（group 级别，各 group 取 leader）
     ordinary_data = []
-    headline_count = len(selected_groups)
-    for j, item in enumerate(ordinary_items, 1):
-        i = headline_count + j  # item_index 在 combined list 中的位置
+    headline_count_actual = len(selected_groups)
+    for j, group in enumerate(ordinary_groups, 1):
+        item = group.leader
+        i = headline_count_actual + j  # item_index 在 combined list 中的位置
         tr = translate_map.get(i, {})
-        group = item_to_group.get(id(item))
         entry = {
             "title": item.title,
             "title_zh": tr.get("title_zh", item.title),
@@ -534,7 +856,7 @@ def run(
         }
         if item.image_url:
             entry["image_url"] = item.image_url
-        if group and group.group_type != "single":
+        if group.group_type != "single":
             entry["group_id"] = group.group_id
             entry["group_type"] = group.group_type
             if group.group_type == "related":
@@ -543,6 +865,9 @@ def run(
                     for m in group.items if m is not item
                 ]
         ordinary_data.append(entry)
+
+    logger.info(f"今天重要新闻: {headline_count_actual} 组, 今日普通新闻: {len(ordinary_data)} 组")
+    logger.info(f"总计: {len(selected_groups) + len(ordinary_data)} / {len(deduped_items)} 条")
 
     # ============================================================
     # 7. 格式化输出
@@ -591,6 +916,45 @@ def run(
         json_module.dump(json_data, f, ensure_ascii=False, indent=2)
     logger.info(f"JSON 数据已保存到 {json_path}")
     timings.append(("输出 JSON", time.time() - t_phase))
+
+    # ============================================================
+    # 7.6 生成 DeepSeek HTML（pipeline 唯一正式 renderer）+ 归档
+    # ============================================================
+    # classic 主题 generate_real_html_v2.py 保留为备份，不参与自动流程。
+    # HTML 归档：archive/YYYY-MM-DD/newsletter.html + latest/newsletter.html
+    t_phase = time.time()
+    logger.info("生成 DeepSeek 主题 HTML...")
+    try:
+        project_root = os.path.dirname(os.path.dirname(__file__))
+        gen_module = os.path.join(project_root, "generate_deepseek_html.py")
+        gen_raw = os.path.join(project_root, "data", "daily_run_raw.json")
+        gen_pipeline_json = json_path
+        gen_output = os.path.join(project_root, "prototype", "deepseek_style_output", "newsletter.html")
+
+        # 直接调用渲染器（同进程内导入，复用其 render()）
+        import importlib.util as _ilu
+        spec = _ilu.spec_from_file_location("generate_deepseek_html", gen_module)
+        gds = _ilu.module_from_spec(spec)
+        spec.loader.exec_module(gds)
+        rc = gds.render(gen_pipeline_json, gen_raw, gen_output, verbose=False)
+        if rc != 0:
+            logger.warning("DeepSeek HTML 生成失败")
+        else:
+            logger.info(f"DeepSeek HTML 已生成: {gen_output}")
+
+            # HTML 归档（日期目录 + 最新版）
+            archive_day = os.path.join(project_root, "archive", date, "newsletter.html")
+            os.makedirs(os.path.dirname(archive_day), exist_ok=True)
+            shutil.copy2(gen_output, archive_day)
+            logger.info(f"HTML 已归档: {archive_day}")
+
+            latest_dir = os.path.join(project_root, "latest")
+            os.makedirs(latest_dir, exist_ok=True)
+            shutil.copy2(gen_output, os.path.join(latest_dir, "newsletter.html"))
+            logger.info(f"HTML 最新版已更新: {os.path.join(latest_dir, 'newsletter.html')}")
+    except Exception as e:
+        logger.error(f"DeepSeek HTML 生成异常: {e}")
+    timings.append(("生成 DeepSeek HTML", time.time() - t_phase))
 
     # ============================================================
     # 耗时汇总

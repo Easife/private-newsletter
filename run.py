@@ -3,13 +3,21 @@
 私人新闻简报 - 命令行入口
 
 用法：
-    python run.py                    # 生成今天的简报
+    python run.py                    # 生成今天的简报（当天已有缓存则 resume）
     python run.py --date 2026-08-18  # 指定日期
     python run.py --config ./my-config  # 使用自定义配置目录
+    python run.py --force-refresh    # 忽略当天缓存，重新执行完整 pipeline
 
     # 两阶段运行：
     python run.py --raw-file data/raw_news.json       # 仅获取，保存 JSON
     python run.py --load-raw data/raw_news.json        # 从 JSON 继续处理
+
+缓存说明：
+    缓存目录 cache/YYYY-MM-DD/（raw_news / dedup_groups / ranking / translation）。
+    当天缓存完整时默认 resume（完整复用当天 RSS/评分/翻译缓存，仅重新生成输出，
+    翻译成功率只作质量指标展示，不影响复用）。
+    --force-refresh 删除当天缓存并完整重跑。不做跨日期复用。
+    --retranslate-only（预留独立操作）：复用 raw/dedup/ranking 缓存，仅重新翻译。
 """
 
 import argparse
@@ -73,6 +81,16 @@ def main():
         default=None,
         help="从 JSON 文件加载原始新闻，跳过获取阶段",
     )
+    parser.add_argument(
+        "--force-refresh",
+        action="store_true",
+        help="忽略当天缓存，删除缓存目录并重新执行完整 pipeline（重新抓取/评分/翻译）",
+    )
+    parser.add_argument(
+        "--retranslate-only",
+        action="store_true",
+        help="预留独立操作：复用当天 raw/dedup/ranking 缓存，仅重新翻译新闻并覆盖翻译缓存",
+    )
 
     args = parser.parse_args()
 
@@ -92,6 +110,8 @@ def main():
         model=args.model,
         raw_file=args.raw_file,
         load_raw=args.load_raw,
+        force_refresh=args.force_refresh,
+        retranslate_only=args.retranslate_only,
     )
 
     if filepath:
