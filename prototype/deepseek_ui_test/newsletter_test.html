@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 新闻简报 · DeepSeek UI Test</title>
+    <style>
+        /* ==================== CSS Variables · 暖色平衡 (from deepseek template) ==================== */
+        :root {
+            --bg-body: #F4F6F9;
+            --bg-card: rgba(255, 255, 255, 0.82);
+            --bg-card-hover: rgba(255, 255, 255, 0.96);
+            --bg-sidebar: rgba(255, 255, 255, 0.70);
+
+            --text-primary: #1E1E1E;
+            --text-secondary: #4A4A4A;
+            --text-tertiary: #8A8A8A;
+
+            --border-light: rgba(220, 224, 230, 0.5);
+            --border-focus: #0F9D8A;
+
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.03);
+            --shadow-card-hover: 0 12px 48px rgba(0, 0, 0, 0.07), 0 4px 12px rgba(0, 0, 0, 0.03);
+
+            --radius-card: 18px;
+            --radius-sm: 10px;
+            --radius-full: 9999px;
+
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+            --green-jade: #0F9D8A;
+            --green-jade-light: rgba(15, 157, 138, 0.10);
+            --green-apple: #7CB342;
+            --green-lime: #B5D33E;
+
+            --coral: #FF6B6B;
+            --coral-light: rgba(255, 107, 107, 0.12);
+            --apricot: #FFB07C;
+            --apricot-light: rgba(255, 176, 124, 0.15);
+            --sunflower: #FFD93D;
+            --sunflower-light: rgba(255, 217, 61, 0.18);
+
+            --cat-tech: #0F9D8A;
+            --cat-business: #FFB07C;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+        body {
+            font-family: var(--font);
+            background: var(--bg-body);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(200, 204, 210, 0.5); border-radius: var(--radius-full); }
+
+        /* ==================== Sidebar ==================== */
+        .sidebar {
+            width: 240px; min-width: 240px;
+            background: var(--bg-sidebar);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(220, 224, 230, 0.3);
+            padding: 28px 20px 32px;
+            display: flex; flex-direction: column;
+            height: 100vh; position: sticky; top: 0;
+            overflow-y: auto; flex-shrink: 0;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.02);
+        }
+        .sidebar-brand {
+            display: flex; align-items: center; gap: 10px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid rgba(220, 224, 230, 0.3);
+            margin-bottom: 24px;
+        }
+        .sidebar-brand .brand-dot {
+            width: 34px; height: 34px; border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--green-jade) 0%, var(--green-lime) 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 600; font-size: 14px;
+            box-shadow: 0 4px 12px rgba(15, 157, 138, 0.20);
+        }
+        .sidebar-brand .brand-name { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+        .sidebar-brand .brand-name span { color: var(--green-jade); }
+
+        .sidebar-label {
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.6px; color: var(--text-tertiary);
+            padding: 0 12px 10px;
+        }
+
+        .nav-list { list-style: none; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 8px 12px; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 450; color: var(--text-secondary);
+            cursor: pointer; transition: background 0.2s, color 0.2s;
+            user-select: none;
+        }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.5); color: var(--text-primary); }
+        .nav-item.active {
+            background: var(--green-jade-light); color: var(--green-jade);
+            font-weight: 500; box-shadow: 0 0 0 1px rgba(15, 157, 138, 0.10);
+        }
+        .nav-item .nav-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+        .nav-item .nav-badge {
+            margin-left: auto; font-size: 11px; font-weight: 500;
+            color: var(--text-tertiary); background: rgba(240, 242, 245, 0.6);
+            padding: 0 8px; border-radius: var(--radius-full);
+            line-height: 18px; min-width: 20px; text-align: center;
+        }
+        .nav-item.active .nav-badge { background: var(--green-jade); color: #fff; }
+
+        .sidebar-footer {
+            margin-top: auto; padding-top: 20px;
+            border-top: 1px solid rgba(220, 224, 230, 0.3);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sidebar-footer .sf-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--apricot) 0%, var(--coral) 100%);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-weight: 500; font-size: 13px;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.20);
+        }
+        .sidebar-footer .sf-info { flex: 1; }
+        .sidebar-footer .sf-name { font-size: 13px; font-weight: 500; }
+        .sidebar-footer .sf-status {
+            font-size: 11px; color: var(--text-tertiary);
+            display: flex; align-items: center; gap: 4px;
+        }
+        .sidebar-footer .sf-status .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--green-apple);
+            animation: pulse-dot 2.4s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        /* ==================== Main ==================== */
+        .main {
+            flex: 1; display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden; background: var(--bg-body);
+        }
+
+        /* ==================== Topbar ==================== */
+        .topbar {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(220, 224, 230, 0.3);
+            padding: 0 40px; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 20px rgba(0, 0, 0, 0.01);
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .topbar-left .page-title {
+            font-size: 16px; font-weight: 600; letter-spacing: -0.2px;
+        }
+        .topbar-left .page-title .highlight { color: var(--green-jade); }
+        .topbar-left .page-title .warm-dot {
+            display: inline-block; width: 8px; height: 8px;
+            border-radius: 50%; background: var(--apricot);
+            margin-left: 6px;
+            box-shadow: 0 0 12px rgba(255, 176, 124, 0.3);
+        }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .topbar-right .ai-status {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: var(--text-tertiary);
+            background: rgba(255, 255, 255, 0.5);
+            padding: 4px 14px 4px 10px; border-radius: var(--radius-full);
+            border: 1px solid rgba(220, 224, 230, 0.3);
+        }
+        .topbar-right .ai-status .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--green-apple);
+            animation: pulse-dot 2.4s ease-in-out infinite;
+        }
+        .topbar-right .avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--apricot) 0%, var(--sunflower) 100%);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-weight: 500; font-size: 13px; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 176, 124, 0.20);
+        }
+
+        /* ==================== Content ==================== */
+        .content {
+            flex: 1; overflow-y: auto; padding: 28px 40px 60px;
+        }
+        .content-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 24px; padding-bottom: 12px;
+            border-bottom: 1px solid rgba(220, 224, 230, 0.3);
+        }
+        .content-header .ch-left { display: flex; align-items: baseline; gap: 12px; }
+        .content-header .ch-left h2 {
+            font-size: 22px; font-weight: 600; letter-spacing: -0.3px;
+        }
+        .content-header .ch-left .ch-count { font-size: 13px; color: var(--text-tertiary); }
+
+        /* ==================== Section Divider ==================== */
+        .section-divider {
+            display: flex; align-items: center; gap: 12px;
+            margin: 28px 0 16px;
+        }
+        .section-divider .sec-label {
+            font-size: 13px; font-weight: 600; color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        .section-divider .sec-badge {
+            font-size: 11px; font-weight: 600; color: var(--green-jade);
+            background: var(--green-jade-light);
+            padding: 2px 8px; border-radius: var(--radius-full);
+        }
+        .section-divider .sec-line {
+            flex: 1; height: 1px;
+            background: linear-gradient(90deg, rgba(220, 224, 230, 0.5), transparent);
+        }
+
+        /* ==================== Feed ==================== */
+        .feed { display: flex; flex-direction: column; gap: 14px; }
+
+        /* ==================== News Card ==================== */
+        .news-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
+            transition: box-shadow 0.3s, transform 0.25s, background 0.3s;
+            cursor: default;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-left: 5px solid transparent;
+            overflow: hidden;
+        }
+        .news-card:hover {
+            box-shadow: var(--shadow-card-hover);
+            transform: translateY(-2px);
+            background: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.9);
+        }
+        .news-card.cat-tech { border-left-color: var(--cat-tech); }
+        .news-card.cat-business { border-left-color: var(--cat-business); }
+
+        /* Card image */
+        .card-image {
+            width: 100%; height: 180px; overflow: hidden;
+            background: #f0efed;
+        }
+        .card-image img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+
+        /* Card body */
+        .card-body { padding: 16px 22px 18px; }
+
+        .card-top {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 6px;
+        }
+        .card-num {
+            font-size: 12px; font-weight: 700; color: var(--green-jade);
+            background: var(--green-jade-light);
+            padding: 2px 8px; border-radius: var(--radius-sm);
+            font-variant-numeric: tabular-nums;
+        }
+        .group-badge {
+            font-size: 10px; font-weight: 600; color: var(--apricot);
+            background: var(--apricot-light);
+            padding: 2px 8px; border-radius: var(--radius-full);
+            letter-spacing: 0.3px;
+        }
+
+        .card-title {
+            font-size: 17px; font-weight: 600; line-height: 1.45;
+            color: var(--text-primary); margin-bottom: 8px;
+            letter-spacing: -0.2px;
+        }
+
+        /* AI Summary */
+        .card-ai-summary {
+            background: linear-gradient(135deg, var(--green-jade-light) 0%, var(--apricot-light) 100%);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px; margin-bottom: 12px;
+            display: flex; gap: 10px; align-items: flex-start;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(4px);
+        }
+        .card-ai-summary .ai-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+        .card-ai-summary .ai-text {
+            font-size: 13.5px; line-height: 1.6; color: var(--text-secondary);
+        }
+        .card-ai-summary .ai-text strong { color: var(--green-jade); font-weight: 500; }
+
+        /* Card footer / source tags */
+        .card-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 12px; color: var(--text-tertiary);
+            flex-wrap: wrap; gap: 6px;
+        }
+        .cf-source { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+        .src-tag {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: 11px; font-weight: 500;
+            padding: 3px 8px; border-radius: var(--radius-sm);
+            text-decoration: none; transition: background 0.15s;
+        }
+        .src-free {
+            color: var(--text-secondary);
+            background: rgba(240, 242, 245, 0.6);
+        }
+        .src-paid {
+            color: var(--coral);
+            background: var(--coral-light);
+            border: 1px solid rgba(255, 107, 107, 0.15);
+        }
+        .src-paid:hover {
+            background: rgba(255, 107, 107, 0.18);
+        }
+
+        /* ==================== Animations ==================== */
+        .fade-in { animation: fadeIn 0.45s ease forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== Responsive ==================== */
+        @media (max-width: 820px) {
+            .sidebar {
+                width: 64px; min-width: 64px; padding: 20px 12px;
+            }
+            .sidebar-brand .brand-name, .sidebar-label,
+            .nav-item .nav-label, .nav-item .nav-badge,
+            .sidebar-footer .sf-info { display: none; }
+            .sidebar-brand { padding-bottom: 16px; margin-bottom: 16px; justify-content: center; }
+            .sidebar-brand .brand-dot { width: 30px; height: 30px; font-size: 12px; }
+            .nav-item { justify-content: center; padding: 10px; }
+            .nav-item .nav-icon { font-size: 18px; width: auto; }
+            .sidebar-footer { justify-content: center; }
+            .sidebar-footer .sf-avatar { width: 30px; height: 30px; font-size: 11px; }
+            .topbar { padding: 0 20px; }
+            .content { padding: 20px 20px 40px; }
+            .topbar-right .ai-status { display: none; }
+            .card-title { font-size: 15px; }
+            .content-header .ch-left h2 { font-size: 18px; }
+        }
+        @media (max-width: 540px) {
+            .sidebar { display: none; }
+            .topbar { padding: 0 16px; height: 56px; }
+            .content { padding: 16px 16px 32px; }
+            .news-card { padding: 0; }
+            .card-body { padding: 14px 16px; }
+            .card-ai-summary { padding: 8px 12px; }
+            .card-ai-summary .ai-text { font-size: 12.5px; }
+            .content-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .card-image { height: 140px; }
+        }
+
+        /* ==================== Dark Mode ==================== */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #121418;
+                --bg-card: rgba(30, 32, 36, 0.85);
+                --bg-card-hover: rgba(36, 38, 42, 0.95);
+                --bg-sidebar: rgba(24, 26, 30, 0.80);
+                --text-primary: #E8E8E8;
+                --text-secondary: #A0A0A0;
+                --text-tertiary: #666;
+                --border-light: rgba(60, 64, 70, 0.5);
+                --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 0, 0, 0.1);
+                --shadow-card-hover: 0 12px 48px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+            .sidebar { box-shadow: 0 0 40px rgba(0, 0, 0, 0.1); }
+            .topbar { box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08); }
+            .card-image { background: #252525; }
+            .src-free { background: rgba(60, 64, 70, 0.4); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-dot">N</div>
+            <span class="brand-name">News <span>AI</span></span>
+        </div>
+
+        <div class="sidebar-label">新闻简报</div>
+        <ul class="nav-list">
+            <li class="nav-item active">
+                <span class="nav-icon">📰</span>
+                <span class="nav-label">全部新闻</span>
+                <span class="nav-badge">30</span>
+            </li>
+            <li class="nav-item">
+                <span class="nav-icon">⭐</span>
+                <span class="nav-label">今日头条</span>
+                <span class="nav-badge">3</span>
+            </li>
+            <li class="nav-item">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">其他新闻</span>
+                <span class="nav-badge">27</span>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="sf-avatar">AI</div>
+            <div class="sf-info">
+                <div class="sf-name">AI 新闻助手</div>
+                <div class="sf-status"><span class="dot"></span> AI 在线</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN ==================== -->
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <span class="page-title">
+                    今日 <span class="highlight">简报</span>
+                    <span class="warm-dot"></span>
+                </span>
+            </div>
+            <div class="topbar-right">
+                <div class="ai-status">
+                    <span class="dot"></span>
+                    <span>AI 就绪</span>
+                </div>
+                <div class="avatar">AI</div>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="content-header">
+                <div class="ch-left">
+                    <h2>每日新闻简报</h2>
+                    <span class="ch-count">343 条抓取 → 30 条精选</span>
+                </div>
+            </div>
+
+            <!-- HEADLINES -->
+            <div class="section-divider">
+                <span class="sec-label">今日头条</span>
+                <span class="sec-badge">3</span>
+                <span class="sec-line"></span>
+            </div>
+            <div class="feed">
+                
+    <div class="news-card cat-tech fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                <span class="card-num">01</span>
+                <span class="group-badge">多源报道</span>
+            </div>
+            <div class="card-title">加拿大与美国贸易战升级</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · 卡尼总理宣布对美国商品征收同等关税</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><a class="src-tag src-paid" href="https://www.google.com/search?q=%E5%8A%A0%E6%8B%BF%E5%A4%A7%E4%B8%8E%E7%BE%8E%E5%9B%BD%E8%B4%B8%E6%98%93%E6%88%98%E5%8D%87%E7%BA%A7%20NYT" target="_blank" rel="noopener">🔒 纽约时报</a></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card cat-tech fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                <span class="card-num">02</span>
+                
+            </div>
+            <div class="card-title">欧盟通过人工智能法案</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · 欧盟议会批准全面的人工智能监管</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><a class="src-tag src-paid" href="https://www.google.com/search?q=%E6%AC%A7%E7%9B%9F%E9%80%9A%E8%BF%87%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E6%B3%95%E6%A1%88%20FT" target="_blank" rel="noopener">🔒 金融时报</a></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card cat-tech fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                <span class="card-num">03</span>
+                
+            </div>
+            <div class="card-title">日本央行维持低利率</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · 日本央行维持-0.1%的利率不变</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">NHK</span></div>
+            </div>
+        </div>
+    </div>
+            </div>
+
+            <!-- ORDINARY -->
+            <div class="section-divider">
+                <span class="sec-label">其他重要新闻</span>
+                <span class="sec-badge">27</span>
+                <span class="sec-line"></span>
+            </div>
+            <div class="feed">
+                
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                <span class="group-badge">多源报道</span>
+            </div>
+            <div class="card-title">加拿大与美国贸易战升级</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · 卡尼总理宣布对美国商品征收同等关税</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><a class="src-tag src-paid" href="https://www.google.com/search?q=%E5%8A%A0%E6%8B%BF%E5%A4%A7%E4%B8%8E%E7%BE%8E%E5%9B%BD%E8%B4%B8%E6%98%93%E6%88%98%E5%8D%87%E7%BA%A7%20NYT" target="_blank" rel="noopener">🔒 纽约时报</a> <span class="src-tag src-free">Guardian</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">US deports 20 people to Liberia, the first of 1,200 migrants under Trump deal</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Agreement is among largest third-country deportations driven by Trump administration’s immigration crackdown Twenty deportees from the United States arrived in Liberia on Thursday, as part of a new agreement that will see the west African country receive as many as 1,200 people under the Trump administration’s immigration crackdown.The group arrived at the Roberts international airport outside the capital, Monrovia. The Liberia-US agreement is one of the largest third-country deportation arrange</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">More than 100 dead after goldmine collapses in Central African Republic</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · The collapse was caused by a landslide, while local officials say the death toll is likely to rise as recovery efforts continueMore than 100 people have died after an artisanal goldmine at a small village in western Central African Republic (CAR) caved in due to a landslide, local officials and aid workers said on Wednesday.The landslide happened on Tuesday afternoon in the village of Zamboye, about 50km (31 miles) from the town of Baboua and close to the border of Cameroon. Footage on social me</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Five Americans among seven killed in safari helicopter crash in Kenya</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Officials say all seven people onboard killed, including Telemundo executive and Ecuador intelligence chiefSeven people, including five Americans, were killed when a safari helicopter crashed on Wednesday morning in a remote part of northern Kenya, according to local police and the state department.Among the dead were an executive with Telemundo, the US-based Spanish-language network owned by NBC Universal, and the director of Ecuador’s national intelligence service. Continue reading...</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Spain to allow 500 children in Ceuta to go to mainland in immigration U-turn</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Madrid government changes stance after previously saying anyone who entered territory illegally would be sent backEurope live – latest updatesThe Spanish government has U-turned and said it will allow 500 migrant children in Ceuta to relocate to the mainland.The majority of the estimated 70,000 people who crossed into Ceuta – a Spanish territory on the coast of north Africa – on 30 July have returned to Morocco. However, under Spanish law, the state has a duty of care to young, unaccompanied mig</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Ebola outbreak in Democratic Republic of the Congo now deadliest in country’s history</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · At least 2,325 people have died from the virus, according to official data, with outbreak on track to be biggest in historyThe Ebola outbreak in the Democratic Republic of the Congo is now the deadliest in the country’s history, with at least 2,325 people dead, according to government data, surpassing the toll from the 2018-20 outbreak.The DRC’s public health institute said confirmed cases had risen to 4,945, including 101 detected in the previous 24 hours. Continue reading...</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Canada vows to match Trump’s tariffs ‘dollar for dollar’ after trade talks fail</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Mark Carney accuses US of ‘unfair’ last-minute changes to deal that would have averted 50% import taxesThe Canadian prime minister, Mark Carney, has promised to match US tariffs “dollar for dollar” after the two sides failed to agree a trade deal by the deadline of midnight on Friday.The trade row is the biggest rupture in recent relations between Washington and one of its closest allies and trading partners as Donald Trump’s bellicose foreign policy angered officials in Ottawa. Continue reading</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">JD Vance reportedly mocks Carney for trying to ‘out-tough’ Trump on trade</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Audio recording of US vice-president apparently made at New York fundraiser and shared with Canadian PressLeaked audio from a private event has reportedly captured the US vice-president, JD Vance, mocking Canada for apparently capitulating in a trade deal and taunting the prime minister, Mark Carney, for trying to “out-tough” Donald Trump.The recording, which was reportedly made at a fundraiser and shared with the Canadian Press, comes in the last stretch of a difficult negotiation in which the </span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Strangers in their own land: Mexicans deported from Trump’s America find refuge in ‘Little LA’</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · With plentiful jobs and community support, one Mexico City neighbourhood has become a haven for those who have lived much of their lives in the USWith its wide avenues lined with tall palm trees, its quaint cafes and old-school cantinas, as well as the mix of English and Spanish spoken on the street, the Tabacalera neighborhood in downtown Mexico City has a certain US feel – so much so that it is has become known as Little LA.The nickname is about more than appearances, however. In recent years,</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Adviser to far-right Latin American leaders arrested for allegedly plotting to kill girlfriend</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Fernando Cerimedo, 42, arrested on suspicion of ordering shooting of Bolivian lawyer Nadia BellerA senior adviser to many of Latin America’s new wave of far-right leaders has been arrested for allegedly masterminding the attempted murder of his girlfriend.The businessman and political consultant Fernando Cerimedo, 42, had been working as an adviser to the Bolivian president, Rodrigo Paz Pereira, and was one of the main strategists behind Javier Milei’s campaign in Argentina’s 2023 presidential e</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Activist forced out of US after criticising Trump-aligned Colombian politician</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Beto Coral held up banners in Florida warning fellow Colombians to not vote for Abelardo de la EspriellaIn the week before Colombia’s presidential election, Beto Coral, a well-known activist living in the United States, travelled to Florida to persuade fellow Colombians not to vote for the far-right candidate Abelardo de la Espriella.Coral held banners outside polling stations in Miami warning that the millionaire lawyer, whose candidacy was endorsed by Donald Trump, would “help deport all of yo</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Man leaves young son on Mount Fuji before ascending Japan’s highest peak</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Boy, seven, had complained of feeling tired so father left him with snacks and a soft drink and continued his climbA man who abandoned his seven-year-old son on Mount Fuji in Japan after the boy complained of feeling tired while on a family hike has been reprimanded by local police.A worker on Japan’s highest mountain discovered the child sitting alone on a bench near the sixth station of the Fujinomiya trail at an altitude of more than 2,000 metres (6,500 feet) on Thursday. Continue reading...</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Tiananmen Square vigil organisers in Hong Kong found guilty of ‘inciting subversion’</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · UK Foreign Office condemns use of national security law to convict activists Lee Cheuk-yan and Chow Hang-tungTwo Hong Kong activists who organised annual vigils marking China’s deadly Tiananmen crackdown in 1989 have been found guilty of “incitement to subversion” in one of the most high-profile cases in Hong Kong since Beijing imposed its national security law in 2020.Lee Cheuk-yan, 69, and Chow Hang-tung, 41, “incited other persons to organise, plan, commit or participate in acts by unlawful m</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Weather tracker: Extreme rain deluges Japan and South Korea</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Downpours break records and cause transport chaos, evacuations and deaths, as people get trapped inside vehicles South Korea and Japan were hit by extreme rain late last week and into this week. On 13 August in the city of Chiba near Tokyo there was a record-breaking 115mm of rainfall in just one hour, while the nearby city of Sakura broke its own record with 97mm in one hour. Local authorities issued a level 5 emergency warning for heavy rain, the highest alert level and the first time one has </span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Russia’s missile tests around disputed islands anger Japan</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Pacific fleet launched missile drills near what Moscow calls the Kuril Islands but Japan regards as its Northern TerritoriesJapan has criticised missile tests carried out by Russia’s navy around the disputed islands visited by Vladimir Putin last week amid continuing tensions between the two countries.Russia’s Pacific fleet said on Thursday that it had fired Bastion surface-to-ship missiles from Etorofu, the largest island in the disputed archipelago, simulating an attack on enemy vessels, hitti</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Founder of China’s Evergrande jailed for life after pleading guilty to fraud</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Hui Ka Yan also forfeits all his personal property and the company he set up is given hefty finesBusiness live – latest updatesThe founder of Evergrande, one of China’s largest property developers, has been sentenced to life in prison and had all of his personal property confiscated.Hui Ka Yan, 67 and once named by Forbes as China’s richest man, with a net worth of $42.5bn (£31.2bn) in 2017, pleaded guilty in April to eight charges. Continue reading...</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Victorian Labor promises free dental care if re-elected in Australia-first move</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Premier Ben Carroll says $230m would be earmarked for 10 public dental clinics to operate on a walk-in basisGet our breaking news email, free app or daily news podcastVictorians would be able to walk into a dental clinic and receive free checkups and treatment under an Australian-first proposal the Labor government will take to the November state election.The premier, Ben Carroll, will announce the plan – Labor’s first major election commitment – at a rally on Saturday to mark fewer than 100 day</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Sorrow as community pays tribute to ‘shining light’ Lily Hooper after NSW hiking tragedy</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · The 18-year-old remembered as a talented athlete with an infectious smile and ‘one of those people who everyone simply liked’Get our breaking news email, free app or daily news podcastTributes have flowed for 18-year-old Lily Hooper, remembered as an adventurous, multitalented athlete with an infectious smile, after her body was found on Thursday afternoon, eight days after she disappeared while hiking in the New South Wales southern highlands.The teenager was a fixture across local sporting and</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Coles website down after viral Reddit post sees customers buy cases of alcoholic drinks at nearly 80% discount</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Supermarket’s website and app go offline as customers save more than $100 on some 24-packsGet our breaking news email, free app or daily news podcastThe Coles website and app have gone offline hours after a viral Reddit post highlighted a nearly 80% discount on 24-packs of premixed alcoholic drinks.For several hours on Saturday, both the Coles website and app displayed a message advising “we’re currently offline – but not for long”. The website and app came back online, before the website went d</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">‘Shameful’: UK, Australia and Canada criticise Israel over Gaza aid convoy killings decision</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Joint statement issued after IDF said it will not pursue criminal investigations into April 2024 strike that killed seven humanitarian workersBritain, Australia and Canada have called the decision of the Israeli military authorities not to open a criminal investigation into the April 2024 airstrikes that hit a convoy of aid vehicles in Gaza “shameful”. The strikes killed seven humanitarian workers from the US-based World Central Kitchen (WCK) organisation.WCK staff from the three countries were </span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">NSW ‘seeking urgent advice’ on controversial court ruling that found anti-Israel vandalism was not antisemitic</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Exclusive: Attorney general considering appeal after justice Desmond Fagan knocks back terror order request for Mohommed Farhat who wrote ‘Fuk Israel’ on carsGet our breaking news email, free app or daily news podcastThe New South Wales government could appeal a supreme court judge’s controversial decision to refuse its request for a terror order over a Sydney man convicted of writing “Fuk Israel” on cars and setting another vehicle alight in late 2024.Justice Desmond Fagan this week found dispa</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">‘Embryonic’: lost novel by French film-maker Éric Rohmer is republished</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · English translation of Élisabeth, the New Wave director’s 1946 book about young lovers in prewar Paris, receives rave reviews as precursor to auteur’s cinematic workIn the dog days of the second world war, 24-year-old Maurice Schérer wrote a tale of young lovers in prewar small-town France. He described lazy August swims in the Marne River east of Paris. He wrote about age-gap affairs and semi-incestuous flirtations. Schérer gallantly used a nom de plume, Gilbert Cordier, to shield his Catholic </span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Former British and French diplomats urge action over Israel’s ‘erasure’ of Palestine</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · In letter to Macron and Burnham, more than 100 senior figures accuse Israel of ethnic cleansing and call for measures including trade banMore than 100 French and British former diplomats have said Palestine is being erased in front of the world’s eyes and called for urgent action including trade and arms sales bans to press Israel to accept a Palestinian state.An unprecedented joint letter dispenses with diplomatic language by accusing Israel of ethnic cleansing and warning that the world no lon</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Attack on Ukraine shopping centre that killed 16 is ‘terror by design’, says EU foreign policy chief</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Kaja Kallas, the EU’s top diplomat, threatens harshest sanctions yet on Russia after strike on Kryvyi Rih, the home town of Volodymyr Zelenskyy  Russian drones have slammed into a busy shopping centre in central Ukraine, killing 16 people in an attack that Volodymyr Zelenskyy condemned as “cynical and despicable”.The EU’s foreign policy chief, Kaja Kallas, condemned Friday’s attack on Kryvyi Rih – the president’s home town – as “terror by design” and said she was “putting forward the most far-re</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Dutch regulator fines Uber $966m for automating driver suspensions</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · European regulators have imposed billions in penalties on US technology companies due to privacy, competition and digital market rulesThe Dutch data protection authority has fined ⁠Uber €825m ($966m) for deactivating driver ⁠accounts through automated systems without ​adequately informing them, according to a 17 August decision.The penalty would be the second-largest issued yet under Europe’s General Data Protection Regulation (GDPR). Continue reading...</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Gun stash in German forest believed to be linked to Russia, say reports</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Germany seeking to extradite suspect from Romania over guns it is feared could have been used ⁠in assassinationsGermany is seeking to extradite a suspect from Romania over the discovery of an underground stash of weapons in a forest near Berlin that German media reports have linked to Russian intelligence.Two weeks after German authorities found a drone carrying explosives at Leipzig airport, the interior minister, Alexander Dobrindt, confirmed federal prosecutors had opened an investigation rel</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="news-card fade-in">
+        
+        <div class="card-body">
+            <div class="card-top">
+                
+                
+            </div>
+            <div class="card-title">Israeli settler attacks shift focus to West Bank areas under direct Palestinian rule</div>
+            <div class="card-ai-summary">
+                <span class="ai-icon">🤖</span>
+                <span class="ai-text"><strong>AI 摘要</strong> · Report says violence is moving from Israeli-controlled areas to those earmarked for a future Palestinian stateViolent Israeli settler attacks in the two areas of the occupied West Bank under direct Palestinian rule have almost doubled since 2025, as settlers pursue a self-proclaimed “great settlement revolution” in the very heart of the territory earmarked for a Palestinian state.According to a report by the Israeli human rights organisation Yesh Din, shared with the Guardian, data shows that al</span>
+            </div>
+            <div class="card-footer">
+                <div class="cf-source"><span class="src-tag src-free">卫报</span></div>
+            </div>
+        </div>
+    </div>
+            </div>
+
+        </section>
+    </main>
+
+</body>
+</html>
