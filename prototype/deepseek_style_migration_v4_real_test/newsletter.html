@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日新闻简报 · 2026年08月27日</title>
+    <style>
+        /* ==================== Design Tokens · DeepSeek v0.4 ==================== */
+        :root {
+            --bg-body: #F4F6F9;
+            --bg-card: rgba(255, 255, 255, 0.72);
+            --bg-card-hover: rgba(255, 255, 255, 0.92);
+            --bg-header: rgba(255, 255, 255, 0.65);
+
+            --text-primary: #1E1E1E;
+            --text-secondary: #4A4A4A;
+            --text-tertiary: #8A8A8A;
+
+            --border-light: rgba(220, 224, 230, 0.45);
+
+            --shadow-card:
+                0 2px 8px rgba(15, 157, 138, 0.03),
+                0 4px 20px rgba(0, 0, 0, 0.04),
+                0 1px 4px rgba(0, 0, 0, 0.02);
+            --shadow-card-hover:
+                0 8px 32px rgba(15, 157, 138, 0.08),
+                0 12px 48px rgba(0, 0, 0, 0.06),
+                0 4px 12px rgba(255, 176, 124, 0.04);
+            --shadow-glow-jade: 0 0 40px rgba(15, 157, 138, 0.12);
+            --shadow-glow-apricot: 0 0 40px rgba(255, 176, 124, 0.10);
+
+            --radius-card: 18px;
+            --radius-sm: 10px;
+            --radius-full: 9999px;
+
+            --green-jade: #0F9D8A;
+            --green-jade-light: rgba(15, 157, 138, 0.10);
+            --green-apple: #7CB342;
+            --green-lime: #B5D33E;
+            --coral: #FF6B6B;
+            --coral-light: rgba(255, 107, 107, 0.12);
+            --apricot: #FFB07C;
+            --apricot-light: rgba(255, 176, 124, 0.15);
+
+            --grad-brand: linear-gradient(135deg, #0F9D8A 0%, #7CB342 45%, #FFB07C 100%);
+            /* 摘要区冷暖渐变 */
+            --grad-summary: linear-gradient(135deg, rgba(15,157,138,0.10) 0%, rgba(255,176,124,0.12) 100%);
+            --grad-summary-border: linear-gradient(135deg, rgba(15,157,138,0.20) 0%, rgba(255,176,124,0.18) 100%);
+            --grad-card-surface: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+
+            --max-w: 720px;
+            --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Noto Sans SC",
+                     "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.65;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ==================== 背景光晕 ==================== */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(15, 157, 138, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -15%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 176, 124, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ==================== Header ==================== */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-header);
+            backdrop-filter: blur(20px) saturate(1.6);
+            -webkit-backdrop-filter: blur(20px) saturate(1.6);
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: 0 1px 24px rgba(0, 0, 0, 0.015);
+        }
+        .header-inner {
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            background: var(--grad-brand);
+            display: grid;
+            place-items: center;
+            box-shadow: 0 4px 16px rgba(15, 157, 138, 0.25);
+        }
+        .header-icon svg { width: 17px; height: 17px; fill: #fff; }
+        .header-name {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            background: var(--grad-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header-date { font-size: 13px; color: var(--text-tertiary); }
+        .header-stats {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        .header-stats strong { color: var(--text-primary); font-weight: 600; }
+
+        /* ==================== Container ==================== */
+        .page {
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ==================== Section ==================== */
+        .sec { padding: 32px 0 0; }
+        .sec-hd {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .sec-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .sec-badge {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+        }
+        .badge-jade {
+            color: var(--green-jade);
+            background: var(--green-jade-light);
+            box-shadow: 0 0 12px rgba(15, 157, 138, 0.08);
+        }
+        .badge-apricot {
+            color: var(--apricot);
+            background: var(--apricot-light);
+            box-shadow: 0 0 12px rgba(255, 176, 124, 0.08);
+        }
+        .sec-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-light), transparent);
+        }
+
+        .divider {
+            max-width: var(--max-w);
+            margin: 0 auto;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-light) 20%, var(--border-light) 80%, transparent);
+        }
+
+        /* ==================== Headlines ==================== */
+        .hl-wrap { display: flex; flex-direction: column; gap: 16px; }
+
+        .hl {
+            background: var(--grad-card-surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            overflow: hidden;
+            transition: box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .hl::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-card);
+            background: linear-gradient(135deg, rgba(15, 157, 138, 0.02) 0%, rgba(255, 176, 124, 0.02) 100%);
+            pointer-events: none;
+        }
+        .hl:hover {
+            box-shadow: var(--shadow-card-hover), var(--shadow-glow-jade);
+            transform: translateY(-3px);
+        }
+
+        .hl-img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f0efed 0%, #e8e6e3 100%);
+        }
+        .hl-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .hl-body { padding: 18px 24px 20px; position: relative; z-index: 1; }
+
+        /* 标题：黑色文字 + 数字内联 */
+        .hl-title {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.45;
+            margin-bottom: 12px;
+            letter-spacing: -0.2px;
+            color: var(--text-primary);
+        }
+        .hl-num {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green-jade);
+            background: var(--green-jade-light);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-variant-numeric: tabular-nums;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(15, 157, 138, 0.06);
+        }
+        .hl-title-text {
+            color: var(--text-primary);
+        }
+
+        /* 摘要区域：冷暖渐变背景 */
+        .hl-summary-wrap {
+            background: var(--grad-summary);
+            border: 1px solid rgba(15, 157, 138, 0.08);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hl-summary-wrap::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255, 176, 124, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hl-summary {
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        .hl-sources {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* ==================== Source Tags ==================== */
+        .src-tag {
+            display: inline-flex;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .src-free {
+            color: var(--text-secondary);
+            background: rgba(240, 242, 245, 0.7);
+            backdrop-filter: blur(4px);
+        }
+        .src-free:hover {
+            background: rgba(240, 242, 245, 0.95);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .src-paid {
+            color: var(--coral);
+            background: var(--coral-light);
+            border: 1px solid rgba(255, 107, 107, 0.12);
+        }
+        .src-paid:hover {
+            background: rgba(255, 107, 107, 0.18);
+            box-shadow: 0 2px 12px rgba(255, 107, 107, 0.10);
+        }
+        .src-sep {
+            color: rgba(200, 204, 210, 0.5);
+            font-size: 10px;
+        }
+
+        /* ==================== Ordinary ==================== */
+        .ord-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 48px;
+        }
+
+        .ord {
+            background: var(--grad-card-surface);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            overflow: hidden;
+            display: flex;
+            transition: box-shadow 0.3s, transform 0.25s;
+            position: relative;
+        }
+        .ord::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-card);
+            background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .ord:hover {
+            box-shadow: var(--shadow-card-hover), var(--shadow-glow-apricot);
+            transform: translateY(-2px);
+        }
+
+        .ord-img {
+            flex-shrink: 0;
+            width: 160px;
+            aspect-ratio: 16 / 10;
+            background: linear-gradient(135deg, #f0efed, #e8e6e3);
+            overflow: hidden;
+        }
+        .ord-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .ord-body {
+            flex: 1;
+            min-width: 0;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 普通标题：黑色文字 */
+        .ord-title {
+            font-size: 14.5px;
+            font-weight: 600;
+            line-height: 1.45;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .ord-summary {
+            font-size: 12.5px;
+            line-height: 1.65;
+            color: var(--text-secondary);
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .ord-sources {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        /* ==================== Footer ==================== */
+        .foot {
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* ==================== Responsive ==================== */
+        @media (max-width: 640px) {
+            .header-meta { gap: 10px; }
+            .header-date { display: none; }
+            .hl-img { aspect-ratio: 16 / 8; }
+            .ord { flex-direction: column; }
+            .ord-img { width: 100%; aspect-ratio: 16 / 9; }
+        }
+
+        /* ==================== Dark Mode ==================== */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0F1114;
+                --bg-card: rgba(26, 28, 32, 0.80);
+                --bg-card-hover: rgba(32, 34, 38, 0.92);
+                --bg-header: rgba(15, 17, 20, 0.85);
+                --text-primary: #EAEAEA;
+                --text-secondary: #A0A0A0;
+                --text-tertiary: #606060;
+                --border-light: rgba(60, 64, 70, 0.45);
+                --shadow-card:
+                    0 2px 8px rgba(15, 157, 138, 0.05),
+                    0 4px 20px rgba(0, 0, 0, 0.18),
+                    0 1px 4px rgba(0, 0, 0, 0.12);
+                --shadow-card-hover:
+                    0 8px 32px rgba(15, 157, 138, 0.10),
+                    0 12px 48px rgba(0, 0, 0, 0.25),
+                    0 4px 12px rgba(255, 176, 124, 0.05);
+                --shadow-glow-jade: 0 0 50px rgba(15, 157, 138, 0.15);
+                --shadow-glow-apricot: 0 0 50px rgba(255, 176, 124, 0.12);
+                --grad-card-surface: linear-gradient(180deg, rgba(36,38,42,0.85) 0%, rgba(26,28,32,0.7) 100%);
+                --grad-summary: linear-gradient(135deg, rgba(15,157,138,0.15) 0%, rgba(255,176,124,0.12) 100%);
+            }
+            body::before { background: radial-gradient(circle, rgba(15, 157, 138, 0.08) 0%, transparent 70%); }
+            body::after { background: radial-gradient(circle, rgba(255, 176, 124, 0.06) 0%, transparent 70%); }
+            .hl-img, .ord-img { background: linear-gradient(135deg, #1e2024, #25272b); }
+            .src-free { background: rgba(60, 64, 70, 0.45); }
+            .src-free:hover { background: rgba(60, 64, 70, 0.65); }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <div class="header-brand">
+            <div class="header-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span class="header-name">每日新闻简报</span>
+        </div>
+        <div class="header-meta">
+            <span class="header-date">2026年08月27日 · 星期四</span>
+            <div class="header-stats">
+                <span><strong>343</strong> 抓取</span>
+                <span><strong>50</strong> 精选</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="page">
+
+    <div class="sec">
+        <div class="sec-hd">
+            <span class="sec-label">今天重要新闻</span>
+            <span class="sec-badge badge-jade">10</span>
+            <span class="sec-line"></span>
+        </div>
+        <div class="hl-wrap">
+            
+    <article class="hl">
+        
+        <div class="hl-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-canada-tariffs-lgpc/21int-canada-tariffs-lgpc-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="hl-body">
+            <h2 class="hl-title">
+                <span class="hl-num">01</span>
+                <span class="hl-title-text">加拿大与美国贸易战升级</span>
+            </h2>
+            <div class="hl-summary-wrap">
+                <div class="hl-summary">卡尼总理宣布对美国商品征收同等关税</div>
+            </div>
+            <div class="hl-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=%E5%8A%A0%E6%8B%BF%E5%A4%A7%E4%B8%8E%E7%BE%8E%E5%9B%BD%E8%B4%B8%E6%98%93%E6%88%98%E5%8D%87%E7%BA%A7" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=%E5%8A%A0%E6%8B%BF%E5%A4%A7%E4%B8%8E%E7%BE%8E%E5%9B%BD%E8%B4%B8%E6%98%93%E6%88%98%E5%8D%87%E7%BA%A7" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="hl">
+        
+        <div class="hl-body">
+            <h2 class="hl-title">
+                <span class="hl-num">02</span>
+                <span class="hl-title-text">欧盟通过人工智能法案</span>
+            </h2>
+            <div class="hl-summary-wrap">
+                <div class="hl-summary">欧盟议会批准全面的人工智能监管</div>
+            </div>
+            <div class="hl-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=%E6%AC%A7%E7%9B%9F%E9%80%9A%E8%BF%87%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E6%B3%95%E6%A1%88" target="_blank" rel="noopener">金融时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=%E6%AC%A7%E7%9B%9F%E9%80%9A%E8%BF%87%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E6%B3%95%E6%A1%88" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="hl">
+        
+        <div class="hl-body">
+            <h2 class="hl-title">
+                <span class="hl-num">03</span>
+                <span class="hl-title-text">日本央行维持低利率</span>
+            </h2>
+            <div class="hl-summary-wrap">
+                <div class="hl-summary">日本央行维持-0.1%的利率不变</div>
+            </div>
+            <div class="hl-sources"><span class="src-tag src-free">NHK</span></div>
+        </div>
+    </article>
+
+    <article class="hl">
+        
+        <div class="hl-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/00int-canada-tariffs-hfos-pbtz/00int-canada-tariffs-hfos-pbtz-mediumSquareAt3X-v3.jpg" alt="" loading="lazy">
+        </div>
+        <div class="hl-body">
+            <h2 class="hl-title">
+                <span class="hl-num">04</span>
+                <span class="hl-title-text">Carney Stands Up to Trump in U.S.-Canada Trade War</span>
+            </h2>
+            <div class="hl-summary-wrap">
+                <div class="hl-summary">Canada’s prime minister walked away from what he thought was a bad trade deal with the United States. Many Canadians are behind him, but it will be costly.</div>
+            </div>
+            <div class="hl-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Carney%20Stands%20Up%20to%20Trump%20in%20U.S.-Canada%20Trade%20War" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Carney%20Stands%20Up%20to%20Trump%20in%20U.S.-Canada%20Trade%20War" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="hl">
+        
+        <div class="hl-img">
+            <img src="https://static01.nyt.com/images/2026/08/22/multimedia/22int-uk-rest-is-history-01-bkmg/22int-uk-rest-is-history-01-bkmg-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="hl-body">
+            <h2 class="hl-title">
+                <span class="hl-num">05</span>
+                <span class="hl-title-text">How ‘The Rest Is History’ Podcast Conquered the World</span>
+            </h2>
+            <div class="hl-summary-wrap">
+                <div class="hl-summary">When two British historians, Tom Holland and Dominic Sandbrook, began the show, neither anticipated it would become the top history podcast in the English-speaking world.</div>
+            </div>
+            <div class="hl-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=How%20%E2%80%98The%20Rest%20Is%20History%E2%80%99%20Podcast%20Conquered%20the%20World" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=How%20%E2%80%98The%20Rest%20Is%20History%E2%80%99%20Podcast%20Conquered%20the%20World" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="hl">
+        
+        <div class="hl-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/world/00int-italy-bajani-oooo/00int-italy-bajani-oooo-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="hl-body">
+            <h2 class="hl-title">
+                <span class="hl-num">06</span>
+                <span class="hl-title-text">Close and Loving, or Oppressive? A Novelist Takes Aim at Italian Families.</span>
+            </h2>
+            <div class="hl-summary-wrap">
+                <div class="hl-summary">Many Italians see themselves in Andrea Bajani’s latest novel, a portrayal of the family as a “little totalitarian system” shaped by psychological and physical violence.</div>
+            </div>
+            <div class="hl-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Close%20and%20Loving%2C%20or%20Oppressive%3F%20A%20Novelist%20Takes%20Aim%20at%20Italian%20Families." target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Close%20and%20Loving%2C%20or%20Oppressive%3F%20A%20Novelist%20Takes%20Aim%20at%20Italian%20Families." target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="hl">
+        
+        <div class="hl-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-uk-harry-schools-photo1-htbj/21int-uk-harry-schools-photo1-htbj-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="hl-body">
+            <h2 class="hl-title">
+                <span class="hl-num">07</span>
+                <span class="hl-title-text">What Does Harry and Meghan’s Return to England Mean for Their Children?</span>
+            </h2>
+            <div class="hl-summary-wrap">
+                <div class="hl-summary">One effect of moving back is that Archie and Lilibet now have the opportunity to be schooled as Britons. Here’s what that might look like.</div>
+            </div>
+            <div class="hl-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=What%20Does%20Harry%20and%20Meghan%E2%80%99s%20Return%20to%20England%20Mean%20for%20Their%20Children%3F" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=What%20Does%20Harry%20and%20Meghan%E2%80%99s%20Return%20to%20England%20Mean%20for%20Their%20Children%3F" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="hl">
+        
+        <div class="hl-img">
+            <img src="https://static01.nyt.com/images/2026/08/22/multimedia/22Lebanon-Assess-01-vpgh/22Lebanon-Assess-01-vpgh-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="hl-body">
+            <h2 class="hl-title">
+                <span class="hl-num">08</span>
+                <span class="hl-title-text">Lebanon’s Efforts to Tame Hezbollah Stall Amid Israel War</span>
+            </h2>
+            <div class="hl-summary-wrap">
+                <div class="hl-summary">President Joseph Aoun took office with a popular mandate to reassert control after the militant group dragged the country back into war with Israel.</div>
+            </div>
+            <div class="hl-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Lebanon%E2%80%99s%20Efforts%20to%20Tame%20Hezbollah%20Stall%20Amid%20Israel%20War" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Lebanon%E2%80%99s%20Efforts%20to%20Tame%20Hezbollah%20Stall%20Amid%20Israel%20War" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="hl">
+        
+        <div class="hl-img">
+            <img src="https://static01.nyt.com/images/2026/08/22/multimedia/22belarus-envoy-01-lfmg/22belarus-envoy-01-lfmg-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="hl-body">
+            <h2 class="hl-title">
+                <span class="hl-num">09</span>
+                <span class="hl-title-text">How a Trump Envoy Uses Vodka and Dirty Jokes to Conduct U.S. Diplomacy</span>
+            </h2>
+            <div class="hl-summary-wrap">
+                <div class="hl-summary">The diplomat, John Coale, says his personalized approach gets results and matches the president’s style. Critics contend he is giving up too much to an authoritarian leader.</div>
+            </div>
+            <div class="hl-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=How%20a%20Trump%20Envoy%20Uses%20Vodka%20and%20Dirty%20Jokes%20to%20Conduct%20U.S.%20Diplomacy" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=How%20a%20Trump%20Envoy%20Uses%20Vodka%20and%20Dirty%20Jokes%20to%20Conduct%20U.S.%20Diplomacy" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="hl">
+        
+        <div class="hl-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-canada-tariffs-lgpc/21int-canada-tariffs-lgpc-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="hl-body">
+            <h2 class="hl-title">
+                <span class="hl-num">10</span>
+                <span class="hl-title-text">Canada-U.S. Trade War Escalates as Talks Collapse</span>
+            </h2>
+            <div class="hl-summary-wrap">
+                <div class="hl-summary">Intense negotiations to stave off new levies by the Trump administration ended in an impasse as Mark Carney suspended talks. U.S. tariffs on Canada, and retaliatory tariffs on the U.S., will come into effect.</div>
+            </div>
+            <div class="hl-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Canada-U.S.%20Trade%20War%20Escalates%20as%20Talks%20Collapse" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Canada-U.S.%20Trade%20War%20Escalates%20as%20Talks%20Collapse" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+        </div>
+    </div>
+
+    <div class="divider" style="margin-top:32px"></div>
+
+    <div class="sec">
+        <div class="sec-hd">
+            <span class="sec-label">今日普通新闻</span>
+            <span class="sec-badge badge-apricot">40</span>
+            <span class="sec-line"></span>
+        </div>
+        <div class="ord-wrap">
+            
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-canada-tariffs-lgpc/21int-canada-tariffs-lgpc-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">加拿大与美国贸易战升级</h3>
+            <div class="ord-summary">卡尼总理宣布对美国商品征收同等关税</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=%E5%8A%A0%E6%8B%BF%E5%A4%A7%E4%B8%8E%E7%BE%8E%E5%9B%BD%E8%B4%B8%E6%98%93%E6%88%98%E5%8D%87%E7%BA%A7" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><span class="src-tag src-free">卫报</span></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/22/multimedia/22int-japan-capital-gtfl/22int-japan-capital-gtfl-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Cities Compete in Dizzying ‘Gold Rush’ to Be Japan’s Backup Capital</h3>
+            <div class="ord-summary">Osaka? Fukuoka? Sapporo? The race is on to be second to Tokyo — and to claim the prestige and money that could come with it.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Cities%20Compete%20in%20Dizzying%20%E2%80%98Gold%20Rush%E2%80%99%20to%20Be%20Japan%E2%80%99s%20Backup%20Capital" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Cities%20Compete%20in%20Dizzying%20%E2%80%98Gold%20Rush%E2%80%99%20to%20Be%20Japan%E2%80%99s%20Backup%20Capital" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-mexico-governor-bhpv/21int-mexico-governor-bhpv-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Mexican Governor, Accused by U.S. of Helping Cartel, Returns to His Job</h3>
+            <div class="ord-summary">After U.S. prosecutors accused Gov. Rubén Rocha Moya of protecting the Sinaloa cartel, he said he would step down to focus on his defense. On Friday, he declared he was back and faced much criticism.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Mexican%20Governor%2C%20Accused%20by%20U.S.%20of%20Helping%20Cartel%2C%20Returns%20to%20His%20Job" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Mexican%20Governor%2C%20Accused%20by%20U.S.%20of%20Helping%20Cartel%2C%20Returns%20to%20His%20Job" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/00int-ukraine-walkers-vqlh/00int-ukraine-walkers-vqlh-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">At 77, She Walked 9 Miles Under Drone-Filled Skies to Escape From ‘Hell’</h3>
+            <div class="ord-summary">Rescue teams no longer enter the city of Lyman, in eastern Ukraine, because it is deemed too dangerous. The only way out is a terrifying journey on foot.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=At%2077%2C%20She%20Walked%209%20Miles%20Under%20Drone-Filled%20Skies%20to%20Escape%20From%20%E2%80%98Hell%E2%80%99" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=At%2077%2C%20She%20Walked%209%20Miles%20Under%20Drone-Filled%20Skies%20to%20Escape%20From%20%E2%80%98Hell%E2%80%99" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-iran-economy-01-vhbg/21int-iran-economy-01-vhbg-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Iran Must Plan to Overcome U.S. Sanctions After Trump’s ‘Economic D-Day’ Threats, Tehran Official Says</h3>
+            <div class="ord-summary">Mohammad Bagher Ghalibaf, lead negotiator in talks with Washington, made the comments after President Trump vowed an “economic D-Day” against Iran.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Iran%20Must%20Plan%20to%20Overcome%20U.S.%20Sanctions%20After%20Trump%E2%80%99s%20%E2%80%98Economic%20D-Day%E2%80%99%20Threats%2C%20Tehran%20Official%20Says" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Iran%20Must%20Plan%20to%20Overcome%20U.S.%20Sanctions%20After%20Trump%E2%80%99s%20%E2%80%98Economic%20D-Day%E2%80%99%20Threats%2C%20Tehran%20Official%20Says" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21WestBank-attack-01-cwhm/21WestBank-attack-01-cwhm-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Palestinian Teenager Killed After Israeli Settlers Enter West Bank Village</h3>
+            <div class="ord-summary">Palestinian and Israeli authorities offered divergent accounts of the incident, which came as settler violence has surged across the Israeli-occupied territory.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Palestinian%20Teenager%20Killed%20After%20Israeli%20Settlers%20Enter%20West%20Bank%20Village" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Palestinian%20Teenager%20Killed%20After%20Israeli%20Settlers%20Enter%20West%20Bank%20Village" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21uk-harry-meghan-voices-1-wghc/21uk-harry-meghan-voices-1-wghc-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">‘They’re Always Going to Be Polarizing’: Britons Split on Harry and Meghan’s Return</h3>
+            <div class="ord-summary">Recent surveys suggest the broader public views both of them negatively, especially in comparison to Harry’s brother, William, and his wife, Kate.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=%E2%80%98They%E2%80%99re%20Always%20Going%20to%20Be%20Polarizing%E2%80%99%3A%20Britons%20Split%20on%20Harry%20and%20Meghan%E2%80%99s%20Return" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=%E2%80%98They%E2%80%99re%20Always%20Going%20to%20Be%20Polarizing%E2%80%99%3A%20Britons%20Split%20on%20Harry%20and%20Meghan%E2%80%99s%20Return" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/22/multimedia/22canadaletter-leblancembassy-gqjw/22canadaletter-leblancembassy-gqjw-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Waking Up to an Escalating Canada-U.S. Trade War</h3>
+            <div class="ord-summary">The two countries are locked in a potentially devastating tariff war after last-minute demands ended talks in Washington late Friday night.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Waking%20Up%20to%20an%20Escalating%20Canada-U.S.%20Trade%20War" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Waking%20Up%20to%20an%20Escalating%20Canada-U.S.%20Trade%20War" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21Roudy--01-fbzj/21Roudy--01-fbzj-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Yvette Roudy, France’s First Minister for Women’s Rights, Dies at 97</h3>
+            <div class="ord-summary">Maintaining that access to abortion was as much a matter of economic equality as women’s rights, she successfully championed state reimbursement for abortions.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Yvette%20Roudy%2C%20France%E2%80%99s%20First%20Minister%20for%20Women%E2%80%99s%20Rights%2C%20Dies%20at%2097" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Yvette%20Roudy%2C%20France%E2%80%99s%20First%20Minister%20for%20Women%E2%80%99s%20Rights%2C%20Dies%20at%2097" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/11/multimedia/00xp-wedding-vlqk/00xp-wedding-vlqk-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Missing From a Mass Wedding in India: Brides</h3>
+            <div class="ord-summary">A fraud case, in which dozens of grooms showed up for a wedding that never materialized, is an extreme example of scamming in a marriage industry long prone to it.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Missing%20From%20a%20Mass%20Wedding%20in%20India%3A%20Brides" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Missing%20From%20a%20Mass%20Wedding%20in%20India%3A%20Brides" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-turkey-netanyahu-1-fwqt/21int-turkey-netanyahu-1-fwqt-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Turkey Requests Netanyahu’s Arrest, Saying Israel Abused Flotilla Activists</h3>
+            <div class="ord-summary">Turkey’s request for an Interpol ‘red notice’ came at a time of escalating tensions between the two countries.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Turkey%20Requests%20Netanyahu%E2%80%99s%20Arrest%2C%20Saying%20Israel%20Abused%20Flotilla%20Activists" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Turkey%20Requests%20Netanyahu%E2%80%99s%20Arrest%2C%20Saying%20Israel%20Abused%20Flotilla%20Activists" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-equatorial-deport-qfgk/21int-equatorial-deport-qfgk-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">5 Deportees Are Flown by US to Equatorial Guinea After they Resist Deplaning in Liberia</h3>
+            <div class="ord-summary">At least five of the people flown to Liberia under the Trump administration’s third-country deportation program resisted leaving the plane. They were then flown to Equatorial Guinea.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=5%20Deportees%20Are%20Flown%20by%20US%20to%20Equatorial%20Guinea%20After%20they%20Resist%20Deplaning%20in%20Liberia" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=5%20Deportees%20Are%20Flown%20by%20US%20to%20Equatorial%20Guinea%20After%20they%20Resist%20Deplaning%20in%20Liberia" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-zambia-1-jzmc/21int-zambia-1-jzmc-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Zambia’s Democratic Facade Fractures in Post-Election Crackdown</h3>
+            <div class="ord-summary">While the government says it is preventing an insurrection, activists and international observers have raised fears about arbitrary arrests and electoral fraud.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Zambia%E2%80%99s%20Democratic%20Facade%20Fractures%20in%20Post-Election%20Crackdown" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Zambia%E2%80%99s%20Democratic%20Facade%20Fractures%20in%20Post-Election%20Crackdown" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21trav-bali-silence-02-tlkb/21trav-bali-silence-02-tlkb-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Swiss Tourist Sentenced to Prison After Violating ‘Day of Silence’ in Bali</h3>
+            <div class="ord-summary">The 26-year-old received a yearlong sentence from a court on the Indonesian resort island after he flouted a sacred Hindu ritual and insulted it on Instagram.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Swiss%20Tourist%20Sentenced%20to%20Prison%20After%20Violating%20%E2%80%98Day%20of%20Silence%E2%80%99%20in%20Bali" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Swiss%20Tourist%20Sentenced%20to%20Prison%20After%20Violating%20%E2%80%98Day%20of%20Silence%E2%80%99%20in%20Bali" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-ireland-zuckerberg-mbvh/21int-ireland-zuckerberg-mbvh-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Mark Zuckerberg Buys an Irish Castle</h3>
+            <div class="ord-summary">The prominent landowner has added a nearly 200-year-old estate to his holdings. Archival information says it can take “a brisk walk of 4½ minutes to reach the dining room from the kitchen.”</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Mark%20Zuckerberg%20Buys%20an%20Irish%20Castle" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Mark%20Zuckerberg%20Buys%20an%20Irish%20Castle" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-germany-guns-qthk/21int-germany-guns-qthk-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Germany Identifies a Plot After Finding a Weapons Cache, but Names No Culprit</h3>
+            <div class="ord-summary">Officials were careful not to point a finger, after revealing what they said was a plan for a political attack, at a time when a series of destabilizing actions have been blamed on Russia.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Germany%20Identifies%20a%20Plot%20After%20Finding%20a%20Weapons%20Cache%2C%20but%20Names%20No%20Culprit" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Germany%20Identifies%20a%20Plot%20After%20Finding%20a%20Weapons%20Cache%2C%20but%20Names%20No%20Culprit" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-canada-tariffs-deal-1-ltfw/21int-canada-tariffs-deal-1-ltfw-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Canada-U.S. Tariff Talks Continue as Trump’s Midnight Deadline Looms</h3>
+            <div class="ord-summary">Canadian negotiators were in Washington to finalize a deal that would stave off new tariffs and improve the terms of existing ones, but Mark Carney faces a tough sell back home.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Canada-U.S.%20Tariff%20Talks%20Continue%20as%20Trump%E2%80%99s%20Midnight%20Deadline%20Looms" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Canada-U.S.%20Tariff%20Talks%20Continue%20as%20Trump%E2%80%99s%20Midnight%20Deadline%20Looms" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-UK-HARRY-COURT-kbtf/21int-UK-HARRY-COURT-kbtf-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Prince Harry, Elton John and Others Told to Pay Daily Mail Publisher $13 Million</h3>
+            <div class="ord-summary">Harry and six other high-profile figures lost a privacy lawsuit against Associated Newspapers. They may eventually have to pay more than twice the initial sum, a judge said.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Prince%20Harry%2C%20Elton%20John%20and%20Others%20Told%20to%20Pay%20Daily%20Mail%20Publisher%20%2413%20Million" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Prince%20Harry%2C%20Elton%20John%20and%20Others%20Told%20to%20Pay%20Daily%20Mail%20Publisher%20%2413%20Million" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21biz-China-Car-Doors-01-jvgz/21biz-China-Car-Doors-01-jvgz-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">In China’s Biggest Car Recall, Tesla and 8 Others Will Address Door Safety</h3>
+            <div class="ord-summary">China’s regulator ordered changes after vehicle occupants sometimes had difficulty exiting electric cars, an issue that has led to lawsuits against Tesla in the United States.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=In%20China%E2%80%99s%20Biggest%20Car%20Recall%2C%20Tesla%20and%208%20Others%20Will%20Address%20Door%20Safety" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=In%20China%E2%80%99s%20Biggest%20Car%20Recall%2C%20Tesla%20and%208%20Others%20Will%20Address%20Door%20Safety" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21int-china-iran-analysis-01-pthw/21int-china-iran-analysis-01-pthw-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Why China Thinks It Can Resist Trump’s Economic Threats on Iran</h3>
+            <div class="ord-summary">Beijing can squeeze U.S. critical mineral supplies and has enough oil to withstand the loss of Iranian crude, Chinese analysts say.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Why%20China%20Thinks%20It%20Can%20Resist%20Trump%E2%80%99s%20Economic%20Threats%20on%20Iran" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Why%20China%20Thinks%20It%20Can%20Resist%20Trump%E2%80%99s%20Economic%20Threats%20on%20Iran" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/21meloni-takeaways-1-kczl/21meloni-takeaways-1-kczl-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Giorgia Meloni Has a Lot to Say: The Takeaways</h3>
+            <div class="ord-summary">The Italian prime minister is leading what will soon be the longest-lasting government in the country’s postwar history. She shows herself by turns funny and fierce in a rare interview.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Giorgia%20Meloni%20Has%20a%20Lot%20to%20Say%3A%20The%20Takeaways" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Giorgia%20Meloni%20Has%20a%20Lot%20to%20Say%3A%20The%20Takeaways" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20int-uk-charity-1-tvjb/20int-uk-charity-1-tvjb-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Muslim Charity in Britain Faces Scrutiny for Possible Links to Hamas</h3>
+            <div class="ord-summary">British regulators are investigating Al-Khair Foundation after U.S. prosecutors accused a man affiliated with the group of funding terrorism.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Muslim%20Charity%20in%20Britain%20Faces%20Scrutiny%20for%20Possible%20Links%20to%20Hamas" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Muslim%20Charity%20in%20Britain%20Faces%20Scrutiny%20for%20Possible%20Links%20to%20Hamas" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20xp-trees-major-oak-copy-promo/20xp-trees-major-oak-copy-promo-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">England’s Ancient Trees Are Dying in the Heat</h3>
+            <div class="ord-summary">Extreme temperatures and drought are adding to the stress on oak trees that have lived for hundreds of years and play a key role in the national imagination.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=England%E2%80%99s%20Ancient%20Trees%20Are%20Dying%20in%20the%20Heat" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=England%E2%80%99s%20Ancient%20Trees%20Are%20Dying%20in%20the%20Heat" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/11/multimedia/00int-meloni-profile-01-tmfc/00int-meloni-profile-01-tmfc-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Giorgia Meloni Cuts the Hard Right a Path to Power</h3>
+            <div class="ord-summary">In a rare interview, the onetime political outcast reflects on her route from “the uncomfortable side of history” to the threshold of leading Italy’s most durable postwar government.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Giorgia%20Meloni%20Cuts%20the%20Hard%20Right%20a%20Path%20to%20Power" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Giorgia%20Meloni%20Cuts%20the%20Hard%20Right%20a%20Path%20to%20Power" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/19/world/00int-argentina-disease-promo/00int-argentina-disease-03-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Rare South American Diseases Offer Clues on the Next Pandemic</h3>
+            <div class="ord-summary">Ebola virus, hantavirus and the pathogen that causes Covid-19 likely jumped from animals to humans. So do these viruses — and scientists say climate change is speeding their spread.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Rare%20South%20American%20Diseases%20Offer%20Clues%20on%20the%20Next%20Pandemic" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Rare%20South%20American%20Diseases%20Offer%20Clues%20on%20the%20Next%20Pandemic" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/world/21int-uk-harry-security/21int-uk-harry-security-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Return of Harry and Meghan to U.K. Renews Questions About Their Security Fears</h3>
+            <div class="ord-summary">The couple lost their publicly funded security after deciding to leave Britain in 2020, deepening their split with the royal family.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Return%20of%20Harry%20and%20Meghan%20to%20U.K.%20Renews%20Questions%20About%20Their%20Security%20Fears" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Return%20of%20Harry%20and%20Meghan%20to%20U.K.%20Renews%20Questions%20About%20Their%20Security%20Fears" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/13/multimedia/00int-hungary-dispatch-03-lhwk/00int-hungary-dispatch-03-lhwk-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Orban’s Office, Thrown Open, Is Not the Den Hungarians Expected</h3>
+            <div class="ord-summary">The new government of Peter Magyar hoped to use the suite overlooking the Danube as evidence of an autocrat’s indulgence. The trappings fell short.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Orban%E2%80%99s%20Office%2C%20Thrown%20Open%2C%20Is%20Not%20the%20Den%20Hungarians%20Expected" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Orban%E2%80%99s%20Office%2C%20Thrown%20Open%2C%20Is%20Not%20the%20Den%20Hungarians%20Expected" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20Kissinger-Nancy-plfg/20Kissinger-Nancy-plfg-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Nancy Kissinger, Wife of Former Secretary of State, Dies at 92</h3>
+            <div class="ord-summary">A foreign policy specialist, she was politically savvy and well versed in global issues, and traveled widely with her husband, Henry A. Kissinger, on his diplomatic missions.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Nancy%20Kissinger%2C%20Wife%20of%20Former%20Secretary%20of%20State%2C%20Dies%20at%2092" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Nancy%20Kissinger%2C%20Wife%20of%20Former%20Secretary%20of%20State%2C%20Dies%20at%2092" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20int-somalia-1-jbtg/20int-somalia-1-jbtg-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">2 Hijackings in 4 Days: Somali Piracy Rises</h3>
+            <div class="ord-summary">Experts worry that the conflict in Iran and other regional dynamics are setting the stage for a Somali pirates’ comeback.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=2%20Hijackings%20in%204%20Days%3A%20Somali%20Piracy%20Rises" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=2%20Hijackings%20in%204%20Days%3A%20Somali%20Piracy%20Rises" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20int-cameroon-1-cwzj/20int-cameroon-1-cwzj-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Cameroon’s Aging President Returns From Monthslong Stay Abroad</h3>
+            <div class="ord-summary">Paul Biya, 93, had been in Switzerland since early June. The prolonged absence stirred questions about his health and plans for succession.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Cameroon%E2%80%99s%20Aging%20President%20Returns%20From%20Monthslong%20Stay%20Abroad" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Cameroon%E2%80%99s%20Aging%20President%20Returns%20From%20Monthslong%20Stay%20Abroad" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20dc-prexy01a-photo-jgzt/20dc-prexy01a-photo-jgzt-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">The Message Behind Trump’s Threats of ‘Economic Warfare’ Against Iran</h3>
+            <div class="ord-summary">President Trump’s threats of an “economic D-Day” carry a clear signal to Iran that he does not want to go back to war.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=The%20Message%20Behind%20Trump%E2%80%99s%20Threats%20of%20%E2%80%98Economic%20Warfare%E2%80%99%20Against%20Iran" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=The%20Message%20Behind%20Trump%E2%80%99s%20Threats%20of%20%E2%80%98Economic%20Warfare%E2%80%99%20Against%20Iran" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20int-japan-icc-01-gtjv/20int-japan-icc-01-gtjv-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Japan’s U.S. Ties Could Not Save a Top Judge From Trump’s I.C.C. Sanctions</h3>
+            <div class="ord-summary">Japan had tried to dissuade the U.S. from imposing sanctions on Tomoko Akane, president of the International Criminal Court, but the White House pressed ahead.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Japan%E2%80%99s%20U.S.%20Ties%20Could%20Not%20Save%20a%20Top%20Judge%20From%20Trump%E2%80%99s%20I.C.C.%20Sanctions" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Japan%E2%80%99s%20U.S.%20Ties%20Could%20Not%20Save%20a%20Top%20Judge%20From%20Trump%E2%80%99s%20I.C.C.%20Sanctions" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20int-pakistan-new1-tkwc/20int-pakistan-new1-tkwc-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Imran Khan Is Granted Brief Hospital Visit Before Returning to Prison</h3>
+            <div class="ord-summary">The former prime minister of Pakistan, who was convicted on corruption charges, has been fighting a legal battle over his medical treatment.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Imran%20Khan%20Is%20Granted%20Brief%20Hospital%20Visit%20Before%20Returning%20to%20Prison" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Imran%20Khan%20Is%20Granted%20Brief%20Hospital%20Visit%20Before%20Returning%20to%20Prison" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/05/multimedia/21int-theworld-amplifier-promo/05cul-soundwalk-01-hzqg-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Songs for Lizard Season</h3>
+            <div class="ord-summary">Our colleagues at The Amplifier newsletter have music recommendations for the final sun-basking days of summer.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Songs%20for%20Lizard%20Season" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Songs%20for%20Lizard%20Season" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/21/multimedia/20int-arday-1-lzgc/20int-arday-1-lzgc-mediumSquareAt3X-v2.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Academic Who Publicized Plagiarism Allegations Against Jason Arday Is Suspended</h3>
+            <div class="ord-summary">Ghent University in Belgium said it suspended the academic, Nathan Cofnas, pending an investigation.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Academic%20Who%20Publicized%20Plagiarism%20Allegations%20Against%20Jason%20Arday%20Is%20Suspended" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Academic%20Who%20Publicized%20Plagiarism%20Allegations%20Against%20Jason%20Arday%20Is%20Suspended" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20int-canada-tariffs-deal-mqlb/20int-canada-tariffs-deal-mqlb-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Trump Tariff Talks Leave Key Canadian Official Hopeful</h3>
+            <div class="ord-summary">While President Trump has declared that the two countries effectively have a deal, a Canadian trade official said progress continued ahead of the Saturday deadline.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Trump%20Tariff%20Talks%20Leave%20Key%20Canadian%20Official%20Hopeful" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Trump%20Tariff%20Talks%20Leave%20Key%20Canadian%20Official%20Hopeful" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/09/02/multimedia/20int-liberia-trump-deportees-1-fcjz/02int-liberia-trump-deportees-1-fcjz-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">First U.S. Deportees to Arrive in Liberia Amid Growing Backlash</h3>
+            <div class="ord-summary">The five men were part of the first group of deportees to be sent to the West African nation by the Trump administration. The Liberian government has not clarified their status.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=First%20U.S.%20Deportees%20to%20Arrive%20in%20Liberia%20Amid%20Growing%20Backlash" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=First%20U.S.%20Deportees%20to%20Arrive%20in%20Liberia%20Amid%20Growing%20Backlash" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20dc-scholar-fjbl/20dc-scholar-fjbl-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">State Dept. Declares U.S. Citizen in China Wrongfully Detained</h3>
+            <div class="ord-summary">U Min Zin, a scholar who studied Myanmar, is one of two U.S. citizens the department has designated as wrongfully detained in China.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=State%20Dept.%20Declares%20U.S.%20Citizen%20in%20China%20Wrongfully%20Detained" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=State%20Dept.%20Declares%20U.S.%20Citizen%20in%20China%20Wrongfully%20Detained" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20xp-sanctions-china-topart-vctq/20xp-sanctions-china-topart-vctq-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">Trump’s Economic Threat Puts Focus on Iran’s Trading Partners</h3>
+            <div class="ord-summary">President Trump appeared to suggest that the United States would impose economic penalties on countries that do business with Iran, though he did not specify what actions he would take.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=Trump%E2%80%99s%20Economic%20Threat%20Puts%20Focus%20on%20Iran%E2%80%99s%20Trading%20Partners" target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=Trump%E2%80%99s%20Economic%20Threat%20Puts%20Focus%20on%20Iran%E2%80%99s%20Trading%20Partners" target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+
+    <article class="ord">
+        <div class="ord-img">
+            <img src="https://static01.nyt.com/images/2026/08/20/multimedia/20int-harry-meghan-wtk-kcmv/20int-harry-meghan-wtk-kcmv-mediumSquareAt3X.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ord-body">
+            <h3 class="ord-title">What to Know About Prince Harry and Meghan’s Move Back to the U.K.</h3>
+            <div class="ord-summary">The couple are moving back after six years in the United States. What they will do, and much else, are still unclear.</div>
+            <div class="ord-sources"><a class="src-tag src-paid" href="https://www.google.com/search?q=What%20to%20Know%20About%20Prince%20Harry%20and%20Meghan%E2%80%99s%20Move%20Back%20to%20the%20U.K." target="_blank" rel="noopener">纽约时报</a><span class="src-sep">·</span><a class="src-tag src-free" href="https://www.google.com/search?q=What%20to%20Know%20About%20Prince%20Harry%20and%20Meghan%E2%80%99s%20Move%20Back%20to%20the%20U.K." target="_blank" rel="noopener">Google 搜索</a></div>
+        </div>
+    </article>
+        </div>
+    </div>
+
+</main>
+
+<footer class="foot">每日新闻简报 · v0.4.0 · 真实数据全流程测试</footer>
+
+</body>
+</html>
