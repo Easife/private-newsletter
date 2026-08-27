@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日新闻简报 · Natural Future Tech</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --ff:-apple-system,BlinkMacSystemFont,"SF Pro Text","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --bg:#fafaf8;
+  --card:#ffffff;
+  --ink:#181818;
+  --ink2:#4a4a4a;
+  --ink3:#999;
+  --mint:#3a9d78;
+  --mint-soft:rgba(58,157,120,0.06);
+  --lime:#8fb83a;
+  --lime-soft:rgba(143,184,58,0.06);
+  --avocado:#6a9a3a;
+  --amber:#c48a10;
+  --amber-soft:rgba(196,138,16,0.06);
+  --coral:#d06a50;
+  --line:rgba(0,0,0,0.055);
+  --line-faint:rgba(0,0,0,0.035);
+  --shadow-xs:0 1px 2px rgba(0,0,0,0.03);
+  --shadow-s:0 1px 4px rgba(0,0,0,0.045);
+  --shadow-m:0 4px 16px rgba(0,0,0,0.06);
+  --shadow-l:0 8px 32px rgba(0,0,0,0.08);
+  --col:700px;
+  --r:14px;
+  --r-sm:10px;
+}
+
+body{
+  font-family:var(--ff);
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+/* ─── Sticky Header ─── */
+.hdr{
+  position:sticky;top:0;z-index:100;
+  background:rgba(250,250,248,0.8);
+  backdrop-filter:blur(16px) saturate(1.4);
+  -webkit-backdrop-filter:blur(16px) saturate(1.4);
+  border-bottom:1px solid var(--line-faint);
+}
+.hdr-row{
+  max-width:var(--col);margin:0 auto;
+  padding:0 24px;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.hdr-brand{display:flex;align-items:center;gap:9px}
+.hdr-icon{
+  width:26px;height:26px;border-radius:7px;
+  background:linear-gradient(135deg,var(--mint),var(--lime));
+  display:grid;place-items:center;
+  box-shadow:0 2px 8px rgba(58,157,120,0.2);
+}
+.hdr-icon svg{width:14px;height:14px;fill:#fff}
+.hdr-name{font-size:15px;font-weight:700;letter-spacing:0.2px}
+.hdr-right{display:flex;align-items:center;gap:20px}
+.hdr-date{font-size:12.5px;color:var(--ink3)}
+.hdr-pills{display:flex;gap:12px;font-size:11.5px;color:var(--ink3)}
+.hdr-pills strong{color:var(--ink);font-weight:600}
+
+/* ─── Container ─── */
+.page{max-width:var(--col);margin:0 auto;padding:0 24px}
+
+/* ─── Section ─── */
+.sec{padding:32px 0 0}
+.sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.sec-label{font-size:14px;font-weight:600}
+.sec-badge{
+  font-size:10px;font-weight:700;letter-spacing:0.3px;
+  padding:2px 8px;border-radius:5px;
+}
+.badge-mint{color:var(--mint);background:var(--mint-soft)}
+.badge-lime{color:var(--lime);background:var(--lime-soft)}
+.sec-line{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+/* ─── Divider ─── */
+.divider{
+  max-width:var(--col);margin:0 auto;
+  height:1px;background:var(--line);
+}
+
+/* ─── Headlines ─── */
+.hl-wrap{display:flex;flex-direction:column;gap:12px}
+.hl{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  overflow:hidden;
+  box-shadow:var(--shadow-s);
+  display:flex;flex-direction:column;
+  transition:box-shadow .22s,transform .22s;
+  position:relative;
+}
+.hl::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--mint),var(--lime));
+  border-radius:var(--r) 0 0 var(--r);
+  opacity:0;transition:opacity .22s;
+}
+.hl:hover{box-shadow:var(--shadow-l);transform:translateY(-1px)}
+.hl:hover::before{opacity:1}
+.hl-img{width:100%;height:165px;overflow:hidden;background:#f0efed;position:relative}
+.hl-img img{width:100%;height:100%;object-fit:cover;display:block}
+.hl-img::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,0.03));
+}
+.hl-body{padding:14px 18px 16px}
+.hl-row{display:flex;align-items:baseline;gap:8px;margin-bottom:5px}
+.hl-num{
+  font-size:11.5px;font-weight:700;color:var(--mint);
+  font-variant-numeric:tabular-nums;flex-shrink:0;
+  background:var(--mint-soft);
+  padding:2px 7px;border-radius:5px;
+}
+.hl h2{font-size:16px;font-weight:600;line-height:1.45}
+.hl .desc{font-size:13px;color:var(--ink2);line-height:1.7;margin:0 0 8px}
+
+/* ─── Source Tags ─── */
+.tags{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.tag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:500;
+  padding:3px 8px;border-radius:5px;
+  text-decoration:none;transition:background .15s;
+}
+.tag-s{color:var(--ink2);background:rgba(0,0,0,0.035)}
+.tag-s:hover{background:rgba(0,0,0,0.06)}
+.tag-p{color:var(--amber);background:var(--amber-soft)}
+.tag-p:hover{background:rgba(196,138,16,0.1)}
+.tag-p svg{width:10px;height:10px;fill:currentColor;flex-shrink:0}
+.sep{width:1px;height:11px;background:var(--line);flex-shrink:0}
+
+/* ─── Ordinary ─── */
+.ord-wrap{display:flex;flex-direction:column;gap:8px;padding-bottom:48px}
+.ord{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  padding:14px;
+  display:flex;gap:14px;align-items:stretch;
+  box-shadow:var(--shadow-xs);
+  transition:box-shadow .22s,transform .22s;
+  position:relative;
+}
+.ord::before{
+  content:'';position:absolute;left:0;top:8px;bottom:8px;width:2.5px;
+  border-radius:2px;
+  background:var(--lime);
+  opacity:0;transition:opacity .22s;
+}
+.ord:hover{box-shadow:var(--shadow-m);transform:translateY(-1px)}
+.ord:hover::before{opacity:0.6}
+.ord-img{
+  flex-shrink:0;width:120px;
+  border-radius:8px;overflow:hidden;
+  background:#f0efed;
+}
+.ord-img img{width:100%;height:100%;object-fit:cover;display:block}
+.ord-empty{
+  flex-shrink:0;width:120px;border-radius:8px;
+  background:linear-gradient(135deg,var(--mint-soft),var(--lime-soft));
+  display:grid;place-items:center;
+  font-size:10px;color:var(--ink3);
+}
+.ord-body{flex:1;min-width:0;display:flex;flex-direction:column}
+.ord h3{font-size:14px;font-weight:600;line-height:1.45;margin-bottom:3px}
+.ord .desc{
+  font-size:12.5px;color:var(--ink2);line-height:1.65;flex:1;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.ord .tags{margin-top:6px}
+
+/* ─── Footer ─── */
+.foot{
+  max-width:var(--col);margin:0 auto;
+  padding:24px;text-align:center;
+  font-size:11px;color:var(--ink3);
+  border-top:1px solid var(--line-faint);
+}
+
+/* ─── Responsive ─── */
+@media(max-width:640px){
+  .hdr-date{display:none}
+  .hdr-pills{gap:8px}
+  .hl-img{height:140px}
+  .ord{flex-direction:column}
+  .ord-img,.ord-empty{width:100%;height:130px}
+}
+
+/* ─── Dark ─── */
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#111;--card:#1a1a1a;
+    --ink:#e2e2e2;--ink2:#a8a8a8;--ink3:#666;
+    --mint:#5cc8a0;--mint-soft:rgba(92,200,160,0.1);
+    --lime:#a0d060;--lime-soft:rgba(160,208,96,0.08);
+    --amber:#e8b030;--amber-soft:rgba(232,176,48,0.1);
+    --line:rgba(255,255,255,0.07);--line-faint:rgba(255,255,255,0.04);
+    --shadow-xs:0 1px 2px rgba(0,0,0,0.2);
+    --shadow-s:0 1px 4px rgba(0,0,0,0.25);
+    --shadow-m:0 4px 16px rgba(0,0,0,0.3);
+    --shadow-l:0 8px 32px rgba(0,0,0,0.35);
+  }
+  .hdr{background:rgba(17,17,17,0.88)}
+  .hl-img,.ord-img{background:#252525}
+  .ord-empty{background:linear-gradient(135deg,rgba(92,200,160,0.08),rgba(160,208,96,0.06))}
+  .tag-s{background:rgba(255,255,255,0.06)}
+  .tag-s:hover{background:rgba(255,255,255,0.1)}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="hdr-brand">
+      <div class="hdr-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span class="hdr-name">Natural Future Tech</span>
+    </div>
+    <div class="hdr-right">
+      <span class="hdr-date">2026.08.27 周三</span>
+      <div class="hdr-pills">
+        <span><strong>343</strong> 抓取</span>
+        <span><strong>84</strong> 去重</span>
+        <span><strong>50</strong> 精选</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- ═══ HEADLINES ═══ -->
+  <div class="sec">
+    <div class="sec-hd">
+      <span class="sec-label">今日头条</span>
+      <span class="sec-badge badge-mint">TOP 3</span>
+      <span class="sec-line"></span>
+    </div>
+    <div class="hl-wrap">
+
+      <article class="hl">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-row">
+            <span class="hl-num">01</span>
+            <h2>加拿大与美国贸易战全面升级，卡尼誓言"一美元对一美元"回击</h2>
+          </div>
+          <div class="desc">在华盛顿最新的贸易谈判破裂后，加拿大总理马克·卡尼宣布将对美国产品征收对等关税，涵盖钢铁、铝制品及消费品。两国经济界对供应链中断表示深度担忧。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">纽约时报</a>
+            <span class="sep"></span>
+            <a class="tag tag-s" href="#">卫报</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="hl">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-row">
+            <span class="hl-num">02</span>
+            <h2>欧盟通过全球首个全面 AI 法案，科技巨头面临合规挑战</h2>
+          </div>
+          <div class="desc">欧盟议会以压倒性多数通过《人工智能法案》，对高风险 AI 系统实施严格监管。违规者将面临全球营收 7% 的罚款。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">金融时报</a>
+            <a class="tag tag-p" href="https://www.google.com/search?q=EU+AI+Act+Financial+Times" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="hl">
+        <div class="hl-img">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="hl-body">
+          <div class="hl-row">
+            <span class="hl-num">03</span>
+            <h2>联合国气候峰会：120 国承诺 2035 年前碳排放减半</h2>
+          </div>
+          <div class="desc">120 个国家签署了历史性减排协议。中国、美国和欧盟承诺在 2035 年前将碳排放较 2020 年水平减少 50%。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">德国之声</a>
+            <span class="sep"></span>
+            <a class="tag tag-s" href="#">半岛电视台</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <div class="divider" style="margin-top:32px"></div>
+
+  <!-- ═══ ORDINARY ═══ -->
+  <div class="sec">
+    <div class="sec-hd">
+      <span class="sec-label">其他重要新闻</span>
+      <span class="sec-badge badge-lime">8</span>
+      <span class="sec-line"></span>
+    </div>
+    <div class="ord-wrap">
+
+      <article class="ord">
+        <div class="ord-img">
+          <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-body">
+          <h3>Anthropic 计划通过大规模 IPO 筹集 1000 亿美元</h3>
+          <div class="desc">AI 公司 Anthropic 正在筹备史上最大规模的科技 IPO，计划估值超过 3000 亿美元，将超过阿里巴巴 2014 年创下的纪录。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">纽约时报科技版</a>
+            <a class="tag tag-p" href="https://www.google.com/search?q=Anthropic+IPO+NYT+Technology" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ord">
+        <div class="ord-img">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-body">
+          <h3>缅甸军方空袭佛寺造成 14 人死亡</h3>
+          <div class="desc">联合国人权办公室对缅甸最新空袭事件表示震惊，呼吁各方遵守国际人道法，保护平民和宗教场所。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">BBC World</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ord">
+        <div class="ord-img">
+          <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-body">
+          <h3>被美国指控帮助贩毒集团的墨西哥州长重返工作岗位</h3>
+          <div class="desc">尽管面临美国的引渡要求和制裁威胁，该州长在获得墨西哥法院裁决后恢复执政，美墨关系再添变数。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">纽约时报</a>
+            <a class="tag tag-p" href="https://www.google.com/search?q=墨西哥州长+New+York+Times" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ord">
+        <div class="ord-img">
+          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-body">
+          <h3>日本央行维持超低利率政策，日元汇率继续承压</h3>
+          <div class="desc">日本央行宣布维持 -0.1% 的基准利率不变，市场预期短期内不会退出超宽松货币政策。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">NHK World</a>
+            <span class="sep"></span>
+            <a class="tag tag-s" href="#">彭博社</a>
+            <a class="tag tag-p" href="https://www.google.com/search?q=日本央行+利率+Bloomberg" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ord">
+        <div class="ord-img">
+          <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-body">
+          <h3>SpaceX 星舰完成轨道飞行测试</h3>
+          <div class="desc">星舰在第三次全系统轨道试飞中成功完成绕地球飞行并安全着陆，载人火星计划迈出关键一步。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">纽约时报科技版</a>
+            <a class="tag tag-p" href="https://www.google.com/search?q=SpaceX+Starship+NYT+Technology" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ord">
+        <div class="ord-img">
+          <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="ord-body">
+          <h3>伊朗称美国新制裁侵犯了其他国家的主权</h3>
+          <div class="desc">伊朗外交部强烈谴责美国最新的单边制裁措施，称其违反国际法准则，并表示将采取"相应回应"。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">半岛电视台</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ord">
+        <div class="ord-empty">无图片</div>
+        <div class="ord-body">
+          <h3>沃尔玛发布季度财报，电商增长超预期</h3>
+          <div class="desc">沃尔玛第二季度电商销售额同比增长 22%，受 AI 推荐系统和配送网络优化推动。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">Bloomberg</a>
+            <a class="tag tag-p" href="https://www.google.com/search?q=Walmart+earnings+Bloomberg" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="ord">
+        <div class="ord-empty">无图片</div>
+        <div class="ord-body">
+          <h3>欧洲央行考虑进一步降息以应对经济放缓</h3>
+          <div class="desc">多位欧洲央行官员暗示可能在年内再次降息 25 个基点，以应对欧元区经济疲软。</div>
+          <div class="tags">
+            <a class="tag tag-s" href="#">Financial Times</a>
+            <a class="tag tag-p" href="https://www.google.com/search?q=ECB+rate+cut+Financial+Times" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="foot">每日新闻简报 · Natural Future Tech · AI 驱动</footer>
+
+</body>
+</html>
