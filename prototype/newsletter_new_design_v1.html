@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日新闻简报 · AI Digest</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --ff:-apple-system,BlinkMacSystemFont,"SF Pro Text","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --bg:#f8f7f5;
+  --surface:#ffffff;
+  --ink:#181818;
+  --ink2:#505050;
+  --ink3:#9a9a9a;
+  --mint:#3a9e78;
+  --lime:#7db83a;
+  --amber:#c48a10;
+  --peach:#d06a50;
+  --mint-soft:rgba(58,158,120,0.07);
+  --lime-soft:rgba(125,184,58,0.07);
+  --amber-soft:rgba(196,138,16,0.07);
+  --peach-soft:rgba(208,106,80,0.06);
+  --line:rgba(0,0,0,0.055);
+  --line-faint:rgba(0,0,0,0.035);
+  --shadow-s:0 1px 3px rgba(0,0,0,0.035);
+  --shadow-m:0 4px 16px rgba(0,0,0,0.06);
+  --shadow-l:0 8px 32px rgba(0,0,0,0.08);
+  --column:700px;
+  --radius:14px;
+}
+
+body{
+  font-family:var(--ff);
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* ═══════ TOP BAR ═══════ */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(248,247,245,0.88);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line-faint);
+}
+.topbar-inner{
+  max-width:var(--column);margin:0 auto;
+  padding:0 24px;height:48px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.brand{display:flex;align-items:center;gap:8px}
+.brand-icon{
+  width:22px;height:22px;border-radius:6px;
+  background:linear-gradient(135deg,var(--mint),var(--lime));
+  display:flex;align-items:center;justify-content:center;
+}
+.brand-icon svg{width:13px;height:13px;fill:#fff}
+.brand-name{font-size:14px;font-weight:600;letter-spacing:0.3px}
+.topbar-meta{font-size:12px;color:var(--ink3)}
+
+/* ═══════ PAGE ═══════ */
+.page{max-width:var(--column);margin:0 auto;padding:0 24px}
+
+/* ═══════ HERO ═══════ */
+.hero{
+  padding:36px 0 20px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  border-bottom:1px solid var(--line);
+}
+.hero h1{font-size:26px;font-weight:700;line-height:1.3;letter-spacing:-0.3px}
+.hero-sub{font-size:13px;color:var(--ink3);margin-top:4px}
+.hero-stats{
+  display:flex;gap:18px;
+  font-size:12px;color:var(--ink3);white-space:nowrap;
+  padding-bottom:3px;
+}
+.hero-stats strong{color:var(--ink);font-weight:600}
+
+/* ═══════ SECTION ═══════ */
+.section{padding:28px 0 0}
+.sec-bar{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:16px;
+}
+.sec-title{font-size:14px;font-weight:600}
+.sec-badge{
+  font-size:10px;font-weight:700;color:var(--mint);
+  background:var(--mint-soft);
+  padding:2px 7px;border-radius:5px;
+  letter-spacing:0.3px;
+}
+.sec-rule{flex:1;height:1px;background:var(--line)}
+
+/* ═══════ SEPARATOR ═══════ */
+.sep{height:1px;background:var(--line);margin:0}
+
+/* ═══════ HEADLINE ═══════ */
+.headlines{display:flex;flex-direction:column;gap:14px}
+.h-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-s);
+  transition:box-shadow .22s ease,transform .22s ease;
+}
+.h-card:hover{box-shadow:var(--shadow-l);transform:translateY(-2px)}
+.h-img{position:relative;width:100%;height:180px;overflow:hidden;background:#edecea}
+.h-img img{width:100%;height:100%;object-fit:cover;display:block}
+.h-img::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:60px;
+  background:linear-gradient(transparent,rgba(0,0,0,0.04));
+}
+.h-body{padding:16px 20px 18px}
+.h-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.h-num{
+  font-size:11px;font-weight:700;color:var(--mint);
+  background:var(--mint-soft);
+  padding:2px 6px;border-radius:4px;
+  font-variant-numeric:tabular-nums;
+  flex-shrink:0;
+}
+.h-card h2{font-size:17px;font-weight:600;line-height:1.45}
+.h-card .desc{font-size:13.5px;color:var(--ink2);line-height:1.7;margin:0 0 10px}
+
+/* ═══════ SOURCE TAGS ═══════ */
+.tags{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.tag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:500;
+  padding:3px 8px;border-radius:5px;
+  text-decoration:none;
+  transition:background .15s;
+}
+.tag-src{
+  color:var(--ink2);
+  background:rgba(0,0,0,0.035);
+}
+.tag-src:hover{background:rgba(0,0,0,0.06)}
+.tag-paid{
+  color:var(--amber);
+  background:var(--amber-soft);
+}
+.tag-paid:hover{background:rgba(196,138,16,0.12)}
+.tag-paid svg{width:10px;height:10px;fill:currentColor;flex-shrink:0}
+.tag-sep{
+  width:1px;height:12px;background:var(--line);flex-shrink:0;
+}
+
+/* ═══════ ORDINARY ═══════ */
+.ord-list{display:flex;flex-direction:column;gap:6px}
+.o-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:16px;
+  display:flex;gap:16px;align-items:stretch;
+  box-shadow:var(--shadow-s);
+  transition:box-shadow .22s ease,transform .22s ease;
+}
+.o-card:hover{box-shadow:var(--shadow-m);transform:translateY(-1px)}
+.o-thumb{
+  flex-shrink:0;width:130px;
+  border-radius:10px;overflow:hidden;
+  background:#edecea;
+}
+.o-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.o-empty{
+  flex-shrink:0;width:130px;
+  border-radius:10px;
+  background:linear-gradient(135deg,rgba(58,158,120,0.04),rgba(125,184,58,0.03));
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--ink3);letter-spacing:0.3px;
+}
+.o-body{flex:1;min-width:0;display:flex;flex-direction:column}
+.o-card h3{font-size:14.5px;font-weight:600;line-height:1.45;margin-bottom:4px}
+.o-card .desc{
+  font-size:12.5px;color:var(--ink2);line-height:1.65;
+  flex:1;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.o-foot{margin-top:8px}
+
+/* ═══════ FOOTER ═══════ */
+.foot{
+  max-width:var(--column);margin:0 auto;
+  padding:28px 24px;
+  text-align:center;
+  font-size:11px;color:var(--ink3);
+  border-top:1px solid var(--line-faint);
+}
+
+/* ═══════ RESPONSIVE ═══════ */
+@media(max-width:640px){
+  .hero{flex-direction:column;gap:10px}
+  .hero h1{font-size:22px}
+  .h-img{height:150px}
+  .o-card{flex-direction:column}
+  .o-thumb,.o-empty{width:100%;height:140px}
+  .topbar-meta{display:none}
+}
+
+/* ═══════ DARK ═══════ */
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#121212;--surface:#1a1a1a;
+    --ink:#e4e4e4;--ink2:#a0a0a0;--ink3:#606060;
+    --mint:#5cc8a0;--lime:#9cd060;--amber:#e8b030;--peach:#e89080;
+    --mint-soft:rgba(92,200,160,0.1);--lime-soft:rgba(156,208,96,0.08);
+    --amber-soft:rgba(232,176,48,0.1);--peach-soft:rgba(232,144,128,0.08);
+    --line:rgba(255,255,255,0.07);--line-faint:rgba(255,255,255,0.04);
+    --shadow-s:0 1px 3px rgba(0,0,0,0.2);
+    --shadow-m:0 4px 16px rgba(0,0,0,0.3);
+    --shadow-l:0 8px 32px rgba(0,0,0,0.35);
+  }
+  .topbar{background:rgba(18,18,18,0.9)}
+  .h-img,.o-thumb{background:#252525}
+  .o-empty{background:linear-gradient(135deg,rgba(92,200,160,0.06),rgba(156,208,96,0.04))}
+  .tag-src{background:rgba(255,255,255,0.06)}
+  .tag-src:hover{background:rgba(255,255,255,0.1)}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════ TOP BAR ══════ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span class="brand-name">AI Digest</span>
+    </div>
+    <div class="topbar-meta">2026 年 8 月 27 日 · 星期三</div>
+  </div>
+</div>
+
+<!-- ══════ PAGE ══════ -->
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <h1>每日新闻简报</h1>
+      <div class="hero-sub">AI 筛选 · 17 个来源 · 智能去重</div>
+    </div>
+    <div class="hero-stats">
+      <span><strong>343</strong> 抓取</span>
+      <span><strong>84</strong> 去重</span>
+      <span><strong>50</strong> 精选</span>
+    </div>
+  </div>
+
+  <!-- ══════ HEADLINES ══════ -->
+  <div class="section">
+    <div class="sec-bar">
+      <span class="sec-title">今日头条</span>
+      <span class="sec-badge">TOP 3</span>
+      <span class="sec-rule"></span>
+    </div>
+    <div class="headlines">
+
+      <!-- H1 -->
+      <article class="h-card">
+        <div class="h-img">
+          <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="h-body">
+          <div class="h-row">
+            <span class="h-num">01</span>
+            <h2>加拿大与美国贸易战全面升级，卡尼誓言"一美元对一美元"回击</h2>
+          </div>
+          <div class="desc">在华盛顿最新的贸易谈判破裂后，加拿大总理马克·卡尼宣布将对美国产品征收对等关税，涵盖钢铁、铝制品及消费品。两国经济界对供应链中断表示深度担忧。</div>
+          <div class="tags">
+            <a class="tag tag-src" href="#">纽约时报</a>
+            <span class="tag-sep"></span>
+            <a class="tag tag-src" href="#">卫报</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- H2 -->
+      <article class="h-card">
+        <div class="h-img">
+          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="h-body">
+          <div class="h-row">
+            <span class="h-num">02</span>
+            <h2>欧盟通过全球首个全面 AI 法案，科技巨头面临合规挑战</h2>
+          </div>
+          <div class="desc">欧盟议会以压倒性多数通过《人工智能法案》，对高风险 AI 系统实施严格监管。违规者将面临全球营收 7% 的罚款。</div>
+          <div class="tags">
+            <a class="tag tag-src" href="#">金融时报</a>
+            <a class="tag tag-paid" href="https://www.google.com/search?q=EU+AI+Act+Financial+Times" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- H3 -->
+      <article class="h-card">
+        <div class="h-img">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=900&h=400&fit=crop" alt="">
+        </div>
+        <div class="h-body">
+          <div class="h-row">
+            <span class="h-num">03</span>
+            <h2>联合国气候峰会：120 国承诺 2035 年前碳排放减半</h2>
+          </div>
+          <div class="desc">120 个国家签署了历史性减排协议。中国、美国和欧盟承诺在 2035 年前将碳排放较 2020 年水平减少 50%。</div>
+          <div class="tags">
+            <a class="tag tag-src" href="#">德国之声</a>
+            <span class="tag-sep"></span>
+            <a class="tag tag-src" href="#">半岛电视台</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <div class="sep" style="margin-top:28px"></div>
+
+  <!-- ══════ ORDINARY ══════ -->
+  <div class="section">
+    <div class="sec-bar">
+      <span class="sec-title">其他重要新闻</span>
+      <span class="sec-badge" style="color:var(--lime);background:var(--lime-soft)">8</span>
+      <span class="sec-rule"></span>
+    </div>
+    <div class="ord-list">
+
+      <!-- O1 -->
+      <article class="o-card">
+        <div class="o-thumb">
+          <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="o-body">
+          <h3>Anthropic 计划通过大规模 IPO 筹集 1000 亿美元</h3>
+          <div class="desc">AI 公司 Anthropic 正在筹备史上最大规模的科技 IPO，计划估值超过 3000 亿美元，将超过阿里巴巴 2014 年创下的纪录。</div>
+          <div class="o-foot tags">
+            <a class="tag tag-src" href="#">纽约时报科技版</a>
+            <a class="tag tag-paid" href="https://www.google.com/search?q=Anthropic+IPO+NYT+Technology" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- O2 -->
+      <article class="o-card">
+        <div class="o-thumb">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="o-body">
+          <h3>缅甸军方空袭佛寺造成 14 人死亡</h3>
+          <div class="desc">联合国人权办公室对缅甸最新空袭事件表示震惊，呼吁各方遵守国际人道法，保护平民和宗教场所。</div>
+          <div class="o-foot tags">
+            <a class="tag tag-src" href="#">BBC World</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- O3 -->
+      <article class="o-card">
+        <div class="o-thumb">
+          <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="o-body">
+          <h3>被美国指控帮助贩毒集团的墨西哥州长重返工作岗位</h3>
+          <div class="desc">尽管面临美国的引渡要求和制裁威胁，该州长在获得墨西哥法院裁决后恢复执政，美墨关系再添变数。</div>
+          <div class="o-foot tags">
+            <a class="tag tag-src" href="#">纽约时报</a>
+            <a class="tag tag-paid" href="https://www.google.com/search?q=墨西哥州长+New+York+Times" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- O4 -->
+      <article class="o-card">
+        <div class="o-thumb">
+          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="o-body">
+          <h3>日本央行维持超低利率政策，日元汇率继续承压</h3>
+          <div class="desc">日本央行宣布维持 -0.1% 的基准利率不变，市场预期短期内不会退出超宽松货币政策。</div>
+          <div class="o-foot tags">
+            <a class="tag tag-src" href="#">NHK World</a>
+            <span class="tag-sep"></span>
+            <a class="tag tag-src" href="#">彭博社</a>
+            <a class="tag tag-paid" href="https://www.google.com/search?q=日本央行+利率+Bloomberg" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- O5 -->
+      <article class="o-card">
+        <div class="o-thumb">
+          <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="o-body">
+          <h3>SpaceX 星舰完成轨道飞行测试</h3>
+          <div class="desc">星舰在第三次全系统轨道试飞中成功完成绕地球飞行并安全着陆，载人火星计划迈出关键一步。</div>
+          <div class="o-foot tags">
+            <a class="tag tag-src" href="#">纽约时报科技版</a>
+            <a class="tag tag-paid" href="https://www.google.com/search?q=SpaceX+Starship+NYT+Technology" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- O6 -->
+      <article class="o-card">
+        <div class="o-thumb">
+          <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="o-body">
+          <h3>伊朗称美国新制裁侵犯了其他国家的主权</h3>
+          <div class="desc">伊朗外交部强烈谴责美国最新的单边制裁措施，称其违反国际法准则，并表示将采取"相应回应"。</div>
+          <div class="o-foot tags">
+            <a class="tag tag-src" href="#">半岛电视台</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- O7 — no image -->
+      <article class="o-card">
+        <div class="o-empty">无图片</div>
+        <div class="o-body">
+          <h3>沃尔玛发布季度财报，电商增长超预期</h3>
+          <div class="desc">沃尔玛第二季度电商销售额同比增长 22%，受 AI 推荐系统和配送网络优化推动。</div>
+          <div class="o-foot tags">
+            <a class="tag tag-src" href="#">Bloomberg</a>
+            <a class="tag tag-paid" href="https://www.google.com/search?q=Walmart+earnings+Bloomberg" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- O8 — no image -->
+      <article class="o-card">
+        <div class="o-empty">无图片</div>
+        <div class="o-body">
+          <h3>欧洲央行考虑进一步降息以应对经济放缓</h3>
+          <div class="desc">多位欧洲央行官员暗示可能在年内再次降息 25 个基点，以应对欧元区经济疲软。</div>
+          <div class="o-foot tags">
+            <a class="tag tag-src" href="#">Financial Times</a>
+            <a class="tag tag-paid" href="https://www.google.com/search?q=ECB+rate+cut+Financial+Times" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              Paywall
+            </a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <div style="height:40px"></div>
+
+</div>
+
+<footer class="foot">每日新闻简报 · AI Digest · Powered by AI</footer>
+
+</body>
+</html>
