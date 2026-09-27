@@ -1,121 +1,139 @@
-# 新闻来源配置
-#
-# 每个来源包含：
-#   name: 来源名称（用于显示）
-#   rss_url: RSS 订阅地址
-#   weight: 权重 0-1，影响排序（来源越可靠，权重越高）
-#   language: 该来源的主要语言 (en/zh/ja)
-#   tags: 分类标签，用于主题匹配
-#
-# 你可以随时增删来源，无需修改程序代码。
-
 sources:
-  # === 国际通讯社 ===
-  - name: Reuters
-    rss_url: https://feeds.reuters.com/reuters/topNews
-    weight: 0.9
+  - id: reuters
+    name: Reuters
+    provider: google_news
+    search: site:reuters.com
+    google_hl: en-US
+    google_gl: US
+    google_ceid: US:en
+    weight: 0.90
     language: en
+    access_type: free
     tags: [international, politics, business, tech]
-
-  - name: Associated Press
-    rss_url: https://rsshub.app/apnews/topics/apf-topnews
-    weight: 0.9
+  - id: associated-press
+    name: Associated Press
+    provider: google_news
+    search: site:apnews.com
+    google_hl: en-US
+    google_gl: US
+    google_ceid: US:en
+    weight: 0.90
     language: en
+    access_type: free
     tags: [international, politics, breaking-news]
-
-  # === 英国媒体 ===
-  - name: BBC
-    rss_url: https://feeds.bbci.co.uk/news/rss.xml
+  - id: bbc
+    name: BBC
+    provider: google_news
+    search: site:bbc.co.uk
+    google_hl: en-GB
+    google_gl: GB
+    google_ceid: GB:en
     weight: 0.85
     language: en
+    access_type: free
     tags: [international, politics, business, tech]
-
-  - name: BBC World
-    rss_url: https://feeds.bbci.co.uk/news/world/rss.xml
-    weight: 0.85
-    language: en
-    tags: [international, geopolitics]
-
-  - name: The Guardian
-    rss_url: https://www.theguardian.com/world/rss
-    weight: 0.8
-    language: en
-    tags: [international, politics, world]
-
-  # === 美国主流媒体 ===
-  - name: New York Times
-    rss_url: https://rss.nytimes.com/services/xml/rss/nyt/World.xml
-    weight: 0.8
-    language: en
-    tags: [international, politics, business]
-
-  - name: NYT Technology
-    rss_url: https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml
+  - id: efe
+    name: EFE
+    provider: google_news
+    search: site:efe.com
+    google_hl: es
+    google_gl: ES
+    google_ceid: ES:es
+    weight: 0.70
+    language: es
+    access_type: free
+    tags: [international, politics, latin-america]
+  - id: cna
+    name: CNA
+    provider: google_news
+    search: site:channelnewsasia.com
+    google_hl: en-SG
+    google_gl: SG
+    google_ceid: SG:en
     weight: 0.75
     language: en
-    tags: [tech, ai, science]
-
-  - name: NYT Chinese
+    access_type: free
+    tags: [international, southeast-asia, geopolitics]
+  - id: guardian
+    name: The Guardian
+    provider: rss
+    rss_url: https://www.theguardian.com/world/rss
+    weight: 0.80
+    language: en
+    access_type: free
+    tags: [international, politics, world]
+  - id: nyt
+    name: New York Times
+    provider: rss
+    rss_url: https://rss.nytimes.com/services/xml/rss/nyt/World.xml
+    weight: 0.80
+    language: en
+    access_type: paid
+    tags: [international, politics, business]
+  - id: nyt-cn
+    name: NYT Chinese
+    provider: rss
     rss_url: https://cn.nytimes.com/rss/
-    weight: 0.8
+    weight: 0.80
     language: zh
+    access_type: paid
     tags: [china, international]
-
-  # === 财经媒体 ===
-  - name: Financial Times
+  - id: ft
+    name: Financial Times
+    provider: rss
     rss_url: https://www.ft.com/rss/home
     weight: 0.85
     language: en
+    access_type: paid
     tags: [business, finance, geopolitics, china]
-
-  - name: Bloomberg
+  - id: bloomberg
+    name: Bloomberg
+    provider: rss
     rss_url: https://feeds.bloomberg.com/markets/news.rss
     weight: 0.85
     language: en
+    access_type: paid
     tags: [business, finance, markets, tech]
-
-  # === 科技媒体 ===
-  - name: The Economist
-    rss_url: https://www.economist.com/rss
-    weight: 0.8
-    language: en
-    tags: [politics, business, tech, international]
-
-  # === 德国/中东媒体 ===
-  - name: DW
+  - id: dw
+    name: DW
+    provider: rss
     rss_url: https://rss.dw.com/rdf/rss-en-all
-    weight: 0.7
+    weight: 0.70
     language: en
+    access_type: free
     tags: [international, politics, germany]
-
-  - name: Al Jazeera
+  - id: al-jazeera
+    name: Al Jazeera
+    provider: rss
     rss_url: https://www.aljazeera.com/xml/rss/all.xml
-    weight: 0.7
+    weight: 0.70
     language: en
+    access_type: free
     tags: [international, middle-east, politics]
-
-  # === 日本媒体 ===
-  - name: NHK World
+  - id: nhk-world
+    name: NHK World
+    provider: rss
     rss_url: https://www3.nhk.or.jp/rss/news/cat0.xml
-    weight: 0.7
+    weight: 0.70
     language: ja
+    access_type: free
     tags: [japan, international]
-
-  - name: 日经
-    rss_url: https://www.nikkei.com/rss/
-    weight: 0.7
+  - id: nikkei
+    name: Nikkei
+    provider: rss
+    rss_url: https://business.nikkei.com/rss/sns/nb.rdf
+    weight: 0.70
     language: ja
+    access_type: paid
     tags: [japan, business, tech, china]
-
-  # === 中文来源 ===
-  - name: 新华社
-    rss_url: http://www.xinhuanet.com/politics/xhll.xml
-    weight: 0.7
-    language: zh
-    tags: [china, politics, policy]
-
-  - name: 联合早报
-    rss_url: https://www.zaobao.com/rss/realtime/china
+  - id: zaobao
+    name: 联合早报
+    provider: google_news
+    search: site:zaobao.com
+    google_hl: zh-CN
+    google_gl: SG
+    google_ceid: SG:zh-Hans
     weight: 0.65
     language: zh
+    access_type: paid
     tags: [china, international, southeast-asia]

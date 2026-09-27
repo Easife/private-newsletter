@@ -1,0 +1,63 @@
+timezone: Asia/Shanghai
+
+paths:
+  runs: runs
+  archive: archive
+  latest: latest
+  logs: logs
+
+fetch:
+  timeout_seconds: 20
+  max_concurrent: 6
+  proxy: ""
+  verify_tls: true
+
+filtering:
+  min_title_length: 12
+  keep_undated: false
+  # A rolling window avoids favouring US evening news during early-morning Asia runs.
+  window_hours: 24
+
+deduplication:
+  exact_threshold: 0.72
+  related_threshold: 0.34
+
+selection:
+  headline_count: 10
+  ordinary_count: 30
+  backup_count: 0
+
+# OpenCode Zen free models allow headless CLI use but reject external serve HTTP requests.
+opencode:
+  mode: cli
+  executable: ""
+  timeout_seconds: 240
+
+ranking:
+  candidate_pool_size: 60
+  # Candidate construction protects recall and source coverage; it is not a final ranking.
+  min_candidates_per_source: 3
+  max_candidates_per_source: 8
+  interest_candidate_slots: 5
+  wildcard_slots: 5
+  top_scored_count: 15
+  ordinary_selected_count: 25
+  # Authenticated OpenCode Zen free models only, in fallback order.
+  models:
+    - opencode/mimo-v2.6-flash-free
+    - opencode/nemotron-3-ultra-free
+    - opencode/ling-3.0-flash-fin-free
+    - opencode/longcat-2.5-preview-free
+    - opencode/space-bunny-free
+
+translation:
+  # GTX is the normal path; OpenCode runs only when at least one title fails.
+  providers: [google_gtx, opencode]
+  proxy: ""
+  provider_timeout_seconds: 15
+  models:
+    - opencode/mimo-v2.6-flash-free
+    - opencode/ling-3.0-flash-fin-free
+    - opencode/nemotron-3.5-lightning-free
+    - opencode/longcat-2.5-preview-free
+    - opencode/space-bunny-free

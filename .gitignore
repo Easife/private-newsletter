@@ -1,52 +1,11 @@
-# Data & Output
-data/
-output/
-*.json
-
-# Runtime outputs (不要提交)
-cache/
-archive/
-latest/
-data/rss_audit/
-prototype/deepseek_style_output/
-
-# Logs
-*.log
-
-# Playwright browsers (本地环境，不提交)
-ms-playwright/
-__ms-playwright/
-
-# Python
+.venv/
 __pycache__/
 *.py[cod]
-*$py.class
-*.egg-info/
+.env
+logs/
+runs/
+archive/
+latest/
+newsletter-opencode-*.json
 dist/
 build/
-*.egg
-.venv/
-venv/
-env/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Environment
-.env
-.env.local
-*.env
-
-# Temporary
-*.tmp
-*.bak
-*.tmp
