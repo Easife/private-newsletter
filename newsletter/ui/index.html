@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Private Newsletter 控制中心</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="masthead">
+      <a class="brand" href="/" aria-label="每日新闻简报控制台首页">
+        <span class="brand-mark">N</span>
+        <span><b>PRIVATE NEWSLETTER</b><small>本机简报控制台</small></span>
+      </a>
+      <div class="header-meta">
+        <span class="version" id="versionLabel">v2.2.0</span>
+        <span class="state-pill state-idle" id="statePill"><i></i><span>准备就绪</span></span>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">DAILY INTELLIGENCE WORKSPACE</p>
+          <h1>每日新闻简报<br><em>生成与设置中心</em></h1>
+        </div>
+        <p class="intro-copy">在一个页面中完成环境检查、当日简报生成、即时日志查看与来源策略调整。程序仅在本机运行，OpenCode 通过无界面 CLI 按需调用。</p>
+      </section>
+
+      <section class="first-steps" aria-label="第一次使用指南">
+        <div class="step-label"><b>第一次使用？</b><span>按照 1 → 3 即可完成首份简报</span></div>
+        <div class="step-item"><span>1</span><div><b>确认环境</b><small>四项检测均正常后继续；异常会在日志中说明。</small></div></div>
+        <div class="step-item"><span>2</span><div><b>按需调整</b><small>默认设置可直接使用；修改来源或规则后先保存。</small></div></div>
+        <div class="step-item"><span>3</span><div><b>生成简报</b><small>首次完整运行，同日后续自动只处理全新事件。</small></div></div>
+      </section>
+
+      <section class="workspace" aria-label="简报生成控制区">
+        <div class="control-panel paper-card">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">LIVE OPERATIONS</p>
+              <h2>运行控制台</h2>
+            </div>
+            <button class="text-button" id="refreshEnvironment" type="button">重新检测环境</button>
+          </div>
+
+          <div class="environment-grid" id="environmentGrid">
+            <div class="env-item checking"><span>PY</span><div><b>Python</b><small>正在检测</small></div></div>
+            <div class="env-item checking"><span>VE</span><div><b>虚拟环境</b><small>正在检测</small></div></div>
+            <div class="env-item checking"><span>CF</span><div><b>配置</b><small>正在检测</small></div></div>
+            <div class="env-item checking"><span>OC</span><div><b>OpenCode</b><small>正在检测</small></div></div>
+          </div>
+
+          <div class="mode-banner" id="modeBanner">
+            <div class="mode-icon">24</div>
+            <div><b id="modeLabel">正在判断运行模式</b><p id="modeReason">读取今天最近一次成功简报与配置指纹。</p></div>
+          </div>
+
+          <div class="progress-track" id="progressTrack" aria-hidden="true"><span></span></div>
+          <div class="console-toolbar">
+            <span>即时信息</span>
+            <button class="text-button" id="clearConsole" type="button">清空显示</button>
+          </div>
+          <div class="console" id="console" role="log" aria-live="polite">
+            <div class="console-empty">等待本机服务信息……</div>
+          </div>
+
+          <div class="action-row">
+            <button class="primary-action" id="generateButton" type="button">
+              <span class="button-icon">↗</span>
+              <span><b>生成今日简报</b><small id="generateHint">自动选择完整或增量模式</small></span>
+            </button>
+            <label class="force-option"><input type="checkbox" id="forceFull"><span>忽略今日基线，强制完整运行</span></label>
+          </div>
+        </div>
+
+        <aside class="history-panel paper-card">
+          <div class="panel-heading compact">
+            <div><p class="section-kicker">ARCHIVE</p><h2>最近20份简报</h2></div>
+            <button class="icon-button" id="refreshHistory" type="button" aria-label="刷新历史">↻</button>
+          </div>
+          <div class="history-list" id="historyList"><p class="empty-note">尚未发现已发布简报。</p></div>
+        </aside>
+      </section>
+
+      <section class="settings-section" aria-labelledby="settingsTitle">
+        <div class="settings-heading">
+          <div><p class="section-kicker">EDITORIAL SYSTEM</p><h2 id="settingsTitle">简报设置</h2></div>
+          <div class="settings-actions"><span id="saveMessage"></span><button class="save-button" id="saveSettings" type="button">保存全部设置</button></div>
+        </div>
+        <p class="settings-intro">设置保存前会校验并自动备份旧配置。来源、数量、公式等持久设置变化会让下一次生成回到完整运行；仅修改一次性兴趣不会破坏同日增量基线。</p>
+
+        <details class="new-user-help">
+          <summary>这些设置会怎样影响结果？</summary>
+          <div>
+            <p><b>来源与权重</b>决定哪些媒体参与，以及 AI 分数在本地会被怎样校正；权重不是 AI 输入。</p>
+            <p><b>候选规则</b>先把数百条事件缩小到有限候选，目标是避免遗漏，不代表最终排名。</p>
+            <p><b>AI 返回结构</b>决定多少条新闻获得重要性分数、多少条仅作为普通新闻入选。</p>
+            <p><b>兴趣</b>只是重要性判断的次要参考，不会改变来源权重，也不会单独生成兴趣分。</p>
+          </div>
+        </details>
+
+        <nav class="settings-tabs" aria-label="设置分类">
+          <button class="active" data-tab="general" type="button">基础与版面</button>
+          <button data-tab="ranking" type="button">候选与评分</button>
+          <button data-tab="sources" type="button">新闻来源</button>
+          <button data-tab="interests" type="button">兴趣参考</button>
+        </nav>
+
+        <div class="settings-pane active" data-pane="general">
+          <div class="settings-grid">
+            <article class="setting-card">
+              <h3>时间与抓取</h3><p>控制24小时窗口、网络超时和并发。</p>
+              <div class="field-grid">
+                <label class="wide">本机业务时区<select id="timezone"></select><small class="field-help">决定“今天”、24小时窗口终点和每日编号；默认 Asia/Shanghai。</small></label>
+                <label>滚动窗口（小时）<input id="windowHours" type="number" min="1" max="72"></label>
+                <label>最短标题长度<input id="minTitleLength" type="number" min="1" max="200"></label>
+                <label>抓取超时（秒）<input id="fetchTimeout" type="number" min="3" max="120"></label>
+                <label>并发来源数<input id="fetchConcurrent" type="number" min="1" max="32"></label>
+                <label class="wide">网络代理（可留空）<input id="fetchProxy" placeholder="http://127.0.0.1:7890"></label>
+                <label class="check-field wide"><input id="verifyTls" type="checkbox"><span>验证 HTTPS 证书</span></label>
+              </div>
+            </article>
+            <article class="setting-card">
+              <h3>版面数量</h3><p>最终输出仍由头条与普通新闻两部分组成。</p>
+              <div class="field-grid">
+                <label>头条数量<input id="headlineCount" type="number" min="1" max="30"></label>
+                <label>普通新闻数量<input id="ordinaryCount" type="number" min="0" max="100"></label>
+              </div>
+              <div class="formula-note"><b id="layoutTotal">40</b><span>最终展示总数</span><small>AI 的最终选择总数必须不少于这个数字。</small></div>
+            </article>
+            <article class="setting-card wide-card">
+              <h3>事件合并</h3><p>标题相似度越高越可能被视为同一事件；相关阈值不得高于精确合并阈值。</p>
+              <div class="field-grid four">
+                <label>精确合并阈值<input id="exactThreshold" type="number" min="0" max="1" step="0.01"></label>
+                <label>相关报道阈值<input id="relatedThreshold" type="number" min="0" max="1" step="0.01"></label>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="settings-pane" data-pane="ranking">
+          <div class="settings-grid">
+            <article class="setting-card">
+              <h3>候选池</h3><p>规则只负责保证召回与来源覆盖，不直接决定最终重要性。</p>
+              <div class="field-grid">
+                <label>AI 候选总数<input id="candidatePool" type="number" min="1" max="200"></label>
+                <label>每来源最低候选<input id="minPerSource" type="number" min="0" max="20"></label>
+                <label>每来源最高候选<input id="maxPerSource" type="number" min="1" max="50"></label>
+                <label>兴趣保留位<input id="interestSlots" type="number" min="0" max="50"></label>
+                <label>来源平衡通配位<input id="wildcardSlots" type="number" min="0" max="50"></label>
+              </div>
+            </article>
+            <article class="setting-card">
+              <h3>AI 返回结构</h3><p>有分数的高位新闻用于头条竞争，其余只表示入选。</p>
+              <div class="field-grid">
+                <label>带分数新闻数<input id="topScoredCount" type="number" min="1" max="50"></label>
+                <label>额外选择新闻数<input id="ordinarySelectedCount" type="number" min="0" max="100"></label>
+              </div>
+              <div class="formula-note"><b id="aiTotal">40</b><span>AI 最终选择数</span><small>候选池不得小于此数。</small></div>
+            </article>
+            <article class="setting-card wide-card">
+              <h3>来源权重与多源校正</h3><p>AI 只给基础重要性 I。媒体权重 W 被映射为0–1的位置 P，再换算成实际乘数 F；独立来源数量决定加分 B。</p>
+              <div class="field-grid four">
+                <label>最低来源乘数 F₀<input id="factorFloor" type="number" min="0" max="2" step="0.01"><small class="field-help">权重处于下限时采用的乘数。</small></label>
+                <label>来源乘数增幅 ΔF<input id="factorRange" type="number" min="0" max="2" step="0.01"><small class="field-help">从最低到最高权重最多增加多少。</small></label>
+                <label>权重映射起点 W₀<input id="weightMin" type="number" min="0" max="1" step="0.01"><small class="field-help">低于该值都按位置0处理。</small></label>
+                <label>权重映射终点 W₁<input id="weightMax" type="number" min="0" max="1" step="0.01"><small class="field-help">高于该值都按位置1处理。</small></label>
+                <label>双来源加分 B₂<input id="bonus2" type="number" min="0" max="100" step="0.5"></label>
+                <label>三来源加分 B₃<input id="bonus3" type="number" min="0" max="100" step="0.5"></label>
+                <label>四来源以上加分 B₄<input id="bonus4" type="number" min="0" max="100" step="0.5"></label>
+              </div>
+              <div class="formula-display" id="formulaDisplay">
+                <code id="formulaPosition">P = clamp((W − 0.65) ÷ (0.90 − 0.65), 0, 1)</code>
+                <code id="formulaFactor">F = 0.90 + 0.10 × P</code>
+                <code id="formulaBonus">B = 0 / 2.00 / 4.00 / 6.00（对应1 / 2 / 3 / 4+来源）</code>
+                <code id="formulaScore">校正分 S = min(100, I × F + B)</code>
+                <small id="formulaExample">示例：来源权重 W=0.85 时，P=0.80，F=0.98。</small>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="settings-pane" data-pane="sources">
+          <div class="source-toolbar">
+            <div><h3>来源目录</h3><p>支持直接 RSS 或 Google News 站内搜索。权重范围为 0–1。</p></div>
+            <button class="secondary-button" id="addSource" type="button">＋ 添加来源</button>
+          </div>
+          <div class="source-list" id="sourceList"></div>
+        </div>
+
+        <div class="settings-pane" data-pane="interests">
+          <div class="settings-grid">
+            <article class="setting-card">
+              <h3>长期兴趣</h3><p>持续保存在配置中，每次 AI 选择都会参考。适合国际政治、AI、能源等长期关注方向；每行一个主题。</p>
+              <textarea id="longTermInterests" rows="14"></textarea>
+            </article>
+            <article class="setting-card">
+              <h3>一次性兴趣</h3><p>只影响下一次成功生成，完成后自动清空。适合临时会议、突发事件或今天特别想关注的主题；失败运行不会清空。</p>
+              <textarea id="recentInterests" rows="14"></textarea>
+              <div class="one-shot-note"><b>一次性规则</b><span>保存后等待下一次生成 → 成功后自动删除 → 不会影响后续日期。</span></div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer><span>Private Newsletter · Localhost only</span><span>设置备份保存在 config/backups</span></footer>
+  </div>
+  <template id="sourceTemplate">
+    <article class="source-card">
+      <div class="source-summary">
+        <span class="source-index">01</span>
+        <div><b class="source-title">新来源</b><small class="source-subtitle">RSS · free</small></div>
+        <button class="remove-source" type="button" aria-label="删除来源">删除</button>
+      </div>
+      <div class="source-fields">
+        <label>来源 ID<input data-key="id" placeholder="rfi"></label>
+        <label>显示名称<input data-key="name" placeholder="法广 RFI"></label>
+        <label>抓取方式<select data-key="provider"><option value="rss">RSS</option><option value="google_news">Google News</option></select></label>
+        <label>来源权重<input data-key="weight" type="number" min="0" max="1" step="0.01"></label>
+        <label>语言代码<input data-key="language" placeholder="zh / en / fr"></label>
+        <label>访问类型<select data-key="access_type"><option value="free">免费</option><option value="paid">付费</option></select></label>
+        <label class="endpoint-field wide">RSS URL<input data-key="rss_url" placeholder="https://example.com/rss.xml"></label>
+        <label class="search-field wide">Google News 搜索式<input data-key="search" placeholder="site:rfi.fr"></label>
+        <label class="locale-field">Google HL<input data-key="google_hl" placeholder="fr"></label>
+        <label class="locale-field">Google GL<input data-key="google_gl" placeholder="FR"></label>
+        <label class="locale-field">Google CEID<input data-key="google_ceid" placeholder="FR:fr"></label>
+        <label class="wide">标签（逗号分隔）<input data-key="tags" placeholder="international, france, politics"></label>
+      </div>
+    </article>
+  </template>
+  <script src="/app.js" defer></script>
+</body>
+</html>

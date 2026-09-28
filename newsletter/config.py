@@ -22,9 +22,21 @@ def _read_yaml(path: Path) -> dict[str, Any]:
     return value
 
 
+def _canonicalize(value: Any) -> Any:
+    """Normalize representation-only differences before hashing configuration."""
+    if isinstance(value, dict):
+        return {key: _canonicalize(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_canonicalize(item) for item in value]
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    return value
+
+
 @dataclass(frozen=True, slots=True)
 class AppConfig:
     root: Path
+    config_dir: Path
     pipeline: dict[str, Any]
     sources: list[dict[str, Any]]
     interests: dict[str, list[str]]
@@ -87,12 +99,14 @@ def load_config(config_dir: str | Path) -> AppConfig:
         ) from exc
 
     canonical = json.dumps(
-        {
+        _canonicalize({
             "pipeline": pipeline,
             "sources": sources,
-            "interests": interests,
+            # recent interests are deliberately one-shot. They affect the next model
+            # request but not cache compatibility after being consumed.
+            "interests": {"long_term": interests["long_term"]},
             "terminology": terminology,
-        },
+        }),
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
@@ -100,6 +114,7 @@ def load_config(config_dir: str | Path) -> AppConfig:
     config_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     return AppConfig(
         root=config_path.parent,
+        config_dir=config_path,
         pipeline=pipeline,
         sources=sources,
         interests=interests,

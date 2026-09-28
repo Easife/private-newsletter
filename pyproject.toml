@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "private-newsletter"
-version = "2.1.0"
+version = "2.2.0"
 description = "Windows-first automated private news briefing using headless OpenCode CLI"
 requires-python = ">=3.11"
 dependencies = [
@@ -20,9 +20,13 @@ dev = ["pytest>=8,<9", "ruff>=0.8,<1"]
 
 [project.scripts]
 private-newsletter = "newsletter.cli:main"
+private-newsletter-ui = "newsletter.webapp:main"
 
 [tool.setuptools.packages.find]
 include = ["newsletter*"]
+
+[tool.setuptools.package-data]
+newsletter = ["ui/*.html", "ui/*.css", "ui/*.js"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

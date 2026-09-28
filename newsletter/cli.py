@@ -11,7 +11,7 @@ from zoneinfo import ZoneInfo
 from .config import load_config
 from .errors import NewsletterError
 from .opencode_client import client_from_config
-from .pipeline import run_pipeline
+from .incremental import run_auto_pipeline
 from .storage import RunContext, RunLock
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -32,6 +32,7 @@ def _parser() -> argparse.ArgumentParser:
     run.add_argument("--date", type=_date_value, default=None)
     run.add_argument("--config", type=Path, default=PROJECT_ROOT / "config")
     run.add_argument("--resume", metavar="RUN_ID")
+    run.add_argument("--full", action="store_true", help="force a full run even if today has a baseline")
 
     doctor = subparsers.add_parser("doctor", help="check configuration and OpenCode health")
     doctor.add_argument("--config", type=Path, default=PROJECT_ROOT / "config")
@@ -85,7 +86,7 @@ def main(argv: list[str] | None = None) -> int:
                 else RunContext.create(config.paths["runs"], run_date, config.config_hash)
             )
             _configure_logging(config.paths["logs"] / f"{context.run_id}.log")
-            result = run_pipeline(context, config)
+            result = run_auto_pipeline(context, config, force_full=bool(args.full or args.resume))
             print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     except NewsletterError as exc:

@@ -7,5 +7,7 @@ runs/
 archive/
 latest/
 newsletter-opencode-*.json
+config/backups/
 dist/
 build/
+*.egg-info/

@@ -42,6 +42,14 @@ ranking:
   wildcard_slots: 5
   top_scored_count: 15
   ordinary_selected_count: 25
+  score_adjustment:
+    source_factor_floor: 0.90
+    source_factor_range: 0.10
+    source_weight_min: 0.65
+    source_weight_max: 0.90
+    corroboration_bonus_2: 2
+    corroboration_bonus_3: 4
+    corroboration_bonus_4_plus: 6
   # Authenticated OpenCode Zen free models only, in fallback order.
   models:
     - opencode/mimo-v2.6-flash-free

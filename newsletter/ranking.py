@@ -220,11 +220,28 @@ def _call_model_fallback(
     raise StageError("ranking", "all OpenCode models failed: " + " | ".join(failures))
 
 
-def _adjust_score(raw_score: int, group: EventGroup) -> tuple[float, dict[str, Any]]:
-    weight = min(0.90, max(0.65, _source_weight(group)))
-    factor = 0.90 + 0.10 * ((weight - 0.65) / 0.25)
+def _adjust_score(
+    raw_score: int, group: EventGroup, config: dict[str, Any]
+) -> tuple[float, dict[str, Any]]:
+    adjustment = dict(config.get("score_adjustment") or {})
+    weight_min = float(adjustment.get("source_weight_min", 0.65))
+    weight_max = float(adjustment.get("source_weight_max", 0.90))
+    if weight_max <= weight_min:
+        raise StageError("ranking", "source_weight_max must be greater than source_weight_min")
+    factor_floor = float(adjustment.get("source_factor_floor", 0.90))
+    factor_range = float(adjustment.get("source_factor_range", 0.10))
+    weight = min(weight_max, max(weight_min, _source_weight(group)))
+    factor = factor_floor + factor_range * ((weight - weight_min) / (weight_max - weight_min))
     source_count = group.source_count
-    bonus = 0 if source_count <= 1 else 2 if source_count == 2 else 4 if source_count == 3 else 6
+    bonus = (
+        0
+        if source_count <= 1
+        else float(adjustment.get("corroboration_bonus_2", 2))
+        if source_count == 2
+        else float(adjustment.get("corroboration_bonus_3", 4))
+        if source_count == 3
+        else float(adjustment.get("corroboration_bonus_4_plus", 6))
+    )
     adjusted = round(min(100.0, raw_score * factor + bonus), 2)
     return adjusted, {
         "ai_importance_score": raw_score,
@@ -315,7 +332,7 @@ def rank_events(
     top_ranked: list[RankedEvent] = []
     for row in top:
         event_id = row["event_id"]
-        adjusted, detail = _adjust_score(row["importance_score"], by_id[event_id])
+        adjusted, detail = _adjust_score(row["importance_score"], by_id[event_id], config)
         adjustments[event_id] = detail
         top_ranked.append(
             RankedEvent(
