@@ -129,6 +129,52 @@ class EconomyFlowTests(unittest.TestCase):
             (archive / "newsletter-other.html").touch()
             self.assertEqual(_next_edition_number(archive, "20260928"), 3)
 
+    def test_ordinary_related_report_keeps_its_source_visible(self) -> None:
+        newsletter = {
+            "run_date": "2026-09-29",
+            "headlines": [],
+            "ordinary": [
+                {
+                    "title": "Main report",
+                    "title_zh": "主报道",
+                    "summary_zh": "摘要",
+                    "image_url": "",
+                    "group_type": "related",
+                    "sources": [
+                        {
+                            "source_id": "reuters",
+                            "name": "Reuters",
+                            "url": "https://example.com/main",
+                            "access_type": "free",
+                        }
+                    ],
+                    "group_members": [
+                        {
+                            "title": "Related report",
+                            "title_zh": "相关报道",
+                            "summary_zh": "",
+                            "sources": [
+                                {
+                                    "source_id": "dw",
+                                    "name": "DW",
+                                    "url": "https://example.com/related",
+                                    "access_type": "free",
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ],
+            "stats": {},
+        }
+        rendered = render_html(newsletter)
+        self.assertIn('href="https://example.com/related"', rendered)
+        self.assertIn("德国之声<span class=\"src-status\">免费</span>", rendered)
+        self.assertNotIn(
+            ".ord-card .gm-item .source-row { display: none; }",
+            rendered,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

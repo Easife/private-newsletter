@@ -1,3 +1,3 @@
 """Private newsletter rewrite."""
 
-__version__ = "2.2.2"
+__version__ = "2.2.3"

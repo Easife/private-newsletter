@@ -31,6 +31,14 @@ from .storage import RunContext, RunLock, atomic_write_text
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ASSET_ROOT = Path(__file__).resolve().parent / "ui"
 ROOT_INDEX = PROJECT_ROOT / "每日新闻简报控制中心.html"
+CONTROL_CENTER_CSP = (
+    "default-src 'self'; style-src 'self'; script-src 'self'; "
+    "img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'"
+)
+ARCHIVE_CSP = (
+    "default-src 'none'; style-src 'unsafe-inline'; img-src http: https: data:; "
+    "object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -462,7 +470,13 @@ class NewsletterHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
-    def _send_file(self, path: Path, *, cache: bool = False) -> None:
+    def _send_file(
+        self,
+        path: Path,
+        *,
+        cache: bool = False,
+        content_security_policy: str = CONTROL_CENTER_CSP,
+    ) -> None:
         if not path.is_file():
             self.send_error(HTTPStatus.NOT_FOUND)
             return
@@ -473,7 +487,7 @@ class NewsletterHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "public, max-age=300" if cache else "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
-        self.send_header("Content-Security-Policy", "default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'self'")
+        self.send_header("Content-Security-Policy", content_security_policy)
         self.end_headers()
         self.wfile.write(data)
 
@@ -524,7 +538,7 @@ class NewsletterHandler(BaseHTTPRequestHandler):
                 relative = Path(unquote(parsed.path[len("/archive/") :]))
                 target = (archive / relative).resolve()
                 target.relative_to(archive)
-                self._send_file(target)
+                self._send_file(target, content_security_policy=ARCHIVE_CSP)
             except Exception:
                 self.send_error(HTTPStatus.NOT_FOUND)
             return

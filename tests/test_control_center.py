@@ -114,6 +114,36 @@ class ControlCenterTests(unittest.TestCase):
             server.server_close()
             thread.join(timeout=3)
 
+    def test_archive_html_is_served_with_inline_styles_enabled(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project = Path(temp_dir)
+            config_dir = project / "config"
+            shutil.copytree(ROOT / "config", config_dir)
+            archive_file = project / "archive" / "2026-09-29" / "newsletter-20260929-1.html"
+            archive_file.parent.mkdir(parents=True)
+            archive_file.write_text(
+                "<!doctype html><style>body{color:#123}</style><main>archive body</main>",
+                encoding="utf-8",
+            )
+            state = ControlState(config_dir)
+            server = NewsletterServer(("127.0.0.1", 0), state)
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                base = f"http://127.0.0.1:{server.server_address[1]}"
+                with urllib.request.urlopen(base + "/api/history", timeout=3) as response:
+                    history = json.loads(response.read().decode("utf-8"))
+                with urllib.request.urlopen(base + history["items"][0]["url"], timeout=3) as response:
+                    body = response.read().decode("utf-8")
+                    policy = response.headers["Content-Security-Policy"]
+                self.assertIn("archive body", body)
+                self.assertIn("style-src 'unsafe-inline'", policy)
+                self.assertNotIn("script-src 'unsafe-inline'", policy)
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join(timeout=3)
+
     def test_generate_endpoint_dispatches_one_click_pipeline(self) -> None:
         state = ControlState(ROOT / "config")
         server = NewsletterServer(("127.0.0.1", 0), state)

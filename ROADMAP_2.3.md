@@ -2,7 +2,7 @@
 
 This document records the proposed scope for the next development cycle. It is a plan, not a promise that every item is already implemented.
 
-本文记录下一开发周期的建议范围，方便后续讨论与验收；以下内容尚未在 2.2.2 中实现。
+本文记录下一开发周期的建议范围，方便后续讨论与验收；以下内容尚未在 2.2.3 中实现。
 
 ## Release objective / 发布目标
 

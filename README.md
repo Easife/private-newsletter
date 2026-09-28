@@ -1,4 +1,4 @@
-# Private Newsletter 2.2.2
+# Private Newsletter 2.2.3
 
 [中文](#中文说明) | [English](#english)
 
@@ -28,7 +28,7 @@ Private Newsletter 是一个在 Windows 本机运行的自动化每日新闻简�
 
 - Windows 10 或 Windows 11。
 - 能访问已配置的新闻源、Google News、Google Translate GTX 和当前 AI 后端。
-- 2.2.2 的 AI 后端仍为 OpenCode CLI，需要安装 OpenCode 并完成 OpenCode Zen 登录。
+- 2.2.3 的 AI 后端仍为 OpenCode CLI，需要安装 OpenCode 并完成 OpenCode Zen 登录。
 
 不要求预先安装 Python，也不需要管理员权限。首次启动会下载经过 SHA-256 校验的便携 `uv`，在项目的 `.tools` 目录准备 Python 3.12，并创建项目 `.venv`。
 
@@ -145,7 +145,7 @@ It does not require WSL or the OpenCode desktop application. Routine operation i
 
 - Windows 10 or Windows 11.
 - Network access to the configured news feeds, Google News, Google Translate GTX, and the selected AI backend.
-- In version 2.2.2, the AI backend is still OpenCode CLI, with OpenCode Zen authentication configured.
+- In version 2.2.3, the AI backend is still OpenCode CLI, with OpenCode Zen authentication configured.
 
 Python does not need to be preinstalled, and administrator privileges are not required. On first launch, the project downloads a SHA-256-verified portable `uv`, prepares Python 3.12 under `.tools`, and creates a project-local `.venv`.
 
@@ -248,4 +248,4 @@ For internal design details, see [DESIGN.md](DESIGN.md) and [docs/ARCHITECTURE.m
 
 ## Version and license
 
-Current release: **2.2.2**. A project license has not yet been selected; choosing and adding `LICENSE` is a release requirement for 2.3. Until then, the absence of a license means no additional reuse rights are granted by default.
+Current release: **2.2.3**. A project license has not yet been selected; choosing and adding `LICENSE` is a release requirement for 2.3. Until then, the absence of a license means no additional reuse rights are granted by default.

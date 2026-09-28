@@ -5,7 +5,7 @@ title Private Newsletter Control Center
 set "PROJECT_ROOT=%~dp0"
 
 echo.
-echo   Private Newsletter 2.2.2
+echo   Private Newsletter 2.2.3
 echo   Starting the local control center...
 echo.
 
