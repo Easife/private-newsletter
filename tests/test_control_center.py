@@ -83,6 +83,14 @@ class ControlCenterTests(unittest.TestCase):
         ):
             self.assertIn(required, html)
         self.assertNotIn("onclick=", html)
+        self.assertIn('href="newsletter/ui/app.css"', html)
+        self.assertIn('src="newsletter/ui/app.js"', html)
+        self.assertIn("运行每日新闻.cmd", html)
+
+        root_entry = ROOT / "每日新闻简报控制中心.html"
+        self.assertTrue(root_entry.is_file())
+        entry_html = root_entry.read_text(encoding="utf-8")
+        self.assertEqual(entry_html, html)
 
     def test_local_server_serves_status_and_settings(self) -> None:
         state = ControlState(ROOT / "config")
@@ -95,9 +103,12 @@ class ControlCenterTests(unittest.TestCase):
                 status = json.loads(response.read().decode("utf-8"))
             with urllib.request.urlopen(base + "/api/settings", timeout=3) as response:
                 settings = json.loads(response.read().decode("utf-8"))
+            with urllib.request.urlopen(base + "/newsletter/ui/app.css", timeout=3) as response:
+                stylesheet = response.read().decode("utf-8")
             self.assertEqual(status["state"], "idle")
             self.assertEqual(settings["selection"]["headline_count"], 10)
             self.assertIn("Asia/Shanghai", settings["timezones"])
+            self.assertIn(".page-shell", stylesheet)
         finally:
             server.shutdown()
             server.server_close()

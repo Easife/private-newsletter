@@ -188,10 +188,11 @@ S = min(100, I × F + B)
 | `PUT /api/settings` | 校验、备份并原子保存设置 |
 | `POST /api/generate` | 在后台线程启动自动或强制完整运行 |
 | `POST /api/environment/refresh` | 重新检测配置和 OpenCode |
+| `POST /api/shutdown` | 安全停止本机控制中心 |
 
 写请求校验 Origin，正文限制为1 MB，设置 API 只接受白名单字段。它不能修改路径、执行命令、模型凭据或任意文件。
 
-页面资源位于 `newsletter/ui/`：
+根目录的 `每日新闻简报控制中心.html` 是完整的 UI 入口，与 `newsletter/ui/index.html` 保持一致。直接打开本地 HTML 时只提供静态预览；启动器会后台启动 localhost 服务并打开可操作页面。其他页面资源位于 `newsletter/ui/`：
 
 - `index.html`：语义结构和所有表单字段；
 - `app.css`：与简报一致的纸张白、深绿、衬线标题设计；

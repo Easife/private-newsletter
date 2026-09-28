@@ -30,6 +30,7 @@ from .storage import RunContext, RunLock, atomic_write_text
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ASSET_ROOT = Path(__file__).resolve().parent / "ui"
+ROOT_INDEX = PROJECT_ROOT / "每日新闻简报控制中心.html"
 logger = logging.getLogger(__name__)
 
 
@@ -491,6 +492,10 @@ class NewsletterHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         parsed = urlsplit(self.path)
+        if parsed.path in {"", "/"}:
+            index_path = ROOT_INDEX if ROOT_INDEX.is_file() else ASSET_ROOT / "index.html"
+            self._send_file(index_path)
+            return
         if parsed.path == "/api/status":
             query = parsed.query.split("after=", 1)
             try:
@@ -523,7 +528,9 @@ class NewsletterHandler(BaseHTTPRequestHandler):
             except Exception:
                 self.send_error(HTTPStatus.NOT_FOUND)
             return
-        asset_name = "index.html" if parsed.path in {"", "/"} else parsed.path.lstrip("/")
+        asset_name = parsed.path.lstrip("/")
+        if asset_name.startswith("newsletter/ui/"):
+            asset_name = asset_name[len("newsletter/ui/") :]
         try:
             target = (ASSET_ROOT / asset_name).resolve()
             target.relative_to(ASSET_ROOT.resolve())
@@ -536,6 +543,10 @@ class NewsletterHandler(BaseHTTPRequestHandler):
             self._send_json({"error": "origin rejected"}, 403)
             return
         parsed = urlsplit(self.path)
+        if parsed.path == "/api/shutdown":
+            self._send_json({"ok": True, "message": "控制中心正在停止"})
+            threading.Thread(target=self.server.shutdown, daemon=True).start()
+            return
         if parsed.path == "/api/generate":
             try:
                 payload = self._json_body()

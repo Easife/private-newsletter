@@ -4,6 +4,7 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 let lastLogSequence = 0;
 let settings = null;
 let lastState = "idle";
+const staticPreview = window.location.protocol === "file:";
 
 async function request(url, options = {}) {
   const response = await fetch(url, {
@@ -281,6 +282,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("#forceFull").addEventListener("change", pollStatus);
   ["headlineCount", "ordinaryCount", "topScoredCount", "ordinarySelectedCount"].forEach(id => $(`#${id}`).addEventListener("input", updateTotals));
   ["factorFloor", "factorRange", "weightMin", "weightMax", "bonus2", "bonus3", "bonus4"].forEach(id => $(`#${id}`).addEventListener("input", updateFormula));
+  if (staticPreview) {
+    const pill = $("#statePill");
+    pill.className = "state-pill state-idle";
+    $("span", pill).textContent = "静态预览";
+    $("#environmentGrid").innerHTML = [
+      environmentItem("PY", "Python", { detail: "请从运行每日新闻.cmd 启动" }),
+      environmentItem("VE", "虚拟环境", { detail: "静态预览不连接后台" }),
+      environmentItem("CF", "配置", { detail: "启动服务后读取" }),
+      environmentItem("OC", "OpenCode", { detail: "启动服务后检测" }),
+    ].join("");
+    $("#modeLabel").textContent = "当前是静态预览";
+    $("#modeReason").textContent = "关闭本页，双击运行每日新闻.cmd；浏览器会自动重新打开可操作的控制中心。";
+    $("#console").innerHTML = '<div class="log-row info"><span class="log-time">--:--:--</span><span class="log-level">提示</span><span>本页用于查看界面。生成简报前，请双击项目根目录的“运行每日新闻.cmd”，无需管理员权限。</span></div>';
+    $("#generateButton").disabled = true;
+    $("#saveSettings").disabled = true;
+    $("#refreshEnvironment").disabled = true;
+    $("#refreshHistory").disabled = true;
+    $("#addSource").disabled = true;
+    return;
+  }
   await Promise.all([pollStatus(), loadHistory(), loadSettings()]);
   setInterval(pollStatus, 1100);
 });
