@@ -9,21 +9,41 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $configDir = Join-Path $projectRoot "config"
 $venvPython = Join-Path $projectRoot ".venv\Scripts\python.exe"
 $logDir = Join-Path $projectRoot "logs"
+$projectToml = Get-Content -Raw -LiteralPath (Join-Path $projectRoot "pyproject.toml")
+$versionMatch = [regex]::Match($projectToml, '(?m)^version\s*=\s*"([^"]+)"')
+if (-not $versionMatch.Success) { throw "Unable to read project version from pyproject.toml" }
+$expectedVersion = $versionMatch.Groups[1].Value
 $url = "http://127.0.0.1:$Port/"
 $statusUrl = "${url}api/status"
 
-function Test-ControlCenter {
+function Get-ControlCenterStatus {
     try {
-        $status = Invoke-RestMethod -UseBasicParsing -Uri $statusUrl -TimeoutSec 2
-        return [bool]$status.app_version
+        return Invoke-RestMethod -UseBasicParsing -Uri $statusUrl -TimeoutSec 2
     }
-    catch { return $false }
+    catch { return $null }
 }
 
-if (Test-ControlCenter) {
-    Write-Host "The control center is already running. Opening the browser..."
+$existingStatus = Get-ControlCenterStatus
+if ($existingStatus -and $existingStatus.app_version -eq $expectedVersion) {
+    Write-Host "The control center $expectedVersion is already running. Opening the browser..."
     if (-not $NoBrowser) { Start-Process $url }
     exit 0
+}
+
+if ($existingStatus -and $existingStatus.app_version) {
+    Write-Host "A stale control center version $($existingStatus.app_version) is running; updating it to $expectedVersion."
+    try {
+        Invoke-RestMethod -UseBasicParsing -Method Post -Uri "${url}api/shutdown" `
+            -ContentType "application/json" -Body "{}" -TimeoutSec 3 | Out-Null
+    }
+    catch { }
+    for ($attempt = 0; $attempt -lt 20; $attempt++) {
+        if (-not (Get-ControlCenterStatus)) { break }
+        Start-Sleep -Milliseconds 250
+    }
+    if (Get-ControlCenterStatus) {
+        throw "The old control center did not stop. Run the stop-control-center command, then start again."
+    }
 }
 
 if (-not (Test-Path -LiteralPath $venvPython)) {
@@ -40,26 +60,12 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 New-Item -ItemType Directory -Force -Path $logDir | Out-Null
-$stdoutLog = Join-Path $logDir "control-center.stdout.log"
-$stderrLog = Join-Path $logDir "control-center.stderr.log"
-$arguments = "-m newsletter.webapp --config `"$configDir`" --port $Port --no-browser"
-$process = Start-Process -FilePath $venvPython -ArgumentList $arguments `
-    -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru `
-    -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog
+$arguments = @("-m", "newsletter.webapp", "--config", $configDir, "--port", "$Port")
+if ($NoBrowser) { $arguments += "--no-browser" }
 
-for ($attempt = 0; $attempt -lt 60; $attempt++) {
-    if (Test-ControlCenter) {
-        Set-Content -LiteralPath (Join-Path $logDir "control-center.pid") -Value $process.Id -Encoding ascii
-        Write-Host "Control center started: $url"
-        if (-not $NoBrowser) { Start-Process $url }
-        exit 0
-    }
-    if ($process.HasExited) { break }
-    Start-Sleep -Milliseconds 500
-}
-
-$details = ""
-if (Test-Path -LiteralPath $stderrLog) {
-    $details = (Get-Content -LiteralPath $stderrLog -Tail 20) -join [Environment]::NewLine
-}
-throw "The control center failed to start.$([Environment]::NewLine)$details"
+Write-Host "Private Newsletter $expectedVersion"
+Write-Host "Starting the control center: $url"
+Write-Host "Keep this window open while using the browser. Close it to stop the service."
+Write-Host ""
+& $venvPython @arguments
+if ($LASTEXITCODE -ne 0) { throw "The control center exited with code $LASTEXITCODE" }

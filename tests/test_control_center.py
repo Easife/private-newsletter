@@ -83,9 +83,12 @@ class ControlCenterTests(unittest.TestCase):
         ):
             self.assertIn(required, html)
         self.assertNotIn("onclick=", html)
-        self.assertIn('href="newsletter/ui/app.css"', html)
-        self.assertIn('src="newsletter/ui/app.js"', html)
+        self.assertIn('href="newsletter/ui/app.css?v=2.2.4"', html)
+        self.assertIn('src="newsletter/ui/app.js?v=2.2.4"', html)
         self.assertIn("运行每日新闻.cmd", html)
+        app_js = (ASSET_ROOT / "app.js").read_text(encoding="utf-8")
+        self.assertIn("item.file_url", app_js)
+        self.assertIn("/api/archive/open", app_js)
 
         root_entry = ROOT / "每日新闻简报控制中心.html"
         self.assertTrue(root_entry.is_file())
@@ -133,12 +136,30 @@ class ControlCenterTests(unittest.TestCase):
                 base = f"http://127.0.0.1:{server.server_address[1]}"
                 with urllib.request.urlopen(base + "/api/history", timeout=3) as response:
                     history = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(
+                    history["items"][0]["path"],
+                    "2026-09-29/newsletter-20260929-1.html",
+                )
+                self.assertEqual(
+                    history["items"][0]["file_url"], archive_file.resolve().as_uri()
+                )
                 with urllib.request.urlopen(base + history["items"][0]["url"], timeout=3) as response:
                     body = response.read().decode("utf-8")
                     policy = response.headers["Content-Security-Policy"]
+                open_request = urllib.request.Request(
+                    base + "/api/archive/open",
+                    data=json.dumps({"path": history["items"][0]["path"]}).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                with patch("newsletter.webapp._open_local_archive") as opener:
+                    with urllib.request.urlopen(open_request, timeout=3) as response:
+                        opened = json.loads(response.read().decode("utf-8"))
+                    opener.assert_called_once_with(archive_file.resolve())
                 self.assertIn("archive body", body)
                 self.assertIn("style-src 'unsafe-inline'", policy)
                 self.assertNotIn("script-src 'unsafe-inline'", policy)
+                self.assertEqual(opened["file_uri"], archive_file.resolve().as_uri())
             finally:
                 server.shutdown()
                 server.server_close()

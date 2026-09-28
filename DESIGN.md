@@ -184,6 +184,7 @@ S = min(100, I × F + B)
 |---|---|
 | `GET /api/status` | 环境、模式、运行状态和增量日志 |
 | `GET /api/history` | 最近20份 HTML 简报 |
+| `POST /api/archive/open` | 验证归档相对路径后，调用操作系统打开本地 HTML |
 | `GET /api/settings` | 可编辑设置和系统时区列表 |
 | `PUT /api/settings` | 校验、备份并原子保存设置 |
 | `POST /api/generate` | 在后台线程启动自动或强制完整运行 |
@@ -192,7 +193,7 @@ S = min(100, I × F + B)
 
 写请求校验 Origin，正文限制为1 MB，设置 API 只接受白名单字段。它不能修改路径、执行命令、模型凭据或任意文件。
 
-根目录的 `每日新闻简报控制中心.html` 是完整的 UI 入口，与 `newsletter/ui/index.html` 保持一致。直接打开本地 HTML 时只提供静态预览；启动器会后台启动 localhost 服务并打开可操作页面。其他页面资源位于 `newsletter/ui/`：
+根目录的 `每日新闻简报控制中心.html` 是完整的 UI 入口，与 `newsletter/ui/index.html` 保持一致。直接打开本地 HTML 时只提供静态预览；启动器会在前台维持 localhost 服务并打开可操作页面。历史简报点击后由受限 API 验证归档路径，再调用操作系统打开真实本地 HTML。其他页面资源位于 `newsletter/ui/`：
 
 - `index.html`：语义结构和所有表单字段；
 - `app.css`：与简报一致的纸张白、深绿、衬线标题设计；

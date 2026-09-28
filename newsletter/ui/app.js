@@ -93,13 +93,29 @@ async function loadHistory() {
       return;
     }
     list.innerHTML = data.items.map((item, index) => `
-      <a class="history-item" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+      <a class="history-item" href="${escapeHtml(item.file_url)}" data-archive-path="${escapeHtml(item.path)}" target="_blank" rel="noopener noreferrer">
         <span class="history-number">${String(index + 1).padStart(2, "0")}</span>
         <span><b>${escapeHtml(item.date)} · 第 ${item.edition} 版</b><small>${escapeHtml(item.name)}</small></span>
         <span class="history-arrow">›</span>
       </a>`).join("");
   } catch (error) {
     list.innerHTML = `<p class="empty-note">读取失败：${escapeHtml(error.message)}</p>`;
+  }
+}
+
+async function openHistoryItem(event) {
+  const link = event.target.closest("[data-archive-path]");
+  if (!link || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  event.preventDefault();
+  try {
+    await request("/api/archive/open", {
+      method: "POST",
+      body: JSON.stringify({ path: link.dataset.archivePath }),
+    });
+  } catch (error) {
+    // Keep the file link usable if an older control-center process is still running.
+    window.open(link.href, "_blank", "noopener");
+    appendLogs([{ seq: ++lastLogSequence, time: new Date().toISOString(), level: "warning", message: `后台打开失败，已回退至本地文件链接：${error.message}` }]);
   }
 }
 
@@ -276,6 +292,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("#generateButton").addEventListener("click", generate);
   $("#saveSettings").addEventListener("click", saveSettings);
   $("#refreshHistory").addEventListener("click", loadHistory);
+  $("#historyList").addEventListener("click", openHistoryItem);
   $("#addSource").addEventListener("click", () => addSourceCard());
   $("#clearConsole").addEventListener("click", () => { $("#console").innerHTML = '<div class="console-empty">显示已清空；新信息会继续出现。</div>'; });
   $("#refreshEnvironment").addEventListener("click", async () => { await request("/api/environment/refresh", { method: "POST", body: "{}" }); });

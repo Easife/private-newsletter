@@ -1,4 +1,4 @@
-# Private Newsletter 2.2.3
+# Private Newsletter 2.2.4
 
 [中文](#中文说明) | [English](#english)
 
@@ -28,7 +28,7 @@ Private Newsletter 是一个在 Windows 本机运行的自动化每日新闻简�
 
 - Windows 10 或 Windows 11。
 - 能访问已配置的新闻源、Google News、Google Translate GTX 和当前 AI 后端。
-- 2.2.3 的 AI 后端仍为 OpenCode CLI，需要安装 OpenCode 并完成 OpenCode Zen 登录。
+- 2.2.4 的 AI 后端仍为 OpenCode CLI，需要安装 OpenCode 并完成 OpenCode Zen 登录。
 
 不要求预先安装 Python，也不需要管理员权限。首次启动会下载经过 SHA-256 校验的便携 `uv`，在项目的 `.tools` 目录准备 Python 3.12，并创建项目 `.venv`。
 
@@ -52,7 +52,7 @@ opencode auth login --provider opencode
 
 日常操作就是：**双击 `运行每日新闻.cmd` → 等待浏览器打开 → 点击“生成今日简报”**。
 
-根目录的 `每日新闻简报控制中心.html` 是完整 UI，也可直接打开查看版式。直接打开时页面处于“静态预览”状态，因为普通浏览器不能从静态 HTML 启动 Python 后台；要生成简报必须使用启动器。需要停止后台服务时，双击 `停止每日新闻控制中心.cmd`。
+根目录的 `每日新闻简报控制中心.html` 是完整 UI，也可直接打开查看版式。直接打开时页面处于“静态预览”状态，因为普通浏览器不能从静态 HTML 启动 Python 后台；要生成简报必须使用启动器。浏览器使用期间请保持启动窗口打开；关闭该窗口或双击 `停止每日新闻控制中心.cmd` 都会停止本机服务。右侧历史项会由服务安全打开对应的本地 HTML 文件。
 
 ### 简报生成逻辑
 
@@ -145,7 +145,7 @@ It does not require WSL or the OpenCode desktop application. Routine operation i
 
 - Windows 10 or Windows 11.
 - Network access to the configured news feeds, Google News, Google Translate GTX, and the selected AI backend.
-- In version 2.2.3, the AI backend is still OpenCode CLI, with OpenCode Zen authentication configured.
+- In version 2.2.4, the AI backend is still OpenCode CLI, with OpenCode Zen authentication configured.
 
 Python does not need to be preinstalled, and administrator privileges are not required. On first launch, the project downloads a SHA-256-verified portable `uv`, prepares Python 3.12 under `.tools`, and creates a project-local `.venv`.
 
@@ -169,7 +169,7 @@ Never store API keys in project configuration, documentation, or Git. Let the pr
 
 The normal daily workflow is: **double-click `运行每日新闻.cmd` → wait for the browser → click the generate button**.
 
-`每日新闻简报控制中心.html` is the complete UI and can be opened directly for a static preview. A browser cannot start a Python process from a local HTML file, so generation is disabled in preview mode. Use `停止每日新闻控制中心.cmd` to stop the background service.
+`每日新闻简报控制中心.html` is the complete UI and can be opened directly for a static preview. A browser cannot start a Python process from a local HTML file, so generation is disabled in preview mode. Keep the launcher window open while using the control center; closing it or running `停止每日新闻控制中心.cmd` stops the local service. History items ask the service to open the corresponding local HTML file safely.
 
 ### How a briefing is built
 
@@ -248,4 +248,4 @@ For internal design details, see [DESIGN.md](DESIGN.md) and [docs/ARCHITECTURE.m
 
 ## Version and license
 
-Current release: **2.2.3**. A project license has not yet been selected; choosing and adding `LICENSE` is a release requirement for 2.3. Until then, the absence of a license means no additional reuse rights are granted by default.
+Current release: **2.2.4**. A project license has not yet been selected; choosing and adding `LICENSE` is a release requirement for 2.3. Until then, the absence of a license means no additional reuse rights are granted by default.

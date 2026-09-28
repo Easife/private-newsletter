@@ -4,6 +4,8 @@ import argparse
 import json
 import logging
 import mimetypes
+import os
+import os
 import re
 import shutil
 import sys
@@ -375,11 +377,33 @@ def _recent_newsletters(config: AppConfig, limit: int = 20) -> list[dict[str, An
                 "edition": int(edition),
                 "name": path.name,
                 "url": f"/archive/{relative}",
+                "path": relative,
+                "file_url": path.resolve().as_uri(),
                 "modified_at": datetime.fromtimestamp(path.stat().st_mtime).astimezone().isoformat(),
             }
         )
     entries.sort(key=lambda row: (row["date"], row["edition"]), reverse=True)
     return entries[:limit]
+
+
+def _resolve_archive_file(config: AppConfig, relative_value: str) -> Path:
+    archive = config.paths["archive"].resolve()
+    relative = Path(unquote(str(relative_value or "").strip()))
+    if not str(relative) or relative.is_absolute() or relative.suffix.lower() != ".html":
+        raise ValueError("归档路径无效")
+    target = (archive / relative).resolve()
+    target.relative_to(archive)
+    if not target.is_file():
+        raise FileNotFoundError(target)
+    return target
+
+
+def _open_local_archive(target: Path) -> None:
+    if sys.platform == "win32":
+        os.startfile(str(target))  # type: ignore[attr-defined]
+        return
+    if not webbrowser.open(target.as_uri()):
+        raise RuntimeError("无法调用默认浏览器")
 
 
 def _refresh_environment(state: ControlState) -> None:
@@ -534,10 +558,9 @@ class NewsletterHandler(BaseHTTPRequestHandler):
         if parsed.path.startswith("/archive/"):
             try:
                 config = load_config(self.server.state.config_dir)
-                archive = config.paths["archive"].resolve()
-                relative = Path(unquote(parsed.path[len("/archive/") :]))
-                target = (archive / relative).resolve()
-                target.relative_to(archive)
+                target = _resolve_archive_file(
+                    config, parsed.path[len("/archive/") :]
+                )
                 self._send_file(target, content_security_policy=ARCHIVE_CSP)
             except Exception:
                 self.send_error(HTTPStatus.NOT_FOUND)
@@ -560,6 +583,16 @@ class NewsletterHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/shutdown":
             self._send_json({"ok": True, "message": "控制中心正在停止"})
             threading.Thread(target=self.server.shutdown, daemon=True).start()
+            return
+        if parsed.path == "/api/archive/open":
+            try:
+                payload = self._json_body()
+                config = load_config(self.server.state.config_dir)
+                target = _resolve_archive_file(config, str(payload.get("path") or ""))
+                _open_local_archive(target)
+                self._send_json({"ok": True, "file_uri": target.as_uri()})
+            except Exception as exc:
+                self._send_json({"error": str(exc)}, 400)
             return
         if parsed.path == "/api/generate":
             try:

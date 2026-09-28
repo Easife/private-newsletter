@@ -5,7 +5,7 @@ title Private Newsletter Control Center
 set "PROJECT_ROOT=%~dp0"
 
 echo.
-echo   Private Newsletter 2.2.3
+echo   Private Newsletter 2.2.4
 echo   Starting the local control center...
 echo.
 
@@ -15,7 +15,7 @@ goto :end
 
 :failure
 echo.
-echo [STARTUP FAILED] Review the message above and logs\control-center.stderr.log.
+echo [STARTUP FAILED] Review the message above.
 pause
 exit /b 1
 

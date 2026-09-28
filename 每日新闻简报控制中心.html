@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Private Newsletter 控制中心</title>
-  <link rel="stylesheet" href="newsletter/ui/app.css">
+  <link rel="stylesheet" href="newsletter/ui/app.css?v=2.2.4">
 </head>
 <body>
   <div class="page-shell">
@@ -14,7 +14,7 @@
         <span><b>PRIVATE NEWSLETTER</b><small>本机简报控制台</small></span>
       </a>
       <div class="header-meta">
-        <span class="version" id="versionLabel">v2.2.3</span>
+        <span class="version" id="versionLabel">v2.2.4</span>
         <span class="state-pill state-idle" id="statePill"><i></i><span>准备就绪</span></span>
       </div>
     </header>
@@ -31,7 +31,7 @@
       <section class="first-steps" aria-label="正确启动与使用方式">
         <div class="step-label"><b>正确启动方式</b><span>不要直接双击 HTML 来生成简报</span></div>
         <div class="step-item"><span>1</span><div><b>双击运行启动器</b><small>打开根目录的“运行每日新闻.cmd”，无需管理员权限。</small></div></div>
-        <div class="step-item"><span>2</span><div><b>等待浏览器自动打开</b><small>首次会先准备便携 Python 和依赖；之后会直接进入本页。</small></div></div>
+        <div class="step-item"><span>2</span><div><b>等待浏览器自动打开</b><small>首次会先准备便携 Python 和依赖；使用期间请保持启动窗口打开。</small></div></div>
         <div class="step-item"><span>3</span><div><b>点击生成今日简报</b><small>确认环境检测后点击下方按钮；进度、成功或错误会实时显示。</small></div></div>
       </section>
 
@@ -231,6 +231,6 @@
       </div>
     </article>
   </template>
-  <script src="newsletter/ui/app.js" defer></script>
+  <script src="newsletter/ui/app.js?v=2.2.4" defer></script>
 </body>
 </html>
